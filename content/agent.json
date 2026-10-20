@@ -1,9 +1,9 @@
 {
-  "name": "Agent Name",
+  "name": "Cedrik",
   "title": "Real Estate Agent",
-  "bio": "",
-  "phone": "",
-  "email": "",
-  "languages": [],
-  "photo": ""
+  "bio": " Cedrik is an experienced real estate agent specializing in residential properties. He is dedicated to helping clients find their perfect home and providing exceptional service throughout the buying and selling process. lorem ipsum dolor sit amet." ,
+  "phone": "(514) 554 4444",
+  "email": "cedrik@example.com",
+  "languages": [ "English", "French" ],
+  "photo": "https://picsum.photos/seed/picsum/200/300"
 }
