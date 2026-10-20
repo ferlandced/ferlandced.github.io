@@ -23,3 +23,12 @@ a { color: var(--brand-primary); }
 .listing__facts { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; color: var(--brand-muted); }
 .listing__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 16px; }
 .listing__photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--brand-radius); }
+
+/* Agent profile (home page) */
+.profile { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.profile__photo { width: 200px; max-width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--brand-radius); }
+.profile__body { flex: 1 1 280px; min-width: 0; }
+.profile__name { margin: 0; }
+.profile__title { margin: 4px 0 16px; color: var(--brand-accent); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: .9rem; }
+.profile__contact { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 4px; color: var(--brand-muted); }
+.profile__loading { color: var(--brand-muted); margin: 0; }
