@@ -1,5 +1,6 @@
 /* global CMS, h, createClass */
 // Preview uses the site's real stylesheet (served under the /ced/ base path).
+CMS.registerPreviewStyle('https://fonts.googleapis.com/css2?family=Allura&family=Barlow+Condensed:wght@500;600&family=Manrope:wght@400;600;700&display=swap');
 CMS.registerPreviewStyle('/ced/css/site.css');
 
 var ListingPreview = createClass({
@@ -23,7 +24,7 @@ var ListingPreview = createClass({
         h('p', { className: 'listing__address' }, get('address') || ''),
         price != null && price !== '' ? h('p', { className: 'listing__price' }, '$' + Number(price).toLocaleString()) : null,
         h('ul', { className: 'listing__facts' }, facts.map(function (f, i) { return h('li', { key: i }, f); })),
-        h('div', {}, this.props.widgetFor('description')),
+        h('div', {}, this.props.widgetFor('body')),
         photos && photos.size ? h('div', { className: 'listing__photos' },
           photos.map(function (p, i) {
             var src = p && p.get ? p.get('image') : p;

@@ -1,0 +1,50 @@
+---
+layout: layouts/base.njk
+bodyClass: home
+permalink: /
+---
+<section class="hero" aria-label="{{ agent.name }}">
+  <div class="hero__panel hero__panel--main">
+    <img src="{{ home.hero_image or agent.photo }}" alt="{{ home.hero_image_alt }}" fetchpriority="high">
+  </div>
+  <div class="hero__panel hero__panel--side" aria-hidden="true">
+    {% if home.hero_image_secondary %}<img src="{{ home.hero_image_secondary }}" alt="">{% endif %}
+  </div>
+  <div class="hero__signature">
+    <span class="hero__initials" aria-hidden="true">{{ home.initials }}</span>
+    <h1 class="hero__name">{{ agent.name }}</h1>
+    <p class="hero__role">{{ home.subtitle or agent.title }}</p>
+  </div>
+</section>
+
+<main>
+  <section id="about" class="section">
+    <div class="container about">
+      {% if agent.photo %}<img class="about__photo" src="{{ agent.photo }}" alt="{{ agent.name }}" loading="lazy">{% endif %}
+      <div class="about__body">
+        <p class="eyebrow">{{ agent.title }}</p>
+        <h2>About {{ agent.name }}</h2>
+        {{ agent.bio | renderContent("md") | safe }}
+        <ul class="about__contact">
+          {% if agent.phone %}<li><a href="tel:{{ agent.phone | replace(' ', '') | replace('(', '') | replace(')', '') }}">{{ agent.phone }}</a></li>{% endif %}
+          {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
+          {% if agent.languages and agent.languages.length %}<li>Languages: {{ agent.languages | join(", ") }}</li>{% endif %}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2>Latest properties</h2>
+      {% if collections.listings.length %}
+      <div class="cards">
+        {% for item in collections.listings | head(6) %}{% include "partials/listing-card.njk" %}{% endfor %}
+      </div>
+      <p><a class="btn" href="/listings/">All properties</a></p>
+      {% else %}
+      <p class="muted">No properties listed yet.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>

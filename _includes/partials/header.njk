@@ -1,0 +1,10 @@
+<header class="site-header">
+  <a class="site-header__brand" href="/">
+    <img src="/images/logo-light.svg" alt="{{ agent.name }}" width="120" height="30">
+  </a>
+  <nav class="site-header__nav" aria-label="Main">
+    <a href="/#about">About</a>
+    <a href="/listings/">Properties</a>
+  </nav>
+  {% if agent.email %}<a class="btn btn--accent site-header__cta" href="mailto:{{ agent.email }}">{{ home.cta_label or "Contact" }}</a>{% endif %}
+</header>

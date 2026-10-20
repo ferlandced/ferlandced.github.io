@@ -1,34 +1,131 @@
-/* Site stylesheet (stub). Brand tokens are placeholders; admin/theme.css mirrors them. */
+/* ==========================================================================
+   Site stylesheet. Brand tokens first; change these to restyle everything.
+   admin/theme.css mirrors the colour/font tokens for the CMS chrome.
+   ========================================================================== */
 :root {
-  --brand-primary: #1f3a5f;
-  --brand-accent: #c9a227;
-  --brand-ink: #1d2433;
-  --brand-muted: #5b6475;
+  --brand-dark: #1b1b1b;          /* hero + header background */
+  --brand-primary: #1b1b1b;       /* headings, links */
+  --brand-accent: #d3202f;        /* CTA, status pills */
+  --brand-ink: #1d1d1f;
+  --brand-muted: #5f6368;
   --brand-surface: #ffffff;
-  --brand-bg: #f6f4ef;
-  --brand-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --brand-bg: #f5f4f1;
+  --brand-font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --brand-font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --brand-font-script: "Allura", cursive;
   --brand-radius: 6px;
-}
-* { box-sizing: border-box; }
-body { margin: 0; font-family: var(--brand-font); color: var(--brand-ink); background: var(--brand-bg); line-height: 1.55; }
-h1, h2, h3 { color: var(--brand-primary); line-height: 1.2; }
-a { color: var(--brand-primary); }
-.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
 
-/* Listing card, also used by the CMS preview template */
+  /* Hero geometry: x-positions of the diagonal edges (top / bottom), in % of width */
+  --hero-main-l-top: 38%;  --hero-main-l-bot: 50%;
+  --hero-main-r-top: 70%;  --hero-main-r-bot: 87%;
+  --hero-gap: 2.5%;        /* dark band between the two photos */
+  --hero-height: 100svh;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-height: 100svh; display: flex; flex-direction: column; font-family: var(--brand-font); color: var(--brand-ink); background: var(--brand-bg); line-height: 1.6; }
+img { max-width: 100%; display: block; }
+body > main { flex: 1 0 auto; }
+h1, h2, h3 { color: var(--brand-primary); line-height: 1.15; font-family: var(--brand-font-display); font-weight: 600; letter-spacing: .01em; }
+h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 16px; }
+a { color: var(--brand-primary); }
+.container { max-width: 1120px; margin: 0 auto; padding: 24px 16px; }
+.muted { color: var(--brand-muted); }
+.eyebrow { margin: 0 0 4px; color: var(--brand-accent); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+
+.btn { display: inline-block; padding: 10px 22px; border-radius: var(--brand-radius); background: var(--brand-dark); color: #fff; text-decoration: none; font-weight: 600; transition: transform .2s, filter .2s; }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
+.btn--accent { background: var(--brand-accent); }
+
+/* Header: transparent over the hero on the home page, solid elsewhere */
+.site-header { position: absolute; inset: 0 0 auto 0; z-index: 10; display: flex; align-items: center; gap: 32px; padding: 20px clamp(16px, 3vw, 40px); }
+.page .site-header { position: static; background: var(--brand-dark); }
+.site-header__brand img { width: 120px; height: auto; }
+.site-header__nav { display: flex; gap: 28px; margin-left: auto; }
+.site-header__nav a { color: #fff; text-decoration: none; font-weight: 600; text-shadow: 0 1px 8px rgba(0,0,0,.35); }
+.site-header__nav a:hover { color: var(--brand-accent); }
+
+/* ==========================================================================
+   Hero: dark canvas, two diagonal photo panels, signature bottom-left
+   ========================================================================== */
+.hero { position: relative; height: var(--hero-height); min-height: 560px; background: var(--brand-dark); overflow: hidden; color: #fff; }
+/* Top shade so the nav stays readable over bright photos */
+.hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 180px; z-index: 1; background: linear-gradient(rgba(0,0,0,.55), transparent); pointer-events: none; }
+.hero__panel { position: absolute; inset: 0; overflow: hidden; }
+.hero__panel img { width: 100%; height: 100%; object-fit: cover; }
+.hero__panel--main { clip-path: polygon(var(--hero-main-l-top) 0, var(--hero-main-r-top) 0, var(--hero-main-r-bot) 100%, var(--hero-main-l-bot) 100%); }
+.hero__panel--main img { object-position: 60% 20%; }
+.hero__panel--side { clip-path: polygon(calc(var(--hero-main-r-top) + var(--hero-gap)) 0, 100% 0, 100% 100%, calc(var(--hero-main-r-bot) + var(--hero-gap)) 100%); }
+.hero__panel--side img { position: absolute; inset: 0 0 0 auto; width: 40%; }
+.hero__signature { position: absolute; left: clamp(16px, 8vw, 160px); bottom: clamp(48px, 10vh, 120px); z-index: 2; }
+.hero__initials { display: block; font-family: var(--brand-font-script); font-size: clamp(6rem, 13vw, 11rem); line-height: .6; padding-left: .12em; }
+.hero__name { margin: 0 0 0 clamp(40px, 4vw, 72px); color: #fff; font-size: clamp(1.6rem, 2.6vw, 2.4rem); text-transform: uppercase; letter-spacing: .02em; }
+.hero__role { margin: 0 0 0 clamp(20px, 3vw, 56px); font-family: var(--brand-font-display); font-size: clamp(1rem, 1.5vw, 1.35rem); opacity: .9; }
+
+/* Intro: panels wipe in, signature rises */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__panel--main { animation: wipe-in 1.1s cubic-bezier(.2,.7,.2,1) both; }
+  .hero__panel--side { animation: wipe-in 1.1s .15s cubic-bezier(.2,.7,.2,1) both; }
+  .hero__signature  { animation: rise-in .9s .5s cubic-bezier(.2,.7,.2,1) both; }
+}
+@keyframes wipe-in { from { opacity: 0; translate: 6% 0; } }
+@keyframes rise-in { from { opacity: 0; translate: 0 24px; } }
+
+/* Parallax: scroll-driven animations (Chrome, Edge, Safari 26+). Other browsers get a static hero. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__panel img, .hero__signature > * {
+      animation: parallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+    .hero__panel--main img { --parallax-y: 18%; }
+    .hero__panel--side img { --parallax-y: 32%; }
+    .hero__signature > *   { --parallax-y: -60%; }
+  }
+}
+@keyframes parallax {
+  from { transform: translateY(0) scale(1.08); }
+  to   { transform: translateY(var(--parallax-y, 15%)) scale(1.08); }
+}
+
+/* Phones: one diagonal photo on top, signature underneath */
+@media (max-width: 720px) {
+  .site-header__nav { display: none; }
+  .site-header__cta { margin-left: auto; }
+  .hero { --hero-height: 92svh; }
+  .hero__panel--main { clip-path: polygon(0 0, 100% 0, 100% 58%, 0 72%); }
+  .hero__panel--side { display: none; }
+  .hero__signature { left: 16px; right: 16px; bottom: 32px; }
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+.section { padding: clamp(32px, 6vw, 72px) 0; }
+.section--alt { background: var(--brand-surface); }
+.about { display: flex; flex-wrap: wrap; gap: clamp(24px, 4vw, 56px); align-items: flex-start; }
+.about__photo { width: 280px; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: var(--brand-radius); }
+.about__body { flex: 1 1 320px; min-width: 0; }
+.about__contact { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 4px; color: var(--brand-muted); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-bottom: 24px; }
+.card { display: block; background: var(--brand-surface); border-radius: var(--brand-radius); overflow: hidden; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: transform .2s, box-shadow .2s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+.card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #ddd; }
+.card__body { padding: 16px; }
+.card__title { margin: 8px 0 2px; font-size: 1.3rem; }
+.card__meta { margin: 0; color: var(--brand-muted); }
+.card__price { margin: 6px 0 0; font-weight: 700; }
+
+.site-footer { background: var(--brand-dark); color: rgba(255,255,255,.75); font-size: .9rem; }
+
+/* Listing page, also used by the CMS preview template */
 .listing { background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.listing__status { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--brand-accent); color: #fff; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.listing__status { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--brand-accent); color: #fff; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 .listing__address { color: var(--brand-muted); margin-top: -8px; }
 .listing__price { font-size: 1.5rem; font-weight: 700; color: var(--brand-primary); }
 .listing__facts { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; color: var(--brand-muted); }
 .listing__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 16px; }
 .listing__photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--brand-radius); }
-
-/* Agent profile (home page) */
-.profile { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.profile__photo { width: 200px; max-width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--brand-radius); }
-.profile__body { flex: 1 1 280px; min-width: 0; }
-.profile__name { margin: 0; }
-.profile__title { margin: 4px 0 16px; color: var(--brand-accent); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: .9rem; }
-.profile__contact { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 4px; color: var(--brand-muted); }
-.profile__loading { color: var(--brand-muted); margin: 0; }

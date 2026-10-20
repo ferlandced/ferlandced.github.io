@@ -1,0 +1,16 @@
+---
+layout: layouts/base.njk
+title: Properties
+bodyClass: page
+permalink: /listings/
+---
+<main class="container">
+  <h1>Properties</h1>
+  {% if collections.listings.length %}
+  <div class="cards">
+    {% for item in collections.listings %}{% include "partials/listing-card.njk" %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">No properties listed yet.</p>
+  {% endif %}
+</main>

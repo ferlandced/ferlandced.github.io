@@ -1,0 +1,25 @@
+---
+layout: layouts/base.njk
+bodyClass: page
+---
+<main class="container">
+  <p><a href="/listings/">← All properties</a></p>
+  <article class="listing">
+    {% if status %}<span class="listing__status">{{ status }}</span>{% endif %}
+    <h1>{{ title }}</h1>
+    <p class="listing__address">{{ address }}</p>
+    {% if price !== undefined %}<p class="listing__price">{{ price | money }}</p>{% endif %}
+    <ul class="listing__facts">
+      {% if bedrooms %}<li>{{ bedrooms }} bd</li>{% endif %}
+      {% if bathrooms %}<li>{{ bathrooms }} ba</li>{% endif %}
+      {% if area %}<li>{{ area }} sq ft</li>{% endif %}
+      {% if neighbourhood %}<li>{{ neighbourhood }}</li>{% endif %}
+    </ul>
+    {{ content | safe }}
+    {% if photos and photos.length %}
+    <div class="listing__photos">
+      {% for p in photos %}<img src="{{ p }}" alt="" loading="lazy">{% endfor %}
+    </div>
+    {% endif %}
+  </article>
+</main>

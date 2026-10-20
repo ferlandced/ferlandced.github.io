@@ -5,9 +5,10 @@ backend:
   branch: main
   # No `repo`: Turbo uses the repo set in the Turbo dashboard.
 
-# Uploads are committed to /images/uploads; the site is served under the /ced/ base path.
+# Uploads are committed to /images/uploads. public_folder has no /ced prefix:
+# the Eleventy build adds pathPrefix to every URL in the generated HTML.
 media_folder: images/uploads
-public_folder: /ced/images/uploads
+public_folder: /images/uploads
 
 # Header + login logo. `logo` supersedes the deprecated `logo_url`; only `logo` can show in the header.
 logo:
@@ -17,6 +18,22 @@ site_url: https://matteougolini.net/ced/
 display_url: https://matteougolini.net/ced/
 
 collections:
+  # Home page hero (read by index.njk as `home`).
+  - name: home
+    label: Home page
+    files:
+      - name: hero
+        label: Hero
+        file: content/home.json
+        format: json
+        fields:
+          - { name: initials, label: "Signature initials", widget: string, hint: "Shown large in the script font" }
+          - { name: subtitle, label: Subtitle, widget: string }
+          - { name: hero_image, label: "Main photo", widget: image }
+          - { name: hero_image_alt, label: "Main photo description", widget: string, required: false }
+          - { name: hero_image_secondary, label: "Side photo", widget: image, required: false }
+          - { name: cta_label, label: "Contact button label", widget: string, default: "Contact me" }
+
   # a) Agent profile. Placeholder fields; adjust to the real site.
   - name: agent
     label: Agent profile
@@ -39,8 +56,8 @@ collections:
     label: Listings
     label_singular: Listing
     folder: content/listings
-    format: json
-    extension: json
+    format: frontmatter
+    extension: md
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     summary: "{{title}} · {{status}}"
@@ -54,10 +71,10 @@ collections:
       - { name: bathrooms, label: Bathrooms, widget: number, value_type: float, min: 0, step: 0.5, required: false }
       - { name: area, label: "Area (sq ft)", widget: number, value_type: int, min: 0, required: false }
       - { name: status, label: Status, widget: select, options: [available, under offer, sold, rented], default: available }
-      - { name: description, label: Description, widget: markdown, required: false }
       - name: photos
         label: Photos
         widget: list
         required: false
         field: { name: image, label: Image, widget: image }
       - { name: published, label: Published date, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { name: body, label: Description, widget: markdown, required: false }

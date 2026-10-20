@@ -7,15 +7,15 @@
  * Brand tokens below mirror css/site.css and are placeholders until real brand values exist.
  */
 :root {
-  --cms-primary: #1f3a5f;
+  --cms-primary: #1b1b1b;
   --cms-primary-ink: #ffffff;
-  --cms-accent: #c9a227;
+  --cms-accent: #d3202f;
   --cms-ink: #1d2433;
   --cms-muted: #5b6475;
-  --cms-bg: #f6f4ef;
+  --cms-bg: #f5f4f1;
   --cms-surface: #ffffff;
   --cms-border: #dcd8ce;
-  --cms-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --cms-font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --cms-radius: 6px;
 }
 
