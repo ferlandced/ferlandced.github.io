@@ -13,8 +13,8 @@ public_folder: /ced/images/uploads
 logo:
   src: /ced/images/logo.svg
   show_in_header: true
-site_url: https://mt81.github.io/ced/
-display_url: https://mt81.github.io/ced/
+site_url: https://matteougolini.net/ced/
+display_url: https://matteougolini.net/ced/
 
 collections:
   # a) Agent profile. Placeholder fields; adjust to the real site.
