@@ -1,0 +1,63 @@
+# Decap CMS config. Served at https://mt81.github.io/ced/admin/
+backend:
+  name: turbo-github
+  turbo_site_id: 22f1b961-cfd9-45c3-9abf-f120a44b4ac5
+  branch: main
+  # No `repo`: Turbo uses the repo set in the Turbo dashboard.
+
+# Uploads are committed to /images/uploads; the site is served under the /ced/ base path.
+media_folder: images/uploads
+public_folder: /ced/images/uploads
+
+# Header + login logo. `logo` supersedes the deprecated `logo_url`; only `logo` can show in the header.
+logo:
+  src: /ced/images/logo.svg
+  show_in_header: true
+site_url: https://mt81.github.io/ced/
+display_url: https://mt81.github.io/ced/
+
+collections:
+  # a) Agent profile. Placeholder fields; adjust to the real site.
+  - name: agent
+    label: Agent profile
+    files:
+      - name: profile
+        label: Profile
+        file: content/agent.json
+        format: json
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: title, label: Title, widget: string, required: false }
+          - { name: bio, label: Bio, widget: markdown, required: false }
+          - { name: phone, label: Phone, widget: string, required: false }
+          - { name: email, label: Email, widget: string, required: false, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Must be an email address'] }
+          - { name: languages, label: Languages, widget: list, required: false }
+          - { name: photo, label: Photo, widget: image, required: false }
+
+  # b) Listings. Placeholder fields; adjust to the real site.
+  - name: listings
+    label: Listings
+    label_singular: Listing
+    folder: content/listings
+    format: json
+    extension: json
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{title}} · {{status}}"
+    sortable_fields: [published, title, price]
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: address, label: Address, widget: string }
+      - { name: neighbourhood, label: Neighbourhood, widget: string, required: false }
+      - { name: price, label: Price, widget: number, value_type: int, min: 0 }
+      - { name: bedrooms, label: Bedrooms, widget: number, value_type: int, min: 0, required: false }
+      - { name: bathrooms, label: Bathrooms, widget: number, value_type: float, min: 0, step: 0.5, required: false }
+      - { name: area, label: "Area (sq ft)", widget: number, value_type: int, min: 0, required: false }
+      - { name: status, label: Status, widget: select, options: [available, under offer, sold, rented], default: available }
+      - { name: description, label: Description, widget: markdown, required: false }
+      - name: photos
+        label: Photos
+        widget: list
+        required: false
+        field: { name: image, label: Image, widget: image }
+      - { name: published, label: Published date, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }

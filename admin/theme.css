@@ -1,0 +1,76 @@
+/*
+ * Decap CMS admin chrome overrides.
+ *
+ * BEST-EFFORT: Decap renders with Emotion (hashed class names), so these rules target only
+ * stable hooks: element tags, aria-* / data-* / role attributes and #nc-root.
+ * Verified against decap-cms@3.17.1. Re-check after every Decap upgrade; may need rework.
+ * Brand tokens below mirror css/site.css and are placeholders until real brand values exist.
+ */
+:root {
+  --cms-primary: #1f3a5f;
+  --cms-primary-ink: #ffffff;
+  --cms-accent: #c9a227;
+  --cms-ink: #1d2433;
+  --cms-muted: #5b6475;
+  --cms-bg: #f6f4ef;
+  --cms-surface: #ffffff;
+  --cms-border: #dcd8ce;
+  --cms-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --cms-radius: 6px;
+}
+
+/* Base */
+body,
+#nc-root,
+#nc-root button,
+#nc-root input,
+#nc-root select,
+#nc-root textarea {
+  font-family: var(--cms-font);
+}
+body { background: var(--cms-bg); color: var(--cms-ink); }
+
+/* Top app header */
+#nc-root header {
+  border-bottom: 3px solid var(--cms-accent);
+}
+#nc-root header nav a { color: var(--cms-muted); }
+#nc-root header nav a[aria-current="page"],
+#nc-root header nav a:hover { color: var(--cms-primary); }
+
+/* Sidebar collection links (data-testid = collection name) */
+#nc-root aside a[data-testid][aria-current="page"],
+#nc-root aside a[data-testid].active {
+  color: var(--cms-primary);
+  border-left-color: var(--cms-primary);
+}
+#nc-root aside a[data-testid]:hover { color: var(--cms-primary); }
+
+/* Headings */
+#nc-root h1,
+#nc-root h2 { color: var(--cms-primary); }
+
+/* Editor form */
+#nc-root label { border-radius: var(--cms-radius) var(--cms-radius) 0 0; }
+#nc-root input:not([type="checkbox"]):not([type="radio"]),
+#nc-root select,
+#nc-root textarea {
+  border-radius: 0 var(--cms-radius) var(--cms-radius) var(--cms-radius);
+}
+#nc-root input:focus,
+#nc-root select:focus,
+#nc-root textarea:focus {
+  outline: 2px solid var(--cms-accent);
+  outline-offset: 1px;
+}
+
+/* Buttons: soften radius everywhere; brand the login button on the login screen */
+#nc-root button { border-radius: var(--cms-radius); }
+#nc-root > div > section button,
+#nc-root button[type="submit"] {
+  background-color: var(--cms-primary);
+  color: var(--cms-primary-ink);
+}
+
+/* Preview pane frame */
+#nc-root iframe { background: var(--cms-bg); }

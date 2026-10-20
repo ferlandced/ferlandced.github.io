@@ -1,0 +1,25 @@
+/* Site stylesheet (stub). Brand tokens are placeholders; admin/theme.css mirrors them. */
+:root {
+  --brand-primary: #1f3a5f;
+  --brand-accent: #c9a227;
+  --brand-ink: #1d2433;
+  --brand-muted: #5b6475;
+  --brand-surface: #ffffff;
+  --brand-bg: #f6f4ef;
+  --brand-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --brand-radius: 6px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--brand-font); color: var(--brand-ink); background: var(--brand-bg); line-height: 1.55; }
+h1, h2, h3 { color: var(--brand-primary); line-height: 1.2; }
+a { color: var(--brand-primary); }
+.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+/* Listing card, also used by the CMS preview template */
+.listing { background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.listing__status { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--brand-accent); color: #fff; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.listing__address { color: var(--brand-muted); margin-top: -8px; }
+.listing__price { font-size: 1.5rem; font-weight: 700; color: var(--brand-primary); }
+.listing__facts { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; color: var(--brand-muted); }
+.listing__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 16px; }
+.listing__photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--brand-radius); }
