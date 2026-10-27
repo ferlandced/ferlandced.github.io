@@ -2,10 +2,9 @@
    Site stylesheet. Colours and fonts come from css/tokens.css (loaded first).
    Only layout variables live here.
 
-   Breakpoints (Bootstrap values, plain media queries):
+   Breakpoints: two layouts only.
      phone          < 768px
-     tablet portrait 768px to 991px   (md)
-     desktop        >= 992px          (lg, xl)
+     desktop        >= 768px
      very large     >= 1400px         (xxl): content capped at --wrap-max, colour bleeds to the edge
    ========================================================================== */
 
@@ -15,7 +14,10 @@
 :root {
   --gutter: 16px;
   --wrap-max: 1320px;
-  --wrap: min(var(--wrap-max), 100vw - 2 * var(--gutter));  /* viewport-based twin of .container width, for transforms */
+  /* Content is aligned left: it starts at --wrap-left from the screen edge (gutter, plus the logo shift
+     on desktop) and is at most --wrap-max wide. Extra space on wide screens goes to the right. */
+  --wrap-left: calc(var(--gutter) + var(--brand-shift, 0px));
+  --wrap: min(var(--wrap-max), 100vw - var(--wrap-left) - var(--gutter));  /* viewport-based twin of .container width, for transforms */
 
   --header-h: 64px;          /* initial header height */
   --header-h-compact: 64px;  /* after scrolling */
@@ -27,8 +29,8 @@
   /* Fine grain (SVG noise, light speckle) laid over a solid colour for a textured surface */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (min-width: 768px) { :root { --gutter: 24px; --header-h: 80px; --logo-h: 72px; } }
-@media (min-width: 992px) { :root { --header-h: 96px; --logo-h: 80px; } }
+@media (min-width: 768px) { :root { --gutter: 24px; --header-h: 80px; --logo-h: 72px; --brand-shift: clamp(24px, 6vw, 120px); } }   /* logo and agent sit a bit right of the content edge */
+@media (min-width: 992px) { :root { --header-h: 112px; --logo-h: 104px; --logo-shift: clamp(40px, 8vw, 200px); } }   /* larger header only; layout is desktop from 768px */
 
 * { box-sizing: border-box; }
 html { scroll-padding-top: calc(var(--header-h-compact) + 8px); }
@@ -44,7 +46,7 @@ h1, h2, h3 { color: var(--brand-primary); line-height: 1.15; font-weight: var(--
 h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 24px; }
 a { color: var(--brand-link); text-underline-offset: .15em; }
 a:hover { color: var(--brand-link-hover); }
-.container { width: min(var(--wrap-max), 100% - 2 * var(--gutter)); margin-inline: auto; padding-block: 24px; }
+.container { width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); margin-right: auto; padding-block: 24px; }
 .muted { color: var(--brand-muted); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
@@ -59,7 +61,8 @@ a:hover { color: var(--brand-link-hover); }
   position: fixed; inset: 0 0 auto 0; z-index: 100;
   height: var(--header-h);
   display: flex; align-items: center; gap: 24px;
-  padding-inline: max(var(--gutter), (100% - var(--wrap-max)) / 2);
+  /* The logo (and the agent under it) sit --logo-shift further right than the content */
+  padding-inline: calc(var(--wrap-left) + var(--logo-shift, 0px)) var(--gutter);
   background: transparent;
 }
 /* Inner pages have no hero behind the header, so it stays white there */
@@ -109,7 +112,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 [data-open] .nav-toggle__bars::before { transform: translateY(7px) rotate(45deg); }
 [data-open] .nav-toggle__bars::after { transform: translateY(-7px) rotate(-45deg); }
 
-@media (max-width: 991.98px) {
+@media (max-width: 767.98px) {
   .js-nav .nav-toggle { display: block; }
   .js-nav .site-nav {
     display: none; position: absolute; inset: 100% 0 auto 0;
@@ -177,10 +180,15 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   /* Geometry shared by the hero, the travelling photo and About.
      Horizontal positions are offsets from the page centre. */
   --hero-h: clamp(560px, 100svh, 960px);
-  --photo-h: min(var(--hero-h) * 1.2, var(--wrap) * .75);
+  --photo-h: calc(var(--hero-h) * .85);   /* photo top at 15%; with its built-in margin his head starts near 25% */
   --photo-w: calc(var(--photo-h) * .5623);               /* portrait cut-out; other ratios are contained */
-  --band-x: calc(200px - var(--wrap) * .18);             /* band bottom-left corner */
-  --photo-x: calc(var(--band-x) - var(--photo-w) * .37); /* photo left edge: the body runs under the band */
+  /* Agent: head centred under the REMAX logo (logo centre ≈ one logo height from the content's left edge) */
+  --photo-x: calc(var(--wrap-left) + var(--logo-shift, 0px) - 50vw + var(--logo-h) - var(--photo-w) / 2);
+  /* Slash: placed from the agent so it always passes just right of his hands. Hands reach about 88% of
+     the photo's width, about 12% of its height above the bottom; the line leans right as it rises. */
+  --band-x: calc(var(--photo-x) + var(--photo-w) * .8 - var(--photo-h) * .12 * tan(var(--slash-angle)));   /* crosses his right arm, hands stay clear */
+  --red-w: 10px;                            /* Primary Red line: fixed on every screen */
+  --dark-w: 5px;                            /* Dark Red line, half as wide */
   --band-w: clamp(48px, 5vw, 80px);
   --name-size: clamp(1.25rem, 1.8vw, 2rem);
   --sig-w: clamp(88px, 8vw, 140px);                      /* kept smaller than the header logo */
@@ -195,7 +203,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   --frame-top: calc(var(--about-top) + 24px);             /* section padding + container padding */
   --frame-h: calc(var(--hero-h) - var(--frame-top) - var(--about-pad));
   --frame-w: calc(var(--frame-h) * 9 / 16);
-  --frame-x: calc(var(--wrap) / -2);                      /* card left edge, from the page centre */
+  --frame-x: calc(var(--wrap-left) - 50vw);                /* card left edge, from the page centre */
   --pose-h: var(--frame-h);
   --pose-w: calc(var(--pose-h) * .5623);
 }
@@ -210,7 +218,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   transform: skewX(calc(var(--slash-angle) * -1)); transform-origin: bottom left;
   background: linear-gradient(90deg, var(--brand-surface) 50%, var(--brand-hero-tone));
 }
-.hero__inner { position: relative; z-index: 2; height: 100%; width: min(var(--wrap-max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.hero__inner { position: relative; z-index: 2; height: 100%; width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); }
 
 /* The text may overlap the photo's transparent left margin, so it sits above the photo */
 /* Sits in the lower part of the hero */
@@ -247,13 +255,21 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   background: linear-gradient(90deg, var(--color-dark-red), color-mix(in srgb, var(--color-primary-red) 0%, transparent));
 }
 /* The picture starts under the dark band so nothing white shows through the fade */
-.hero__side { clip-path: polygon(calc(var(--R) + var(--S)) 0, 100% 0, 100% 100%, var(--R) 100%); }
-.hero__side img { position: absolute; inset: 0 0 0 var(--R); width: calc(100% - var(--R)); max-width: none; height: 100%; object-fit: cover; }
+/* Side image: fills everything left of the red line (the stripe sits on top of its edge) */
+/* Side image: fills everything right of the lines */
+.hero__side { clip-path: polygon(calc(var(--E) + var(--S) - 1px) 0, 100% 0, 100% 100%, calc(var(--E) - 1px) 100%); }
+/* Fitted to the hero height at its own proportions, starting at the lines. If it is too narrow to reach
+   the right edge, its right side fades into black. */
+.hero__side { background: var(--color-black); }
+.hero__side img { position: absolute; top: 0; bottom: 0; left: var(--E); width: auto; height: 100%; max-width: none;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 25%); mask-image: linear-gradient(to left, transparent, #000 25%); }
+/* Wide enough: the fade falls off-screen; when it cannot, the black shows past the image */
+.hero__stripe--red { z-index: 1; }
 
 /* Phones and tablet portrait (wireframe): agent in the top half, a short slash band across the
    middle, signature block right-aligned at the bottom right. The photo is cut along the band's
    red stripe, so the agent stays on his side of the slash. */
-@media (max-width: 991.98px) {
+@media (max-width: 767.98px) {
   .stage {
     --hero-h: clamp(560px, 100svh, 900px);
     --photo-h: min(var(--hero-h) * .62, var(--wrap) * 1.25);
@@ -298,7 +314,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   .hero__band { inset: 0; height: auto; z-index: 0; --band-h: var(--hero-h); --L: 50%; --band-w: 56px; }
   .hero__side { display: block; clip-path: none; }
   .hero__stripe--red { z-index: 1; }   /* above the full-size photo */
-  .hero__side img { inset: 0; width: 100%; }
+  .hero__side img { inset: 0; left: 0; width: 100%; object-fit: cover; -webkit-mask-image: none; mask-image: none; }
   /* Red stripe from the bottom centre; Dark Red fills everything to its right, no fade */
   .hero__stripe--dark { inset: 0; width: auto; transform: none; background: var(--color-dark-red);
     clip-path: polygon(calc(var(--R) + var(--S)) 0, calc(var(--R) + var(--S) + 100vw) 0, calc(var(--R) + 100vw) 100%, var(--R) 100%); }
@@ -312,6 +328,62 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   .contact-icons--hero a { color: var(--brand-on-dark); }
 }
 
+/* Desktop: agent on white at the left, two thin lines (Primary Red, then Dark Red), and the side
+   image on the right. The name block sits on the image, right-aligned, white over a dark scrim.
+   The header keeps the black logo on the white side; the menu sits on the image in white. */
+@media (min-width: 768px) {
+  /* Order: agent and travelling copy (3, behind), side image + lines (4), scrim (5), text (6) */
+  .hero__figure { z-index: 3; }
+  .hero__band { --R: calc(var(--L) + var(--red-w)); --E: calc(var(--R) + var(--dark-w)); }
+  .hero__stripe--dark { background: var(--color-dark-red); }
+  .hero { background-color: var(--brand-surface); }
+  /* Scrim: only over the image, dark at the bottom (name block) and along the top (menu) */
+  .hero::before { --x0: calc(50% + var(--band-x) + var(--red-w) + var(--dark-w));
+    left: 0; width: 100%; transform: none; z-index: 5;
+    clip-path: polygon(calc(var(--x0) + var(--S)) 0, 100% 0, 100% 100%, var(--x0) 100%);
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--color-black) 50%, transparent), transparent 180px),   /* menu */
+                linear-gradient(to top, color-mix(in srgb, var(--color-black) 65%, transparent), color-mix(in srgb, var(--color-black) 30%, transparent) 45%, transparent 75%); }
+  .hero__inner { z-index: 6; }
+  /* Just right of the lines, next to the agent, text aligned left. The block's left edge follows
+     the slash at the block's top height (about 300px above its bottom). Offsets are from .hero__inner. */
+  .hero__id { --id-bottom: clamp(48px, 14%, 160px);
+    left: calc(max(50vw + var(--band-x) + var(--red-w) + var(--dark-w) + (var(--hero-h) * .14 + 300px) * tan(var(--slash-angle)) + 40px,
+                   50vw + var(--photo-x) + var(--photo-w) + 24px) - var(--wrap-left));   /* clear of both the lines and the agent */
+    right: auto; bottom: var(--id-bottom); max-width: 34rem; text-align: left; }
+  .hero__signature { margin-left: 0; filter: invert(1); }
+  .contact-icons--hero { justify-content: flex-start; margin: 16px 0 0 -12px; }
+  .hero__id, .hero__name, .hero__role, .hero__agency, .contact-icons--hero a { color: var(--brand-on-dark); }
+
+  /* Header: menu on the right, next to the icons and language; language without its white chip */
+  .site-nav { margin-left: auto; }
+  .site-header__tools { margin-left: 0; }
+  /* Icons take no space until they appear, so the menu sits right next to EN at the top */
+  .contact-icons--header { display: none; }
+  [data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { display: flex; }
+  .lang-switch { background: none; }
+  body.home .site-header { transition: background-color .3s; }
+  body.home .site-header[data-scrolled] { background: var(--brand-surface); }
+  body.home .site-header:not([data-scrolled]) .site-nav a:not(.btn),
+  body.home .site-header:not([data-scrolled]) .lang-switch { color: var(--brand-on-dark); }
+}
+
+/* Portrait tablet (768-991px): a slightly smaller
+   agent, the name block lower and closer to the slash, and a plain white header with a black menu. */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .stage {
+    --photo-h: calc(var(--hero-h) * .7);
+  }
+}
+/* Up to 1199px the menu would cross the slash, so the header is plain white with a black menu */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .hero__id { --id-bottom: 40px; max-width: 18rem;
+    left: calc(50vw + var(--band-x) + var(--red-w) + var(--dark-w) + 260px * tan(var(--slash-angle)) + 24px - var(--wrap-left)); }
+  .hero__name { font-size: 1.125rem; }
+  body.home .site-header, body.home .site-header:not([data-scrolled]) { background: var(--brand-surface); }
+  body.home .site-header:not([data-scrolled]) .site-nav { gap: 24px; padding: 0; background: none; }
+  body.home .site-header .site-nav a:not(.btn), body.home .site-header .lang-switch { color: var(--brand-ink) !important; }
+}
+
 /* ==========================================================================
    About: white. The agent photo travels into the About card from the hero.
    ========================================================================== */
@@ -323,7 +395,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .about__card { display: flex; align-items: flex-end; justify-content: center; overflow: hidden; width: var(--frame-w); height: var(--frame-h); background: var(--color-charcoal) var(--grain) 0 0 / 180px; }
 .about__card[style] { background-size: cover; background-position: center; }
 .about__card img { height: 100%; width: auto; max-width: none; }
-@media (max-width: 991.98px) {
+@media (max-width: 767.98px) {
   .about__inner { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
   .about__card { justify-self: center; }
 }
@@ -424,19 +496,15 @@ body:not(.home) .site-header { background: var(--brand-surface); }
     /* About text slides in from the right as it enters */
     .about__body { animation: slide-in-right linear both; animation-timeline: view(); animation-range: entry 10% entry 80%; }
 
-    @media (min-width: 992px) {
+    @media (min-width: 768px) {
       /* Header compacts over the first 160px of scroll */
       .site-header { animation: header-compact linear both; animation-timeline: scroll(root); animation-range: 0 160px; }
-      /* Hero: band and side image slide out to the right, signature block fades and lifts */
-      /* The whole band (red stripe, dark fade and side picture) slides out together */
-      .hero__band { animation: side-out linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+      /* Side image, red lines and scrim ease out to the right together while fading */
+      .hero__band, .hero::before { animation: image-out cubic-bezier(.33, 1, .68, 1) both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+      /* The name block fades and lifts */
       .hero__id { animation: id-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .6); }
-      /* Base is white so nothing gray is uncovered as the gradient slides away (the panorama covers the right side) */
-      .hero { background-color: var(--brand-surface); }
-      /* The gray gradient slides right with the band while it fades out */
-      .hero::before { animation: gradient-out linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
     }
-    @media (max-width: 991.98px) {
+    @media (max-width: 767.98px) {
       /* Signature block, band and gray fade out during the first half while the agent travels */
       .hero__id { animation: id-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .4); }
       .hero__band { animation: gradient-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .5); }
@@ -450,6 +518,10 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 @keyframes header-compact { to { --logo-h: 60px; height: var(--header-h-compact); } }
 @keyframes slide-in-right { from { opacity: 0; translate: 40vw 0; } }
 @keyframes side-out { to { translate: 60vw 0; } }
+@keyframes side-out-left { to { translate: -150vw 0; opacity: 0; } }
+@keyframes image-out { to { translate: 35vw 0; opacity: 0; } }
+@keyframes scrim-out { to { translate: -80vw 0; opacity: 0; } }
+@keyframes hero-bg-out { to { background-color: var(--brand-surface); } }
 @keyframes gradient-out { to { translate: 60vw 0; opacity: 0; } }
 @keyframes fade-out { to { opacity: 0; } }
 @keyframes id-out { to { opacity: 0; translate: 0 -80px; } }
@@ -476,7 +548,9 @@ body:not(.home) .site-header { background: var(--brand-surface); }
     /* Hold: the section keeps scrolling during the last 10%, so its content is offset by that same
        distance and sits still in its final place from 90% on, level with the pinned card */
     .about__inner { animation: about-hold linear both; animation-timeline: scroll(root); animation-range: var(--motion-end) var(--hero-h); }
-    @media (min-width: 992px) {
+    @media (min-width: 768px) {
+      /* The travelling agent starts behind the lines and photo, like the hero photo */
+      .stage__track { z-index: 3; }
       /* Text slides in from the right during the second half of the scroll */
       .about__body { animation-timeline: scroll(root); animation-range: calc(var(--hero-h) * .5) var(--motion-end); }
     }
@@ -485,7 +559,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
       .about__card { visibility: visible; }
       .about__inner { animation: none; }
     }
-    @media (max-width: 991.98px) {
+    @media (max-width: 767.98px) {
       /* The copy starts cut along the slash like the hero photo; the cut opens as the band fades */
       .stage__agent { animation: agent-to-about linear both, agent-uncut linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--motion-end), 0 calc(var(--hero-h) * .5); }
     }

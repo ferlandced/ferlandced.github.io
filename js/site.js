@@ -39,3 +39,13 @@
   }, { rootMargin: `-${header.offsetHeight}px 0px 0px 0px` });
   io.observe(hero);
 })();
+
+// Desktop header: switches from the cream logo over the hero photo to the dark logo on white as
+// soon as the page scrolls, because the photo slides away immediately.
+(() => {
+  const header = document.querySelector(".site-header");
+  if (!header) return;
+  const update = () => header.toggleAttribute("data-scrolled", window.scrollY > 24);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+})();
