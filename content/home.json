@@ -2,6 +2,7 @@
   "signature": "/images/signature.svg",
   "hero_photo": "/images/cedrik.webp",
   "hero_photo_alt": "Cedrik Ferland",
-  "side_image": "/images/OhHappyGays.jpg",
-  "side_image_alt": ""
+  "side_image": "/images/pannorama.jpg",
+  "side_image_alt": "",
+  "about_backdrop": ""
 }

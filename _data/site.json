@@ -8,5 +8,20 @@
     "fr",
     "en"
   ],
-  "defaultLang": "fr"
+  "defaultLang": "fr",
+  "office": {
+    "name": "REMAX Privilège",
+    "nameSuffix": "Privilège",
+    "address": "103-7750 Boul. Cousineau, St-Hubert, Qc, J3Z 0C8",
+    "phone": "450 678 3150",
+    "independence": {
+      "fr": "Each Office Independently Owned and Operated.",
+      "en": "Each Office Independently Owned and Operated."
+    },
+    "independenceLang": {
+      "fr": "en",
+      "en": "en"
+    }
+  },
+  "_comment": "office.independence.fr must be replaced by the wording from REMAX Québec; set independenceLang.fr to fr at the same time."
 }

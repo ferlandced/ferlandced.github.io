@@ -32,6 +32,442 @@ collections:
           - { name: hero_photo_alt, label: "Agent photo description", widget: string, required: false }
           - { name: side_image, label: "Side image", widget: image, required: false, hint: "Shown right of the red band on desktop only. Portrait, at least 1600 px tall, usage rights confirmed." }
           - { name: side_image_alt, label: "Side image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
+          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Desktop only: the scene behind the agent photo in the About section. Portrait, same proportions as the agent photo. Empty shows a plain gray panel." }
+
+  # Site copy (read by eleventy.config.js as `i18n`). Each text has a French and an English
+  # version. Keys are fixed here, so editors can change the wording but not the structure.
+  # Labels are the French description of where each text appears.
+  - name: copy
+    label: Textes du site
+    files:
+      - name: i18n
+        label: Textes (français et anglais)
+        file: content/i18n.json
+        format: json
+        fields:
+          - name: nav
+            label: "Menu"
+            widget: object
+            collapsed: true
+            fields:
+              - name: label
+                label: "Nom du menu principal, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: home
+                label: "Nom de la page d'accueil, lu par les lecteurs d'écran sur le logo"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: about
+                label: "Lien du menu vers la section À propos"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: services
+                label: "Lien du menu vers la section Services"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: properties
+                label: "Lien du menu vers la page des propriétés"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: open
+                label: "Bouton du menu mobile (fermé), lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: close
+                label: "Bouton du menu mobile (ouvert), lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: langSwitch
+            label: "Sélecteur de langue"
+            widget: object
+            collapsed: true
+            fields:
+              - name: label
+                label: "Nom du sélecteur de langue, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: fr
+                label: "Nom de la langue française dans le sélecteur"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: en
+                label: "Nom de la langue anglaise dans le sélecteur"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: hero
+            label: "Bandeau d'accueil"
+            widget: object
+            collapsed: true
+            fields:
+              - name: agency
+                label: "Ligne sous le titre du courtier : nom de l'agence"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: contactIcons
+            label: "Icônes de contact"
+            widget: object
+            collapsed: true
+            fields:
+              - name: label
+                label: "Nom de la rangée d'icônes, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: phone
+                label: "Icône téléphone, lue avant le numéro"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: email
+                label: "Icône courriel, lue avant l'adresse"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: newTab
+                label: "Ajouté après Instagram et Facebook : le lien s'ouvre dans un nouvel onglet"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: about
+            label: "À propos"
+            widget: object
+            collapsed: true
+            fields:
+              - name: heading
+                label: "Titre de la section À propos"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: cellLabel
+                label: "Étiquette devant le numéro de cellulaire"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: contact
+                label: "Bouton qui mène au formulaire de contact"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: services
+            label: "Services"
+            widget: object
+            collapsed: true
+            fields:
+              - name: heading
+                label: "Titre de la section Services"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: buy
+                label: "Acheter"
+                widget: object
+                collapsed: false
+                fields:
+                  - name: title
+                    label: "Acheter : titre de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: text
+                    label: "Acheter : texte de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
+                  - name: action1
+                    label: "Bouton"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: label
+                        label: "Acheter : texte du bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+                      - name: subject
+                        label: "Acheter : objet du courriel envoyé par le bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+              - name: sell
+                label: "Vendre"
+                widget: object
+                collapsed: false
+                fields:
+                  - name: title
+                    label: "Vendre : titre de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: text
+                    label: "Vendre : texte de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
+                  - name: action1
+                    label: "Bouton"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: label
+                        label: "Vendre : texte du bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+                      - name: subject
+                        label: "Vendre : objet du courriel envoyé par le bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+              - name: rent
+                label: "Louer"
+                widget: object
+                collapsed: false
+                fields:
+                  - name: title
+                    label: "Louer : titre de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: text
+                    label: "Louer : texte de la colonne"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
+                  - name: action1
+                    label: "Premier bouton"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: label
+                        label: "Louer : texte du premier bouton (trouver un logement)"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+                      - name: subject
+                        label: "Louer : objet du courriel du premier bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+                  - name: action2
+                    label: "Deuxième bouton"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: label
+                        label: "Louer : texte du deuxième bouton (louer sa propriété)"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+                      - name: subject
+                        label: "Louer : objet du courriel du deuxième bouton"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - { name: fr, label: "Français", widget: string }
+                          - { name: en, label: "English", widget: string }
+          - name: properties
+            label: "Propriétés"
+            widget: object
+            collapsed: true
+            fields:
+              - name: heading
+                label: "Titre de la section des propriétés"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: all
+                label: "Bouton vers la page de toutes les propriétés"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: contact
+            label: "Formulaire de contact"
+            widget: object
+            collapsed: true
+            fields:
+              - name: heading
+                label: "Titre de la section Contact"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: intro
+                label: "Phrase sous le titre"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
+              - name: name
+                label: "Étiquette du champ Nom"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: email
+                label: "Étiquette du champ Courriel"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: phone
+                label: "Étiquette du champ Téléphone"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: either
+                label: "Aide sous les champs : courriel ou téléphone obligatoire"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: message
+                label: "Étiquette du champ Message"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: consentBefore
+                label: "Case de consentement : texte avant le lien vers la politique"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
+              - name: privacy
+                label: "Case de consentement : texte du lien vers la politique de confidentialité"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: consentAfter
+                label: "Case de consentement : texte après le lien (souvent un point)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: submit
+                label: "Bouton d'envoi du formulaire"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: subject
+                label: "Objet du courriel reçu par le courtier"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: office
+            label: "Pied de page"
+            widget: object
+            collapsed: true
+            fields:
+              - name: type
+                label: "Type d'entreprise sous le nom du bureau"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: phoneLabel
+                label: "Étiquette devant le numéro du bureau"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
 
   # a) Agent profile. Placeholder fields; adjust to the real site.
   - name: agent
@@ -43,10 +479,29 @@ collections:
         format: json
         fields:
           - { name: name, label: Name, widget: string }
-          - { name: title, label: Title, widget: string, required: false }
-          - { name: bio, label: Bio, widget: markdown, required: false }
+          # Bilingual fields: French and English versions, picked by page language.
+          - name: title
+            label: Title
+            widget: object
+            fields:
+              - { name: fr, label: "Titre (français)", widget: string }
+              - { name: en, label: "Title (English)", widget: string }
+          - name: bio
+            label: Bio
+            widget: object
+            fields:
+              - { name: fr, label: "Bio (français)", widget: markdown }
+              - { name: en, label: "Bio (English)", widget: markdown }
           - { name: phone, label: Phone, widget: string, required: false }
           - { name: email, label: Email, widget: string, required: false, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Must be an email address'] }
+          # Social profiles: an icon shows on the site only when the link is filled in.
+          - name: social
+            label: Social links
+            widget: object
+            required: false
+            fields:
+              - { name: instagram, label: Instagram, widget: string, required: false, pattern: ['^$|^https://(www\.)?instagram\.com/', 'Must be an instagram.com link'] }
+              - { name: facebook, label: Facebook, widget: string, required: false, pattern: ['^$|^https://(www\.)?facebook\.com/', 'Must be a facebook.com link'] }
           - { name: languages, label: Languages, widget: list, required: false }
           - { name: photo, label: Photo, widget: image, required: false }
 

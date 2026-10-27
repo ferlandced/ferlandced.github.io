@@ -11,8 +11,8 @@ translated: true
 {%- set t = i18n[lang] -%}
 {%- set photo = home.hero_photo or agent.photo -%}
 <main>
-  {# The stage holds the hero and About. On desktop with motion allowed, the agent photo in
-     .stage__track stays pinned while it travels from the hero centre to the About column. #}
+  {# The stage holds the hero and About. With motion allowed, the agent photo in .stage__track
+     stays pinned while it travels from the hero into the About card, then scrolls up with About. #}
   <div class="stage">
     <section class="hero" aria-labelledby="hero-name">
       {# Stripes are decorative. The side image uses the CMS description; empty keeps it silent. #}
@@ -25,24 +25,33 @@ translated: true
         <div class="hero__id">
           {% if home.signature %}<img class="hero__signature" src="{{ home.signature }}" alt="" width="2160" height="1960">{% endif %}
           <h1 class="hero__name" id="hero-name">{{ agent.name }}</h1>
-          <p class="hero__role">{{ t.hero.role }}</p>
+          <p class="hero__role">{{ agent.title[lang] }}</p>
           <p class="hero__agency">{{ t.hero.agency }}</p>
+          {% set iconsClass = "contact-icons--hero" %}{% include "partials/contact-icons.njk" %}
         </div>
-        {% if photo %}<img class="hero__photo" src="{{ photo }}" alt="{{ home.hero_photo_alt }}" fetchpriority="high">{% endif %}
       </div>
+      {# Own layer so it can be cut along the slash on phones and tablets #}
+      {% if photo %}<div class="hero__figure"><img class="hero__photo" src="{{ photo }}" alt="{{ home.hero_photo_alt }}" fetchpriority="high"></div>{% endif %}
     </section>
 
     {% if photo %}
     <div class="stage__track" aria-hidden="true">
-      <div class="stage__pin"><div class="stage__agent"><img src="{{ photo }}" alt=""></div></div>
+      <div class="stage__pin">
+        {# Backdrop behind the agent once he reaches About: CMS image, or a plain gray placeholder #}
+        <div class="stage__backdrop"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}></div>
+        <div class="stage__agent"><img src="{{ photo }}" alt=""></div>
+      </div>
     </div>
     {% endif %}
 
     <section id="about" class="about">
       <div class="container about__inner">
+        {# The agent's picture in About. When the travelling copy is active it stays invisible and
+           only holds the space where the copy lands; otherwise (reduced motion) it shows as is. #}
+        {% if photo %}<div class="about__card" aria-hidden="true"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}><img src="{{ photo }}" alt="" loading="lazy"></div>{% endif %}
         <div class="about__body">
           <h2>{{ t.about.heading }}</h2>
-          {{ agent.bio | renderContent("md") | safe }}
+          {{ agent.bio[lang] | renderContent("md") | safe }}
           <ul class="about__contact">
             {% if agent.phone %}<li>{{ t.about.cellLabel }} <a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></li>{% endif %}
             {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
@@ -57,13 +66,13 @@ translated: true
     <div class="container">
       <h2 id="services-heading">{{ t.services.heading }}</h2>
       <ul class="services__list">
-        {% for s in t.services.items %}
-        <li class="service service--{{ s.id }}">
+        {% for id in ["buy", "sell", "rent"] %}{% set s = t.services[id] %}
+        <li class="service service--{{ id }}">
           <h3 class="service__title">{{ s.title }}</h3>
           <p class="service__text">{{ s.text }}</p>
           <div class="service__actions">
             {# Later: each button opens its own in-place form. For now they open an email with a preset subject. #}
-            {% for a in s.actions %}<a class="btn" href="mailto:{{ agent.email }}?subject={{ a.subject | urlencode }}">{{ a.label }}</a>{% endfor %}
+            {% for a in [s.action1, s.action2] %}{% if a and a.label %}<a class="btn" href="mailto:{{ agent.email }}?subject={{ a.subject | urlencode }}">{{ a.label }}</a>{% endif %}{% endfor %}
           </div>
         </li>
         {% endfor %}

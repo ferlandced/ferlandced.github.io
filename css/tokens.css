@@ -45,6 +45,7 @@
   --brand-button-border: var(--color-primary-red);
   --brand-highlight: var(--color-primary-red);  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
   --brand-focus: var(--color-primary-blue);
+  --brand-hero-tone: color-mix(in srgb, var(--color-charcoal) 50%, var(--color-white));  /* half-strength charcoal: hero background right of the band, and the end of its fade */
   --brand-shadow: color-mix(in srgb, var(--color-black) 8%, transparent);
   --brand-shadow-strong: color-mix(in srgb, var(--color-black) 14%, transparent);
   --brand-placeholder: color-mix(in srgb, var(--color-charcoal) 12%, var(--color-cream));

@@ -28,3 +28,14 @@
   [email, phone].forEach((el) => el.addEventListener("input", check));
   check();
 })();
+
+// Header contact icons appear once the hero has scrolled out from under the header.
+(() => {
+  const header = document.querySelector(".site-header");
+  const hero = document.querySelector(".hero");
+  if (!header || !hero || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(([entry]) => {
+    header.toggleAttribute("data-past-hero", !entry.isIntersecting && entry.boundingClientRect.top < 0);
+  }, { rootMargin: `-${header.offsetHeight}px 0px 0px 0px` });
+  io.observe(hero);
+})();

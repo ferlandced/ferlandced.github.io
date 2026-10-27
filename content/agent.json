@@ -1,9 +1,19 @@
 {
   "name": "Cedrik Ferland",
-  "title": "Courtier immobilier résidentiel",
-  "bio": " Cedrik is an experienced real estate agent specializing in residential properties. He is dedicated to helping clients find their perfect home and providing exceptional service throughout the buying and selling process. lorem ipsum dolor sit amet.",
+  "title": {
+    "fr": "Courtier immobilier résidentiel",
+    "en": "Residential Real Estate Broker"
+  },
+  "bio": {
+    "fr": "Cedrik est un courtier immobilier d'expérience spécialisé en propriétés résidentielles. Il se consacre à aider ses clients à trouver la maison idéale et à leur offrir un service exceptionnel tout au long de l'achat ou de la vente.",
+    "en": "Cedrik is an experienced real estate agent specializing in residential properties. He is dedicated to helping clients find their perfect home and providing exceptional service throughout the buying and selling process."
+  },
   "phone": "450 776 4895",
   "email": "info@cedrikferland.com",
+  "social": {
+    "instagram": "https://www.instagram.com/cedrikferland_courtier",
+    "facebook": ""
+  },
   "languages": [
     "English",
     "French"

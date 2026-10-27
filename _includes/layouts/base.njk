@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if title %}{{ title }} · {% endif %}{{ agent.name }}</title>
-  <meta name="description" content="{{ description or t.hero.role }}">
+  <meta name="description" content="{{ description or agent.title[lang] }}">
   <link rel="preload" href="/fonts/montserrat-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/montserrat-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   {% if translated %}{% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="/{{ l }}/">
