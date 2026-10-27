@@ -1,68 +1,131 @@
 ---
 layout: layouts/base.njk
 bodyClass: home
-permalink: /
+pagination:
+  data: site.languages
+  size: 1
+  alias: lang
+permalink: "/{{ lang }}/"
+translated: true
 ---
-<section class="hero" aria-label="{{ agent.name }}">
-  <div class="hero__panel hero__panel--main">
-    <img src="{{ home.hero_image or agent.photo }}" alt="{{ home.hero_image_alt }}" fetchpriority="high">
-  </div>
-  <div class="hero__panel hero__panel--side" aria-hidden="true">
-    {% if home.hero_image_secondary %}<img src="{{ home.hero_image_secondary }}" alt="">{% endif %}
-  </div>
-  <div class="hero__signature">
-    <span class="hero__initials" aria-hidden="true">{{ home.initials }}</span>
-    <h1 class="hero__name">{{ agent.name }}</h1>
-    <p class="hero__role">{{ home.subtitle or agent.title }}</p>
-  </div>
-</section>
-
+{%- set t = i18n[lang] -%}
+{%- set photo = home.hero_photo or agent.photo -%}
 <main>
-  <section id="about" class="section">
-    <div class="container about">
-      {% if agent.photo %}<img class="about__photo" src="{{ agent.photo }}" alt="{{ agent.name }}" loading="lazy">{% endif %}
-      <div class="about__body">
-        <p class="eyebrow">{{ agent.title }}</p>
-        <h2>About {{ agent.name }}</h2>
-        {{ agent.bio | renderContent("md") | safe }}
-        <ul class="about__contact">
-          {% if agent.phone %}<li><a href="tel:{{ agent.phone | replace(' ', '') | replace('(', '') | replace(')', '') }}">{{ agent.phone }}</a></li>{% endif %}
-          {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
-          {% if agent.languages and agent.languages.length %}<li>Languages: {{ agent.languages | join(", ") }}</li>{% endif %}
-        </ul>
+  {# The stage holds the hero and About. With motion allowed, the agent photo in .stage__track
+     stays pinned while it travels from the hero into the About card, then scrolls up with About. #}
+  <div class="stage">
+    <section class="hero" aria-labelledby="hero-name">
+      {# Stripes are decorative. The side image uses the CMS description; empty keeps it silent. #}
+      <div class="hero__band">
+        <span class="hero__stripe hero__stripe--red" aria-hidden="true"></span>
+        <span class="hero__stripe hero__stripe--dark" aria-hidden="true"></span>
+        {% if home.side_image %}<span class="hero__side"><img src="{{ home.side_image }}" alt="{{ home.side_image_alt }}"></span>{% endif %}
       </div>
+      <div class="hero__inner">
+        <div class="hero__id">
+          {% if home.signature %}<img class="hero__signature" src="{{ home.signature }}" alt="" width="2160" height="1960">{% endif %}
+          <h1 class="hero__name" id="hero-name">{{ agent.name }}</h1>
+          <p class="hero__role">{{ agent.title[lang] }}</p>
+          <p class="hero__agency">{{ t.hero.agency }}</p>
+          {% set iconsClass = "contact-icons--hero" %}{% include "partials/contact-icons.njk" %}
+        </div>
+      </div>
+      {# Own layer so it can be cut along the slash on phones and tablets #}
+      {% if photo %}<div class="hero__figure"><img class="hero__photo" src="{{ photo }}" alt="{{ home.hero_photo_alt }}" fetchpriority="high"></div>{% endif %}
+    </section>
+
+    {% if photo %}
+    <div class="stage__track" aria-hidden="true">
+      <div class="stage__pin">
+        {# Backdrop behind the agent once he reaches About: CMS image, or a plain gray placeholder #}
+        <div class="stage__backdrop"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}></div>
+        <div class="stage__agent"><img src="{{ photo }}" alt=""></div>
+      </div>
+    </div>
+    {% endif %}
+
+    <section id="about" class="about">
+      <div class="container about__inner">
+        {# The agent's picture in About. When the travelling copy is active it stays invisible and
+           only holds the space where the copy lands; otherwise (reduced motion) it shows as is. #}
+        {% if photo %}<div class="about__card" aria-hidden="true"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}><img src="{{ photo }}" alt="" loading="lazy"></div>{% endif %}
+        <div class="about__body">
+          <h2>{{ t.about.heading }}</h2>
+          {{ agent.bio[lang] | renderContent("md") | safe }}
+          <ul class="about__contact">
+            {% if agent.phone %}<li>{{ t.about.cellLabel }} <a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></li>{% endif %}
+            {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
+          </ul>
+          <p><a class="btn" href="#contact">{{ t.about.contact }}</a></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="services" class="services" aria-labelledby="services-heading">
+    <div class="container">
+      <h2 id="services-heading">{{ t.services.heading }}</h2>
+      <ul class="services__list">
+        {% for id in ["buy", "sell", "rent"] %}{% set s = t.services[id] %}
+        <li class="service service--{{ id }}">
+          <h3 class="service__title">{{ s.title }}</h3>
+          <p class="service__text">{{ s.text }}</p>
+          <div class="service__actions">
+            {# Later: each button opens its own in-place form. For now they open an email with a preset subject. #}
+            {% for a in [s.action1, s.action2] %}{% if a and a.label %}<a class="btn" href="mailto:{{ agent.email }}?subject={{ a.subject | urlencode }}">{{ a.label }}</a>{% endif %}{% endfor %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
   </section>
 
-  <section class="section section--alt">
+  {% if collections.listings.length %}
+  <section id="properties" class="properties" aria-labelledby="properties-heading">
     <div class="container">
-      <h2>Latest properties</h2>
-      {% if collections.listings.length %}
+      <h2 id="properties-heading">{{ t.properties.heading }}</h2>
       <div class="cards">
         {% for item in collections.listings | head(6) %}{% include "partials/listing-card.njk" %}{% endfor %}
       </div>
-      <p><a class="btn" href="/listings/">All properties</a></p>
-      {% else %}
-      <p class="muted">No properties listed yet.</p>
-      {% endif %}
+      <p><a class="btn" href="/listings/">{{ t.properties.all }}</a></p>
     </div>
   </section>
+  {% endif %}
 
-
-  <section class="section">
-  <div class="container">
-      <h2>Latest properties</h2>
-<form action="https://api.web3forms.com/submit" method="POST">
-  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
-  <input type="text" name="name" required>
-  <input type="email" name="email" required>
-  <input type="number" name="furca" required>
-  <textarea name="message" required></textarea>
-  <button type="submit">Submit</button>
-</form>
+  <section id="contact" class="contact" aria-labelledby="contact-heading">
+    <div class="container contact__inner">
+      <h2 id="contact-heading">{{ t.contact.heading }}</h2>
+      <p>{{ t.contact.intro }}</p>
+      {# Web3Forms: emails the submission to the agent. The access key is public by design (restrict it to the site domain). #}
+      <form class="contact-form" action="https://api.web3forms.com/submit" method="POST" data-contact-form data-either-message="{{ t.contact.either }}">
+        <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+        <input type="hidden" name="subject" value="{{ t.contact.subject }}">
+        <input type="checkbox" name="botcheck" class="botcheck" tabindex="-1" autocomplete="off">
+        <div class="field">
+          <label for="cf-name">{{ t.contact.name }}</label>
+          <input id="cf-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="contact-form__row">
+          <div class="field">
+            <label for="cf-email">{{ t.contact.email }}</label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" aria-describedby="cf-either">
+          </div>
+          <div class="field">
+            <label for="cf-phone">{{ t.contact.phone }}</label>
+            <input id="cf-phone" name="phone" type="tel" autocomplete="tel" aria-describedby="cf-either">
+          </div>
+        </div>
+        <p class="contact-form__hint" id="cf-either">{{ t.contact.either }}</p>
+        <div class="field">
+          <label for="cf-message">{{ t.contact.message }}</label>
+          <textarea id="cf-message" name="message" required></textarea>
+        </div>
+        <label class="consent">
+          <input type="checkbox" name="consent" value="yes" required>
+          <span>{{ t.contact.consentBefore }}{% if site.privacyUrl[lang] %}<a href="{{ site.privacyUrl[lang] }}">{{ t.contact.privacy }}</a>{% else %}{{ t.contact.privacy }}{% endif %}{{ t.contact.consentAfter }}</span>
+        </label>
+        <button class="btn" type="submit">{{ t.contact.submit }}</button>
+      </form>
     </div>
-
-
-
   </section>
 </main>

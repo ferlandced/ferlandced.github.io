@@ -1,143 +1,497 @@
 /* ==========================================================================
    Site stylesheet. Colours and fonts come from css/tokens.css (loaded first).
    Only layout variables live here.
+
+   Breakpoints: two layouts only.
+     phone          < 768px
+     desktop        >= 768px
+     very large     >= 1400px         (xxl): content capped at --wrap-max, colour bleeds to the edge
    ========================================================================== */
+
+/* Header logo height; registered so the scroll animation can interpolate it */
+@property --logo-h { syntax: "<length>"; inherits: true; initial-value: 60px; }
+
 :root {
-  /* Hero geometry, in % of hero width. Every diagonal edge shares --hero-slant,
-     so all edges stay parallel. Edge positions are measured at the top. */
-  --hero-slant: 14%;       /* how far each edge leans right from top to bottom */
-  --hero-main-left: 38%;   /* left edge of the main panel */
-  --hero-main-right: 70%;  /* right edge of the main panel */
-  --hero-gap: 2.5%;        /* dark band between the two panels */
-  --hero-height: 100svh;
+  --gutter: 16px;
+  --wrap-max: 1320px;
+  /* Content is aligned left: it starts at --wrap-left from the screen edge (gutter, plus the logo shift
+     on desktop) and is at most --wrap-max wide. Extra space on wide screens goes to the right. */
+  --wrap-left: calc(var(--gutter) + var(--brand-shift, 0px));
+  --wrap: min(var(--wrap-max), 100vw - var(--wrap-left) - var(--gutter));  /* viewport-based twin of .container width, for transforms */
+
+  --header-h: 64px;          /* initial header height */
+  --header-h-compact: 64px;  /* after scrolling */
+  --logo-h: 60px;            /* rendered height of the logo file (its canvas has built-in clear space) */
+
+  /* Slash Design: fixed angle, Primary Red 1/4 next to the photo, Dark Red 3/4 */
+  --slash-angle: 27.5deg;
+  --slash-red-ratio: .25;
+  /* Fine grain (SVG noise, light speckle) laid over a solid colour for a textured surface */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+@media (min-width: 768px) { :root { --gutter: 24px; --header-h: 80px; --logo-h: 72px; --brand-shift: clamp(24px, 6vw, 120px); } }   /* logo and agent sit a bit right of the content edge */
+@media (min-width: 992px) { :root { --header-h: 112px; --logo-h: 104px; --logo-shift: clamp(40px, 8vw, 200px); } }   /* larger header only; layout is desktop from 768px */
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; min-height: 100svh; display: flex; flex-direction: column; font-family: var(--font-family); font-weight: var(--font-light); font-size: 1.0625rem; color: var(--brand-ink); background: var(--brand-bg); line-height: 1.65; }
+html { scroll-padding-top: calc(var(--header-h-compact) + 8px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; padding-top: var(--header-h); min-height: 100svh; display: flex; flex-direction: column; font-family: var(--font-family); font-weight: var(--font-light); font-size: 1.0625rem; color: var(--brand-ink); background: var(--brand-surface); line-height: 1.65; overflow-x: clip; }
+/* Home page content runs under the transparent header */
+body.home { padding-top: 0; }
 strong, b { font-weight: var(--font-bold); }
 :focus-visible { outline: 3px solid var(--brand-focus); outline-offset: 2px; }
 img { max-width: 100%; display: block; }
 body > main { flex: 1 0 auto; }
 h1, h2, h3 { color: var(--brand-primary); line-height: 1.15; font-weight: var(--font-bold); letter-spacing: -.01em; }
-h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 16px; }
-a { color: var(--brand-link); }
-.container { max-width: 1120px; margin: 0 auto; padding: 24px 16px; }
+h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 24px; }
+a { color: var(--brand-link); text-underline-offset: .15em; }
+a:hover { color: var(--brand-link-hover); }
+.container { width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); margin-right: auto; padding-block: 24px; }
 .muted { color: var(--brand-muted); }
-.eyebrow { margin: 0 0 4px; color: var(--brand-accent); font-weight: var(--font-bold); text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-.btn { display: inline-block; padding: 10px 22px; border-radius: var(--brand-radius); background: var(--brand-dark); color: var(--brand-on-dark); text-decoration: none; font-weight: var(--font-medium); transition: transform .2s, filter .2s; }
-.btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
-.btn--accent { background: var(--brand-accent); }
-
-/* Header: transparent over the hero on the home page, solid elsewhere */
-.site-header { position: absolute; inset: 0 0 auto 0; z-index: 10; display: flex; align-items: center; gap: 32px; padding: 20px clamp(16px, 3vw, 40px); }
-.page .site-header { position: static; background: var(--brand-dark); }
-.site-header__brand img { width: 120px; height: auto; }
-.site-header__nav { display: flex; gap: 28px; margin-left: auto; }
-.site-header__nav a { color: var(--brand-on-dark); text-decoration: none; font-weight: var(--font-medium); text-shadow: 0 1px 8px var(--brand-shadow-strong); }
-.site-header__nav a:hover { color: var(--brand-highlight); }
+/* Ghost button: Primary Red border, Dark Red text, no fill. Fills Dark Red with white text on hover. */
+.btn { display: inline-block; padding: 9px 0; border: 0; border-radius: 0; background: none; color: var(--brand-button); font: inherit; font-size: .875rem; font-weight: var(--font-bold); line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; text-align: left; text-decoration: none; cursor: pointer; transition: color .2s; }
+/* No border or fill: text aligns with the content's left edge; hover underlines in Bridge Red */
+.btn:hover { color: var(--brand-link-hover); text-decoration: underline; text-underline-offset: .3em; }
 
 /* ==========================================================================
-   Hero: dark canvas, two diagonal photo panels, signature bottom-left
+   Header: fixed, white. On desktop the logo shrinks as the page scrolls.
    ========================================================================== */
-.hero { position: relative; height: var(--hero-height); min-height: 560px; background: var(--brand-dark); overflow: hidden; color: var(--brand-on-dark); }
-/* Top shade so the nav stays readable over bright photos */
-.hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 180px; z-index: 2; background: linear-gradient(color-mix(in srgb, var(--color-black) 55%, transparent), transparent); pointer-events: none; }
-.hero__panel { position: absolute; inset: 0; overflow: hidden; }
-.hero__panel img { width: 100%; height: 100%; object-fit: cover; }
-.hero__panel--main {
-  clip-path: polygon(
-    var(--hero-main-left) 0, var(--hero-main-right) 0,
-    calc(var(--hero-main-right) + var(--hero-slant)) 100%, calc(var(--hero-main-left) + var(--hero-slant)) 100%);
+.site-header {
+  position: fixed; inset: 0 0 auto 0; z-index: 100;
+  height: var(--header-h);
+  display: flex; align-items: center; gap: 24px;
+  /* The logo (and the agent under it) sit --logo-shift further right than the content */
+  padding-inline: calc(var(--wrap-left) + var(--logo-shift, 0px)) var(--gutter);
+  background: transparent;
 }
-.hero__panel--main img { object-position: 60% 20%; }
-/* The side panel's box is 1.5× the hero width (it overhangs the right edge, hidden by the
-   hero's overflow) so no vertical cut shows while it slides in. Its clip-path x-values are
-   divided by --side-box to stay in hero-width units. It sits under the main panel. */
-.hero__panel--side {
-  --side-box: 1.5;
-  right: calc((1 - var(--side-box)) * 100%);
-  z-index: 0;
-  clip-path: polygon(
-    calc((var(--hero-main-right) + var(--hero-gap)) / var(--side-box)) 0, 100% 0,
-    100% 100%, calc((var(--hero-main-right) + var(--hero-gap) + var(--hero-slant)) / var(--side-box)) 100%);
-}
-.hero__panel--main { z-index: 1; }
-/* Photo spans the visible part of the side panel: from 60% of hero width to the hero's right edge */
-.hero__panel--side img { position: absolute; top: 0; bottom: 0; right: calc((1 - 1 / var(--side-box)) * 100%); width: calc(40% / var(--side-box)); }
-.hero__signature { position: absolute; left: clamp(16px, 8vw, 160px); bottom: clamp(48px, 10vh, 120px); z-index: 3; }
-.hero__initials { display: block; font-weight: var(--font-light); font-size: clamp(5rem, 11vw, 9rem); line-height: .8; letter-spacing: -.04em; }
-.hero__name { margin: 8px 0 0; color: var(--brand-on-dark); font-size: clamp(1.5rem, 2.4vw, 2.2rem); font-weight: var(--font-bold); text-transform: uppercase; letter-spacing: .04em; }
-.hero__role { margin: 4px 0 0; font-weight: var(--font-medium); font-size: clamp(.95rem, 1.3vw, 1.2rem); color: var(--brand-on-dark-muted); }
+/* Inner pages have no hero behind the header, so it stays white there */
+body:not(.home) .site-header { background: var(--brand-surface); }
+/* Office logo, stacked: REMAX logo with the office name underneath, left-aligned with the R.
+   Measurements are fractions of --logo-h, the rendered height of the 2:1 logo canvas:
+   the R starts at .24, the REMAX capitals are .40 tall.
+   The gap under REMAX keeps the manual's clear space (half the X height, .20). */
+.brand { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; text-decoration: none; color: var(--color-black); translate: 0 calc(var(--logo-h) * -.1); }
+.brand__logo { height: var(--logo-h); width: auto; max-width: none; }
+/* Cap height about 60% of the REMAX capitals (manual: 50-100%) */
+.brand__office { margin: calc(var(--logo-h) * -.12) 0 0 calc(var(--logo-h) * .24); font-weight: var(--font-medium); font-size: calc(var(--logo-h) * .34); line-height: 1; white-space: nowrap; }
 
-/* Intro: panels slide in from the right with an ease-out (side panel slightly later),
-   then the signature rises. Tune with the variables below. */
-:root {
-  --intro-duration: 1.1s;
-  --intro-ease: cubic-bezier(.22, 1, .36, 1);  /* ease-out: fast start, gentle stop, no bounce */
-  --intro-from: 45%;       /* start offset, in % of hero width; positive = from the right */
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hero__panel--main,
-  .hero__panel--side { animation: slide-in var(--intro-duration) var(--intro-ease) both; }
-  .hero__panel--side { animation-delay: .12s; }
-  .hero__signature  { animation: rise-in .9s .55s var(--intro-ease) both; }
-}
-/* translate % is relative to each panel's own width, so the wider side panel scales it back */
-.hero__panel--main { --panel-from: var(--intro-from); }
-.hero__panel--side { --panel-from: calc(var(--intro-from) / var(--side-box)); }
-@keyframes slide-in { from { opacity: 0; translate: var(--panel-from) 0; } }
-@keyframes rise-in { from { opacity: 0; translate: 0 24px; } }
+.site-nav { display: flex; align-items: center; gap: 28px; margin-left: clamp(16px, 3vw, 48px); }
+.site-nav a:not(.btn) { color: var(--brand-ink); text-decoration: none; font-size: .875rem; font-weight: var(--font-medium); letter-spacing: .06em; text-transform: uppercase; }
+.site-nav a:not(.btn):hover { color: var(--brand-link-hover); }
 
-/* Parallax: scroll-driven animations (Chrome, Edge, Safari 26+). Other browsers get a static hero. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__panel img, .hero__signature > * {
-      animation: parallax linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 100svh;
-    }
-    .hero__panel--main img { --parallax-y: 18%; }
-    .hero__panel--side img { --parallax-y: 32%; }
-    .hero__signature > *   { --parallax-y: -60%; }
+/* Top-right tools: contact icons (after the hero) and the language switch.
+   White chips keep them readable over the hero picture and scrolled content. */
+.site-header__tools { order: 2; margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.lang-switch { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-ink); font-size: .875rem; font-weight: var(--font-bold); letter-spacing: .06em; text-decoration: none; }
+.lang-switch:hover { color: var(--brand-link-hover); }
+
+/* Contact icons: phone, email, social. 44px targets, 20px glyphs. */
+.contact-icons { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.contact-icons a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--brand-radius); color: var(--brand-ink); }
+.contact-icons a:hover { color: var(--brand-link-hover); }
+.icon { width: 20px; height: 20px; }
+.contact-icons--hero { margin: 16px 0 0 -12px; }   /* optically aligns the first glyph with the text */
+.contact-icons--header { padding: 0 4px; border-radius: var(--brand-radius); background: var(--brand-surface); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+[data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { opacity: 1; visibility: visible; }
+.contact-icons--menu { display: none; }
+@media (max-width: 767.98px) {
+  .contact-icons--header { display: none; }
+  .js-nav [data-open] .contact-icons--menu { display: flex; margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .contact-icons--header { transition: none; } }
+
+/* White chip, like the language switch, so the icon stays visible over the hero's blue */
+.nav-toggle { order: 3; display: none; margin-left: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-ink); cursor: pointer; }
+.nav-toggle__bars, .nav-toggle__bars::before, .nav-toggle__bars::after { display: block; width: 24px; height: 2px; margin-inline: auto; background: currentColor; transition: transform .2s, opacity .2s; }
+.nav-toggle__bars { position: relative; }
+.nav-toggle__bars::before, .nav-toggle__bars::after { content: ""; position: absolute; left: 0; }
+.nav-toggle__bars::before { top: -7px; }
+.nav-toggle__bars::after { top: 7px; }
+[data-open] .nav-toggle__bars { background: transparent; }
+[data-open] .nav-toggle__bars::before { transform: translateY(7px) rotate(45deg); }
+[data-open] .nav-toggle__bars::after { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 767.98px) {
+  .js-nav .nav-toggle { display: block; }
+  .js-nav .site-nav {
+    display: none; position: absolute; inset: 100% 0 auto 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 8px var(--gutter) 24px; background: var(--brand-surface);
+    box-shadow: 0 12px 24px var(--brand-shadow);
+  }
+  .js-nav [data-open] .site-nav { display: flex; }
+  .js-nav .site-nav a:not(.btn) { padding: 12px 0; border-bottom: 1px solid var(--brand-placeholder); }
+  /* Without JS the links stay inline, smaller */
+  html:not(.js-nav) .site-header { height: auto; min-height: var(--header-h); flex-wrap: wrap; row-gap: 0; padding-block: 8px; }
+  html:not(.js-nav) .site-nav { order: 4; flex-basis: 100%; flex-wrap: wrap; gap: 4px 16px; margin-left: 0; }
+  html:not(.js-nav) .site-nav a:not(.btn) { font-size: .8rem; padding-block: 6px; }
+}
+
+/* ==========================================================================
+   Phone menu: the hero's slash lives here as a fixed bottom-right corner (red stripe, solid
+   Dark Red to its right). The white burger sits in it. Tapping it slides the slash line up and
+   left, so the Dark Red grows into the menu panel with the links, contact icons and language.
+   --cx is where the red stripe meets the bottom of the screen.
+   ========================================================================== */
+@property --cx { syntax: "<length-percentage>"; inherits: true; initial-value: 50vw; }
+.menu-corner, .site-nav__lang, .brand__logo--light { display: none; }
+@media (max-width: 767.98px) {
+  .site-header { --cx: 50vw; --cx-stripe: 14px; transition: --cx .45s cubic-bezier(.22, 1, .36, 1), background-color .3s; }
+  .site-header[data-past-hero], body:not(.home) .site-header { --cx: 82vw; }   /* small corner after the hero */
+  .site-header[data-open] { --cx: -45vw; }
+  .menu-corner { display: block; position: fixed; inset: 0; pointer-events: none; }
+  .menu-corner > span { position: absolute; inset: 0; }
+  .menu-corner__red  { background: var(--color-primary-red); clip-path: polygon(calc(var(--cx) + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 1px + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 1px) 100%, var(--cx) 100%); }
+  .menu-corner__dark { background: var(--color-dark-red); clip-path: polygon(calc(var(--cx) + var(--cx-stripe) + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 100lvh * tan(var(--slash-angle)) + 200vw) 0, calc(var(--cx) + var(--cx-stripe) + 200vw) 100%, calc(var(--cx) + var(--cx-stripe)) 100%); }
+  /* The hero's own stripes are replaced by the corner */
+  .hero__stripe { display: none; }
+
+  /* Burger: white, bottom right, on the Dark Red */
+  .js-nav .nav-toggle { position: fixed; right: 12px; bottom: 12px; z-index: 1; margin: 0; background: none; color: var(--brand-on-dark); }
+  /* Language and contact icons move into the menu */
+  /* Language lives in the menu. The contact icons stack above the burger on the hero only,
+     and fade out once the visitor scrolls past it (or opens the menu, which has its own). */
+  .site-header__tools .lang-switch { display: none; }
+  .site-header__tools .contact-icons--header { display: flex; flex-direction: column; position: fixed; right: 12px; bottom: 64px; z-index: 1;
+    gap: 0; padding: 0; background: none; opacity: 1; visibility: visible; }
+  .site-header__tools .contact-icons--header a { color: var(--brand-on-dark); }
+  .site-header[data-past-hero] .contact-icons--header, .site-header[data-open] .contact-icons--header,
+  body:not(.home) .contact-icons--header { opacity: 0 !important; visibility: hidden !important; }
+  .hero .contact-icons--hero { display: none; }
+
+  /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
+  /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
+  .js-nav .site-nav { display: flex; position: fixed; inset: auto 16px 72px auto; z-index: 1; flex-direction: column; align-items: flex-end; gap: 4px;
+    max-height: calc(100dvh - 72px - 16px); overflow-y: auto; padding: 0 12px 0 0; margin-right: -12px; background: none; box-shadow: none; opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
+  .js-nav [data-open] .site-nav { opacity: 1; visibility: visible; transition-delay: .2s; }
+  .js-nav .site-nav a:not(.btn) { padding: 10px 0; border: 0; color: var(--brand-on-dark); font-size: 1.125rem; }
+  .js-nav [data-open] .contact-icons--menu { display: flex; margin: 8px -12px 0 0; }
+  .contact-icons--menu a { color: var(--brand-on-dark); }
+  .site-nav__lang { display: block; margin-top: 8px; color: var(--brand-on-dark); font-size: .875rem; font-weight: var(--font-bold); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; padding: 10px 0; }
+
+  /* Home, over the photo: transparent header with the cream logo. Past the hero: white, dark logo. */
+  body.home .site-header { background: transparent; }
+  body.home .site-header[data-past-hero] { background: var(--brand-surface); }
+  body.home .site-header:not([data-past-hero]) .brand { color: var(--color-cream); }
+  body.home .site-header:not([data-past-hero]) .brand__logo { display: none; }
+  body.home .site-header:not([data-past-hero]) .brand__logo--light { display: block; }
+}
+@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
+
+/* ==========================================================================
+   Hero: white. Signature block left, agent photo centre-left, slash band and side image right.
+   The band and side image are full-width layers clipped along the slash angle, so they
+   bleed to the right edge on any screen while the content stays in --wrap.
+   The agent photo sits underneath the band, cropped at the hero's bottom edge.
+   ========================================================================== */
+.stage {
+  /* Geometry shared by the hero, the travelling photo and About.
+     Horizontal positions are offsets from the page centre. */
+  --hero-h: clamp(560px, 100svh, 960px);
+  --photo-h: calc(var(--hero-h) * .85);   /* photo top at 15%; with its built-in margin his head starts near 25% */
+  --photo-w: calc(var(--photo-h) * .5623);               /* portrait cut-out; other ratios are contained */
+  /* Agent: head centred under the REMAX logo (logo centre ≈ one logo height from the content's left edge) */
+  --photo-x: calc(var(--wrap-left) + var(--logo-shift, 0px) - 50vw + var(--logo-h) - var(--photo-w) / 2);
+  /* Slash: placed from the agent so it always passes just right of his hands. Hands reach about 88% of
+     the photo's width, about 12% of its height above the bottom; the line leans right as it rises. */
+  --band-x: calc(var(--photo-x) + var(--photo-w) * .8 - var(--photo-h) * .12 * tan(var(--slash-angle)));   /* crosses his right arm, hands stay clear */
+  --red-w: 10px;                            /* Primary Red line: fixed on every screen */
+  --dark-w: 5px;                            /* Dark Red line, half as wide */
+  --band-w: clamp(48px, 5vw, 80px);
+  --name-size: clamp(1.25rem, 1.8vw, 2rem);
+  --sig-w: clamp(88px, 8vw, 140px);                      /* kept smaller than the header logo */
+  /* Scroll choreography: every transition finishes at 90% of the hero scroll; the last 10% is a
+     still pause while the agent stays pinned. Marks used below: text starts at 50%, agent arrives at 75%. */
+  --motion-end: calc(var(--hero-h) * .9);
+  --agent-top: max(0px, var(--hero-h) - var(--photo-h));  /* hero photo top: cropped at the bottom when taller */
+  /* About card: the agent's picture in About, where the travelling photo lands. Desktop: left
+     column, top level with the section content, bottom at the section's bottom padding. */
+  --about-pad: clamp(48px, 8vw, 96px);
+  --about-top: var(--about-pad);
+  --frame-top: calc(var(--about-top) + 24px);             /* section padding + container padding */
+  --frame-h: calc(var(--hero-h) - var(--frame-top) - var(--about-pad));
+  --frame-w: calc(var(--frame-h) * 9 / 16);
+  --frame-x: calc(var(--wrap-left) - 50vw);                /* card left edge, from the page centre */
+  --pose-h: var(--frame-h);
+  --pose-w: calc(var(--pose-h) * .5623);
+}
+/* Background: the hero tone (gray) from the band rightwards. Left of the band, a layer skewed at the
+   slash angle fades from white (behind the text) to that tone, reaching it fully exactly at
+   the band's left edge on every row. */
+.hero { position: relative; overflow: hidden; height: var(--hero-h); background: var(--brand-hero-tone); }
+.hero::before {
+  --S: calc(var(--hero-h) * tan(var(--slash-angle)));
+  content: ""; position: absolute; top: 0; bottom: 0; z-index: 0;
+  left: calc(var(--S) * -1); width: calc(50% + var(--band-x) + var(--S) + 1px);  /* right edge = band's left edge */
+  transform: skewX(calc(var(--slash-angle) * -1)); transform-origin: bottom left;
+  background: linear-gradient(90deg, var(--brand-surface) 50%, var(--brand-hero-tone));
+}
+.hero__inner { position: relative; z-index: 2; height: 100%; width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); }
+
+/* The text may overlap the photo's transparent left margin, so it sits above the photo */
+/* Sits in the lower part of the hero */
+.hero__id { position: absolute; z-index: 1; left: 0; bottom: clamp(48px, 14%, 160px); max-width: calc(50% + var(--photo-x) + var(--photo-w) * .1); }
+.hero__signature { width: var(--sig-w); height: auto; margin-bottom: 12px; }
+.hero__name { margin: 0; font-size: var(--name-size); text-transform: uppercase; letter-spacing: .04em; }
+.hero__role { margin: 6px 0 0; font-weight: var(--font-medium); font-size: clamp(1rem, 1.3vw, 1.2rem); color: var(--brand-ink); }
+.hero__agency { margin: 2px 0 0; font-size: .95rem; color: var(--brand-muted); }
+
+.hero__photo, .stage__agent img { height: var(--photo-h); width: var(--photo-w); max-width: none; object-fit: contain; object-position: top center; }
+/* Photo layer: under the text (z 2) and the band (z 4) */
+.hero__figure { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* Taller than the hero: starts at the top, cropped at the bottom. Shorter: stands on the bottom edge. */
+.hero__photo { position: absolute; top: var(--agent-top); left: calc(50% + var(--photo-x)); }
+
+.hero__band {
+  --band-h: var(--hero-h);
+  --L: calc(50% + var(--band-x));                       /* bottom-left x */
+  --S: calc(var(--band-h) * tan(var(--slash-angle)));   /* horizontal lean over the band height */
+  --R: calc(var(--L) + var(--band-w) * var(--slash-red-ratio));
+  --E: calc(var(--L) + var(--band-w));                  /* bottom-right x */
+  position: absolute; inset: 0; z-index: 4;             /* above the hero photo and its travelling copy */
+  pointer-events: none;
+}
+.hero__stripe, .hero__side { position: absolute; inset: 0; }
+/* Primary Red stripe: solid, from the band's left edge to where the dark band starts (1px overlap avoids a hairline) */
+.hero__stripe--red  { background: var(--color-primary-red); clip-path: polygon(calc(var(--L) + var(--S)) 0, calc(var(--R) + var(--S) + 1px) 0, calc(var(--R) + 1px) 100%, var(--L) 100%); }
+/* Dark band: three times the red stripe's width, on top of the side picture. It fades left to
+   right, from opaque Dark Red to transparent Primary Red. It is skewed at the slash angle from its bottom-left corner, so the
+   fade runs parallel to the band edge on every row. */
+.hero__stripe--dark {
+  inset: 0 auto 0 var(--R); width: calc(var(--E) - var(--R)); z-index: 1;   /* 3x the red stripe */
+  transform: skewX(calc(var(--slash-angle) * -1)); transform-origin: bottom left;
+  background: linear-gradient(90deg, var(--color-dark-red), color-mix(in srgb, var(--color-primary-red) 0%, transparent));
+}
+/* The picture starts under the dark band so nothing white shows through the fade */
+/* Side image: fills everything left of the red line (the stripe sits on top of its edge) */
+/* Side image: fills everything right of the lines */
+.hero__side { clip-path: polygon(calc(var(--E) + var(--S) - 1px) 0, 100% 0, 100% 100%, calc(var(--E) - 1px) 100%); }
+/* Fitted to the hero height at its own proportions, starting at the lines. If it is too narrow to reach
+   the right edge, its right side fades into black. */
+.hero__side { background: var(--color-black); }
+.hero__side img { position: absolute; top: 0; bottom: 0; left: var(--E); width: auto; height: 100%; max-width: none;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 25%); mask-image: linear-gradient(to left, transparent, #000 25%); }
+/* Wide enough: the fade falls off-screen; when it cannot, the black shows past the image */
+.hero__stripe--red { z-index: 1; }
+
+/* Phones and tablet portrait (wireframe): agent in the top half, a short slash band across the
+   middle, signature block right-aligned at the bottom right. The photo is cut along the band's
+   red stripe, so the agent stays on his side of the slash. */
+@media (max-width: 767.98px) {
+  .stage {
+    --hero-h: clamp(560px, 100svh, 900px);
+    --photo-h: min(var(--hero-h) * .62, var(--wrap) * 1.25);
+    --photo-x: calc(var(--photo-w) * -.62);
+    --agent-top: calc(var(--header-h) + 8px);
+    --name-size: 1.25rem;
+    --sig-w: 80px;
+    /* Band: vertical span and position. Its centre sits on the page centre. */
+    --band-w: 40px;
+    --band-y1: calc(var(--hero-h) * .30);
+    --band-y2: calc(var(--hero-h) * .70);
+    --band-S: calc((var(--band-y2) - var(--band-y1)) * tan(var(--slash-angle)));
+    --band-off: calc((var(--band-S) + var(--band-w)) / -2);          /* bottom-left x, from the centre */
+    --band-roff: calc(var(--band-off) + var(--band-w) * var(--slash-red-ratio));  /* red stripe's right edge */
+    /* About card: centred above the text, below the header, 9:16 */
+    --about-top: var(--header-h);
+    --frame-w: min(var(--wrap), 360px, (var(--hero-h) - var(--frame-top) - 24px) * 9 / 16);
+    --frame-h: calc(var(--frame-w) * 16 / 9);
+    --frame-x: calc(var(--frame-w) / -2);
+  }
+  /* Gray behind the agent, white at the top-left corner (logo) and behind the text */
+  .hero { background: var(--brand-surface); }
+  .hero::before { left: 0; width: 100%; transform: none; background: linear-gradient(calc(90deg + var(--slash-angle)), var(--brand-surface), var(--brand-hero-tone) 32%, var(--brand-surface) 72%); }
+  .hero__band { inset: var(--band-y1) 0 auto 0; height: calc(var(--band-y2) - var(--band-y1)); --band-h: calc(var(--band-y2) - var(--band-y1)); --L: calc(50% + var(--band-off)); }
+  .hero__side { display: none; }
+  /* Cut along the line of the band's red stripe, extended over the whole hero */
+  .hero__figure { clip-path: polygon(0 0,
+    calc(50% + var(--band-roff) + var(--band-y2) * tan(var(--slash-angle))) 0,
+    calc(50% + var(--band-roff) - (var(--hero-h) - var(--band-y2)) * tan(var(--slash-angle))) 100%, 0 100%); }
+  .hero__id { left: auto; right: 0; bottom: 24px; max-width: min(100%, 22rem); text-align: right; }
+  .hero__signature { margin-left: auto; }
+  .contact-icons--hero { justify-content: flex-end; margin: 12px -12px 0 0; }
+}
+
+/* Phones only: no agent in the hero (he appears directly in About). The side image fills the
+   hero, the name block sits mid-screen on the left in white over a dark scrim, and a short slash
+   rises from the bottom centre at the fixed 27.5° with solid Dark Red to its right. */
+@media (max-width: 767.98px) {
+  .stage { --hero-h: 100svh; }
+  .hero__figure { display: none; }
+  /* Band layer: under the text, full hero */
+  .hero__band { inset: 0; height: auto; z-index: 0; --band-h: var(--hero-h); --L: 50%; --band-w: 56px; }
+  .hero__side { display: block; clip-path: none; }
+  .hero__stripe--red { z-index: 1; }   /* above the full-size photo */
+  .hero__side img { inset: 0; left: 0; width: 100%; object-fit: cover; -webkit-mask-image: none; mask-image: none; }
+  /* Red stripe from the bottom centre; Dark Red fills everything to its right, no fade */
+  .hero__stripe--dark { inset: 0; width: auto; transform: none; background: var(--color-dark-red);
+    clip-path: polygon(calc(var(--R) + var(--S)) 0, calc(var(--R) + var(--S) + 100vw) 0, calc(var(--R) + 100vw) 100%, var(--R) 100%); }
+  /* Scrim: darkens the left of the photo so white text passes contrast on any image */
+  .hero::before { display: block; z-index: 1; left: 0; width: 100%; transform: none;
+    background: linear-gradient(to right, color-mix(in srgb, var(--color-black) 70%, transparent), color-mix(in srgb, var(--color-black) 35%, transparent) 60%, transparent); }
+  .hero__id { top: 50%; bottom: auto; left: 0; right: auto; translate: 0 -50%; max-width: 100%; text-align: left; color: var(--brand-on-dark); }
+  .hero__name, .hero__role, .hero__agency { color: var(--brand-on-dark); }
+  .hero__signature { margin-left: 0; filter: invert(1); }
+  .contact-icons--hero { justify-content: flex-start; margin: 12px 0 0 -12px; }
+  .contact-icons--hero a { color: var(--brand-on-dark); }
+}
+
+/* Desktop: agent on white at the left, two thin lines (Primary Red, then Dark Red), and the side
+   image on the right. The name block sits on the image, right-aligned, white over a dark scrim.
+   The header keeps the black logo on the white side; the menu sits on the image in white. */
+@media (min-width: 768px) {
+  /* Order: agent and travelling copy (3, behind), side image + lines (4), scrim (5), text (6) */
+  .hero__figure { z-index: 3; }
+  .hero__band { --R: calc(var(--L) + var(--red-w)); --E: calc(var(--R) + var(--dark-w)); }
+  .hero__stripe--dark { background: var(--color-dark-red); }
+  .hero { background-color: var(--brand-surface); }
+  /* Scrim: only over the image, dark at the bottom (name block) and along the top (menu) */
+  .hero::before { --x0: calc(50% + var(--band-x) + var(--red-w) + var(--dark-w));
+    left: 0; width: 100%; transform: none; z-index: 5;
+    clip-path: polygon(calc(var(--x0) + var(--S)) 0, 100% 0, 100% 100%, var(--x0) 100%);
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--color-black) 50%, transparent), transparent 180px),   /* menu */
+                linear-gradient(to top, color-mix(in srgb, var(--color-black) 65%, transparent), color-mix(in srgb, var(--color-black) 30%, transparent) 45%, transparent 75%); }
+  .hero__inner { z-index: 6; }
+  /* Just right of the lines, next to the agent, text aligned left. The block's left edge follows
+     the slash at the block's top height (about 300px above its bottom). Offsets are from .hero__inner. */
+  .hero__id { --id-bottom: clamp(48px, 14%, 160px);
+    left: calc(max(50vw + var(--band-x) + var(--red-w) + var(--dark-w) + (var(--hero-h) * .14 + 300px) * tan(var(--slash-angle)) + 40px,
+                   50vw + var(--photo-x) + var(--photo-w) + 24px) - var(--wrap-left));   /* clear of both the lines and the agent */
+    right: auto; bottom: var(--id-bottom); max-width: 34rem; text-align: left; }
+  .hero__signature { margin-left: 0; filter: invert(1); }
+  .contact-icons--hero { justify-content: flex-start; margin: 16px 0 0 -12px; }
+  .hero__id, .hero__name, .hero__role, .hero__agency, .contact-icons--hero a { color: var(--brand-on-dark); }
+
+  /* Header: menu on the right, next to the icons and language; language without its white chip */
+  .site-nav { margin-left: auto; }
+  .site-header__tools { margin-left: 0; }
+  /* Icons take no space until they appear, so the menu sits right next to EN at the top */
+  .contact-icons--header { display: none; }
+  [data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { display: flex; }
+  .lang-switch { background: none; }
+  body.home .site-header { transition: background-color .3s; }
+  body.home .site-header[data-scrolled] { background: var(--brand-surface); }
+  body.home .site-header:not([data-scrolled]) .site-nav a:not(.btn),
+  body.home .site-header:not([data-scrolled]) .lang-switch { color: var(--brand-on-dark); }
+}
+
+/* Portrait tablet (768-991px): a slightly smaller
+   agent, the name block lower and closer to the slash, and a plain white header with a black menu. */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .stage {
+    --photo-h: calc(var(--hero-h) * .7);
   }
 }
-@keyframes parallax {
-  from { transform: translateY(0) scale(1.08); }
-  to   { transform: translateY(var(--parallax-y, 15%)) scale(1.08); }
-}
-
-/* Phones: one diagonal photo on top, signature underneath */
-@media (max-width: 720px) {
-  .site-header__nav { display: none; }
-  .site-header__cta { margin-left: auto; }
-  .hero { --hero-height: 92svh; }
-  .hero__panel--main { clip-path: polygon(0 0, 100% 0, 100% 58%, 0 72%); }
-  .hero__panel--side { display: none; }
-  .hero__signature { left: 16px; right: 16px; bottom: 32px; }
+/* Up to 1199px the menu would cross the slash, so the header is plain white with a black menu */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .hero__id { --id-bottom: 40px; max-width: 18rem;
+    left: calc(50vw + var(--band-x) + var(--red-w) + var(--dark-w) + 260px * tan(var(--slash-angle)) + 24px - var(--wrap-left)); }
+  .hero__name { font-size: 1.125rem; }
+  body.home .site-header, body.home .site-header:not([data-scrolled]) { background: var(--brand-surface); }
+  body.home .site-header:not([data-scrolled]) .site-nav { gap: 24px; padding: 0; background: none; }
+  body.home .site-header .site-nav a:not(.btn), body.home .site-header .lang-switch { color: var(--brand-ink) !important; }
 }
 
 /* ==========================================================================
-   Sections
+   About: white. The agent photo travels into the About card from the hero.
    ========================================================================== */
-.section { padding: clamp(32px, 6vw, 72px) 0; }
-.section--alt { background: var(--brand-surface); }
-.about { display: flex; flex-wrap: wrap; gap: clamp(24px, 4vw, 56px); align-items: flex-start; }
-.about__photo { width: 280px; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: var(--brand-radius); }
-.about__body { flex: 1 1 320px; min-width: 0; }
-.about__contact { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 4px; color: var(--brand-muted); }
+.about, .services, .properties, .contact { padding-block: clamp(48px, 8vw, 96px); }
+/* overflow-x: clip keeps the text's slide-in from widening the page on phones */
+.about { background: var(--brand-surface); padding-top: var(--about-top); overflow-x: clip; }
+/* Card left, text right and centred on the card; stacked below 992px */
+.about__inner { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 48px; align-items: center; }
+.about__card { display: flex; align-items: flex-end; justify-content: center; overflow: hidden; width: var(--frame-w); height: var(--frame-h); background: var(--color-charcoal) var(--grain) 0 0 / 180px; }
+.about__card[style] { background-size: cover; background-position: center; }
+.about__card img { height: 100%; width: auto; max-width: none; }
+@media (max-width: 767.98px) {
+  .about__inner { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .about__card { justify-self: center; }
+}
+.about__body { max-width: 68ch; }
+.about__contact { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 4px; color: var(--brand-muted); }
+.stage__track { display: none; }
 
+/* ==========================================================================
+   Services: white. Three columns split by slashes; stacked with plain lines on phones.
+   ========================================================================== */
+.services { background: var(--brand-surface); }
+/* Subgrid keeps titles, texts and buttons aligned across the three columns */
+.services__list { --svc-gap: clamp(64px, 7vw, 104px); list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; column-gap: var(--svc-gap); }
+.service { position: relative; display: grid; grid-row: span 3; grid-template-rows: subgrid; }
+.service__title { margin: 0 0 12px; font-size: clamp(1.5rem, 2.4vw, 2rem); }
+.service__text { margin: 0 0 24px; }
+.service__actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+/* Slash between titles: 20px, Primary Red 1/4 + Dark Red 3/4, fixed angle (skew keeps vertical lines at the slash angle) */
+.service + .service::before {
+  content: ""; position: absolute; top: -14px; left: calc(var(--svc-gap) / -2 - 10px);
+  width: 20px; height: 64px;
+  background: linear-gradient(90deg, var(--color-primary-red) calc(var(--slash-red-ratio) * 100%), var(--color-dark-red) 0);
+  transform: skewX(calc(var(--slash-angle) * -1));
+}
+@media (max-width: 767.98px) {
+  .services__list { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 72px; }
+  .service { grid-row: auto; grid-template-rows: none; }
+  /* Plain horizontal divider, not a rotated slash */
+  .service + .service::before { top: -38px; left: 0; width: 64px; height: 4px; transform: none; }
+}
+
+/* ==========================================================================
+   My properties: cream. Grid on tablet and up, card list on phones.
+   ========================================================================== */
+.properties { background: var(--brand-bg); }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-bottom: 24px; }
 .card { display: block; background: var(--brand-surface); border-radius: var(--brand-radius); overflow: hidden; text-decoration: none; color: inherit; box-shadow: 0 1px 3px var(--brand-shadow); transition: transform .2s, box-shadow .2s; }
 .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--brand-shadow-strong); }
+/* After the button and card rules so it wins at equal specificity */
+@media (prefers-reduced-motion: reduce) { .btn, .card { transition: none; } .btn:hover, .card:hover { transform: none; } }
 .card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--brand-placeholder); }
 .card__body { padding: 16px; }
 .card__title { margin: 8px 0 2px; font-size: 1.15rem; }
 .card__meta { margin: 0; color: var(--brand-muted); }
 .card__price { margin: 6px 0 0; font-weight: var(--font-bold); color: var(--brand-primary); }
+@media (max-width: 767.98px) {
+  .cards { grid-template-columns: 1fr; gap: 12px; }
+  .card { display: grid; grid-template-columns: 120px 1fr; }
+  .card__img { height: 100%; aspect-ratio: auto; min-height: 104px; }
+  .card__body { padding: 12px; }
+  .card__title { margin-top: 4px; font-size: 1rem; }
+}
 
+/* ==========================================================================
+   Contact: cream, or white when it follows the cream properties section
+   ========================================================================== */
+.contact { background: var(--brand-bg); }
+.properties + .contact { background: var(--brand-surface); }
+.contact__inner > p { max-width: 60ch; margin: 0 0 24px; }
+.contact-form { display: grid; gap: 16px; max-width: 720px; }
+.contact-form__row { display: grid; gap: 16px; }
+@media (min-width: 768px) { .contact-form__row { grid-template-columns: 1fr 1fr; } }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: var(--font-medium); }
+.field input, .field textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--brand-muted); border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-ink); font: inherit; }
+.field textarea { min-height: 160px; resize: vertical; }
+.contact-form__hint { margin: -8px 0 0; font-size: .9rem; color: var(--brand-muted); }
+.consent { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: .95rem; }
+.consent input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--brand-ink); }
+.contact-form .btn { justify-self: start; }
+.botcheck { display: none !important; }
+
+/* ==========================================================================
+   Footer: office identification on every page
+   ========================================================================== */
 .site-footer { background: var(--brand-dark); color: var(--brand-on-dark-muted); font-size: .9rem; }
+.site-footer__inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; padding-block: 40px; }
+/* Phones: one column, kept left of the fixed red corner (which starts at 82% of the width) */
+@media (max-width: 767.98px) {
+  .site-footer__inner { grid-template-columns: 1fr; gap: 28px; padding-bottom: 48px; }
+  .site-footer__inner > div { max-width: calc(82vw - var(--gutter) - 8px); }
+}
+.site-footer p, .site-footer address { margin: 0 0 2px; font-style: normal; }
+.site-footer a { color: var(--brand-on-dark); }
+.site-footer__office { color: var(--brand-on-dark); font-weight: var(--font-bold); }
+.site-footer__notice, .site-footer__copy { margin-top: 12px !important; }
 
 /* Listing page, also used by the CMS preview template */
 .listing { background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px var(--brand-shadow); }
@@ -147,3 +501,99 @@ a { color: var(--brand-link); }
 .listing__facts { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; color: var(--brand-muted); }
 .listing__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 16px; }
 .listing__photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--brand-radius); }
+
+/* ==========================================================================
+   Motion. Scroll-driven animations (Chrome, Edge, Safari 26+); other browsers and
+   reduced-motion users get the static layout above.
+   ========================================================================== */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* About text slides in from the right as it enters */
+    .about__body { animation: slide-in-right linear both; animation-timeline: view(); animation-range: entry 10% entry 80%; }
+
+    @media (min-width: 768px) {
+      /* Header compacts over the first 160px of scroll */
+      .site-header { animation: header-compact linear both; animation-timeline: scroll(root); animation-range: 0 160px; }
+      /* Side image, red lines and scrim ease out to the right together while fading */
+      .hero__band, .hero::before { animation: image-out cubic-bezier(.33, 1, .68, 1) both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+      /* The name block fades and lifts */
+      .hero__id { animation: id-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .6); }
+    }
+    @media (max-width: 767.98px) {
+      /* Signature block, band and gray fade out during the first half while the agent travels */
+      .hero__id { animation: id-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .4); }
+      .hero__band { animation: gradient-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .5); }
+      .hero::before { animation: fade-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .5); }
+    }
+    @media (max-width: 767.98px) {
+      .hero__id, .hero__band, .hero::before { animation: none; }
+    }
+  }
+}
+@keyframes header-compact { to { --logo-h: 60px; height: var(--header-h-compact); } }
+@keyframes slide-in-right { from { opacity: 0; translate: 40vw 0; } }
+@keyframes side-out { to { translate: 60vw 0; } }
+@keyframes side-out-left { to { translate: -150vw 0; opacity: 0; } }
+@keyframes image-out { to { translate: 35vw 0; opacity: 0; } }
+@keyframes scrim-out { to { translate: -80vw 0; opacity: 0; } }
+@keyframes hero-bg-out { to { background-color: var(--brand-surface); } }
+@keyframes gradient-out { to { translate: 60vw 0; opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+/* visibility: hidden at the end takes the invisible links out of the tab order */
+@keyframes id-out { to { opacity: 0; translate: 0 -80px; visibility: hidden; } }
+
+/* Agent photo travel, over the first screen of scroll (all widths):
+   0-75%   a pinned copy of the photo moves from the hero to the About card;
+   75-90%  the card's backdrop fades in and the agent shrinks to the card's height, standing
+           centred on its bottom edge: he "morphs into his own picture";
+   90-100% everything holds still.
+   Ranges end at --motion-end (90%), so keyframe 83.33% = 75% of the hero scroll.
+   The track is two screens tall, so the pin then releases and the group scrolls up with About.
+   The real About card stays invisible and only holds the space where the copy lands. */
+@supports (timeline-scope: --a) and (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stage { position: relative; timeline-scope: --about; }
+    .stage__track { display: block; position: absolute; inset: 0 0 auto 0; height: calc(var(--hero-h) * 2); z-index: 3; pointer-events: none; }
+    .stage__pin { position: sticky; top: 0; height: var(--hero-h); overflow: clip; }
+    .stage__backdrop { position: absolute; top: var(--frame-top); left: calc(50% + var(--frame-x)); width: var(--frame-w); height: var(--frame-h); background-color: var(--color-charcoal); background-image: var(--grain); background-size: 180px; animation: backdrop-in linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+    .stage__backdrop[style] { background-size: cover; background-position: center; }
+    .stage__agent { position: absolute; top: var(--agent-top); left: calc(50% + var(--photo-x)); animation: agent-to-about linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+    .stage__agent img { position: relative; animation: agent-pose linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+    .hero__photo, .about__card { visibility: hidden; }
+    .about { view-timeline: --about block; }
+    /* Hold: the section keeps scrolling during the last 10%, so its content is offset by that same
+       distance and sits still in its final place from 90% on, level with the pinned card */
+    .about__inner { animation: about-hold linear both; animation-timeline: scroll(root); animation-range: var(--motion-end) var(--hero-h); }
+    @media (min-width: 768px) {
+      /* The travelling agent starts behind the lines and photo, like the hero photo */
+      .stage__track { z-index: 3; }
+      /* Text slides in from the right during the second half of the scroll */
+      .about__body { animation-timeline: scroll(root); animation-range: calc(var(--hero-h) * .5) var(--motion-end); }
+    }
+    @media (max-width: 767.98px) {
+      .stage__track { display: none; }
+      .about__card { visibility: visible; }
+      .about__inner { animation: none; }
+    }
+    @media (max-width: 767.98px) {
+      /* The copy starts cut along the slash like the hero photo; the cut opens as the band fades */
+      .stage__agent { animation: agent-to-about linear both, agent-uncut linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--motion-end), 0 calc(var(--hero-h) * .5); }
+    }
+  }
+}
+@keyframes agent-to-about { 83.33%, 100% { translate: calc(var(--frame-x) - var(--photo-x)) 0; } }
+@keyframes about-hold { from { translate: 0 calc(var(--hero-h) * -.1); } }
+@keyframes backdrop-in { 0%, 83.33% { opacity: 0; } 100% { opacity: 1; } }
+/* Final pose: the card's full height, centred horizontally, feet on the card's bottom edge */
+@keyframes agent-pose {
+  0%, 83.33% { width: var(--photo-w); height: var(--photo-h); translate: 0 0; }
+  100% { width: var(--pose-w); height: var(--pose-h);
+         translate: calc((var(--frame-w) - var(--pose-w)) / 2) calc(var(--frame-top) + var(--frame-h) - var(--pose-h) - var(--agent-top)); }
+}
+/* Same line as .hero__figure's cut, in the copy's own coordinates (the page-centre terms cancel) */
+@keyframes agent-uncut {
+  from { clip-path: polygon(0 0,
+    calc(var(--band-roff) - var(--photo-x) + (var(--band-y2) - var(--agent-top)) * tan(var(--slash-angle))) 0,
+    calc(var(--band-roff) - var(--photo-x) + (var(--band-y2) - var(--agent-top) - var(--photo-h)) * tan(var(--slash-angle))) 100%, 0 100%); }
+  to { clip-path: polygon(0 0, 300% 0, 300% 100%, 0 100%); }
+}

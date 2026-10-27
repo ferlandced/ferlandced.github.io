@@ -1,10 +1,33 @@
-<header class="site-header">
-  <a class="site-header__brand" href="/">
-    <img src="/images/logo-light.svg" alt="{{ agent.name }}" width="120" height="30">
+<header class="site-header" data-nav-root>
+  <a class="brand" href="/{{ lang }}/" aria-label="{{ t.office.name }}, {{ t.nav.home }}">
+    <img class="brand__logo" src="/images/REMAX_logo_RGB_dark.svg" alt="" width="1200" height="600">
+    {# Cream logo: phones, over the home page photo (before scrolling past it) #}
+    <img class="brand__logo brand__logo--light" src="/images/REMAX_logo_RGB_light.svg" alt="" width="1200" height="600">
+    <span class="brand__office" aria-hidden="true">{{ t.office.nameSuffix }}</span>
   </a>
-  <nav class="site-header__nav" aria-label="Main">
-    <a href="/#about">About</a>
-    <a href="/listings/">Properties</a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-label-open="{{ t.nav.open }}" data-label-close="{{ t.nav.close }}">
+    <span class="visually-hidden">{{ t.nav.open }}</span>
+    <span class="nav-toggle__bars" aria-hidden="true"></span>
+  </button>
+  <nav class="site-nav" id="site-nav" aria-label="{{ t.nav.label }}">
+    <a href="/{{ lang }}/#about">{{ t.nav.about }}</a>
+    <a href="/{{ lang }}/#services">{{ t.nav.services }}</a>
+    <a href="/listings/">{{ t.nav.properties }}</a>
+    {# Phone menu: the contact icons sit at the bottom of the burger panel #}
+    {% set iconsClass = "contact-icons--menu" %}{% include "partials/contact-icons.njk" %}
+    {# Phone menu: the language switch lives here instead of the header #}
+    {%- for l in site.languages %}{% if l != lang %}
+    <a class="site-nav__lang" href="/{{ l }}/" hreflang="{{ l }}" lang="{{ l }}">{{ t.langSwitch[l] }}</a>
+    {%- endif %}{% endfor %}
   </nav>
-  {% if agent.email %}<a class="btn btn--accent site-header__cta" href="mailto:{{ agent.email }}">{{ home.cta_label or "Contact" }}</a>{% endif %}
+  {# Phones: the slash as a fixed bottom-right corner. Tapping the burger grows it into the menu. #}
+  <div class="menu-corner" aria-hidden="true"><span class="menu-corner__red"></span><span class="menu-corner__dark"></span></div>
+  <div class="site-header__tools">
+    {# Contact icons: fade in once the visitor scrolls past the hero (see js/site.js) #}
+    {% set iconsClass = "contact-icons--header" %}{% include "partials/contact-icons.njk" %}
+    {# Shows only the other language. Pages without a translation link to that language's home. #}
+    {%- for l in site.languages %}{% if l != lang %}
+    <a class="lang-switch" href="/{{ l }}/" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.langSwitch[l] }}"><span class="visually-hidden">{{ t.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
+    {%- endif %}{% endfor %}
+  </div>
 </header>

@@ -32,16 +32,20 @@
   /* Semantic roles. WCAG 2.1 AA contrast checked for each text pairing. */
   --brand-bg: var(--color-cream);
   --brand-surface: var(--color-white);
-  --brand-ink: var(--color-charcoal);                                                 /* 14.4:1 on cream */
+  --brand-ink: var(--color-black);                                                    /* 19.2:1 on cream, 21:1 on white */
   --brand-muted: color-mix(in srgb, var(--color-charcoal) 75%, var(--color-cream));  /* ≈6.5:1 on cream */
   --brand-dark: var(--color-dark-blue);         /* header, hero, footer backgrounds */
   --brand-on-dark: var(--color-white);
   --brand-on-dark-muted: color-mix(in srgb, var(--color-white) 75%, var(--color-dark-blue)); /* ≈10.7:1 */
-  --brand-primary: var(--color-dark-blue);      /* headings, prices */
-  --brand-link: var(--color-primary-blue);      /* 5.9:1 on cream, 6.5:1 on white */
-  --brand-accent: var(--color-bridge-red);      /* buttons, pills, eyebrows: white text 7.5:1 */
+  --brand-primary: var(--color-black);          /* headings, prices */
+  --brand-link: var(--color-black);             /* underlined */
+  --brand-link-hover: var(--color-bridge-red);  /* 6.9:1 on cream, 7.5:1 on white */
+  --brand-accent: var(--color-bridge-red);      /* pills, eyebrows, button hover: white text 7.5:1 */
+  --brand-button: var(--color-dark-red);        /* ghost button text and hover fill: 13.4:1 on white, 12.3:1 on cream */
+  --brand-button-border: var(--color-primary-red);
   --brand-highlight: var(--color-primary-red);  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
   --brand-focus: var(--color-primary-blue);
+  --brand-hero-tone: color-mix(in srgb, var(--color-charcoal) 50%, var(--color-white));  /* half-strength charcoal: hero background right of the band, and the end of its fade */
   --brand-shadow: color-mix(in srgb, var(--color-black) 8%, transparent);
   --brand-shadow-strong: color-mix(in srgb, var(--color-black) 14%, transparent);
   --brand-placeholder: color-mix(in srgb, var(--color-charcoal) 12%, var(--color-cream));

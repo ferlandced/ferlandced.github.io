@@ -1,0 +1,19 @@
+---
+permalink: /
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Cedrik Ferland</title>
+  {# Relative URL so it works under any path prefix. French is the default language. #}
+  <meta http-equiv="refresh" content="0; url=fr/">
+  <link rel="canonical" href="/{{ site.defaultLang }}/">
+  {% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="/{{ l }}/">
+  {% endfor %}<link rel="alternate" hreflang="x-default" href="/{{ site.defaultLang }}/">
+</head>
+<body>
+  <p><a href="/fr/" lang="fr">Français</a> · <a href="/en/" lang="en">English</a></p>
+</body>
+</html>

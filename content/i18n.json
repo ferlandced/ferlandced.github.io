@@ -1,0 +1,230 @@
+{
+  "nav": {
+    "label": {
+      "fr": "Menu principal",
+      "en": "Main menu"
+    },
+    "home": {
+      "fr": "Accueil",
+      "en": "Home"
+    },
+    "about": {
+      "fr": "À propos",
+      "en": "About"
+    },
+    "services": {
+      "fr": "Services",
+      "en": "Services"
+    },
+    "properties": {
+      "fr": "Propriétés",
+      "en": "Properties"
+    },
+    "open": {
+      "fr": "Ouvrir le menu",
+      "en": "Open menu"
+    },
+    "close": {
+      "fr": "Fermer le menu",
+      "en": "Close menu"
+    }
+  },
+  "langSwitch": {
+    "label": {
+      "fr": "Langue",
+      "en": "Language"
+    },
+    "fr": {
+      "fr": "Français",
+      "en": "Français"
+    },
+    "en": {
+      "fr": "English",
+      "en": "English"
+    }
+  },
+  "hero": {
+    "agency": {
+      "fr": "REMAX Privilège, agence immobilière",
+      "en": "REMAX Privilège, real estate agency"
+    }
+  },
+  "contactIcons": {
+    "label": {
+      "fr": "Coordonnées",
+      "en": "Contact links"
+    },
+    "phone": {
+      "fr": "Téléphone",
+      "en": "Phone"
+    },
+    "email": {
+      "fr": "Courriel",
+      "en": "Email"
+    },
+    "newTab": {
+      "fr": "(nouvel onglet)",
+      "en": "(opens in a new tab)"
+    }
+  },
+  "about": {
+    "heading": {
+      "fr": "À propos",
+      "en": "About"
+    },
+    "cellLabel": {
+      "fr": "Cellulaire",
+      "en": "Cell"
+    },
+    "contact": {
+      "fr": "Me contacter",
+      "en": "Contact me"
+    }
+  },
+  "services": {
+    "heading": {
+      "fr": "Services",
+      "en": "Services"
+    },
+    "buy": {
+      "title": {
+        "fr": "Acheter",
+        "en": "Buy"
+      },
+      "text": {
+        "fr": "Dites-moi ce que vous cherchez. Je vous envoie les nouvelles propriétés qui correspondent à vos critères dès leur arrivée sur le marché.",
+        "en": "Tell me what you are looking for. I send you new properties that match your criteria as soon as they come on the market."
+      },
+      "action1": {
+        "label": {
+          "fr": "Créer ma recherche personnalisée",
+          "en": "Set up my property search"
+        },
+        "subject": {
+          "fr": "Recherche personnalisée",
+          "en": "Property search"
+        }
+      }
+    },
+    "sell": {
+      "title": {
+        "fr": "Vendre",
+        "en": "Sell"
+      },
+      "text": {
+        "fr": "Je vous aide à fixer le bon prix et je vous accompagne jusqu'à la signature chez le notaire.",
+        "en": "I help you set the right price and guide you all the way to the notary signing."
+      },
+      "action1": {
+        "label": {
+          "fr": "Combien vaut ma propriété ?",
+          "en": "What is my property worth?"
+        },
+        "subject": {
+          "fr": "Évaluation de ma propriété",
+          "en": "Property valuation"
+        }
+      }
+    },
+    "rent": {
+      "title": {
+        "fr": "Louer",
+        "en": "Rent"
+      },
+      "text": {
+        "fr": "Vous cherchez un logement ou vous voulez louer votre propriété ? Je vous aide à trouver le bon endroit ou le bon locataire.",
+        "en": "Looking for a place, or want to rent out your property? I help you find the right place or the right tenant."
+      },
+      "action1": {
+        "label": {
+          "fr": "Trouver un logement à louer",
+          "en": "Find a place to rent"
+        },
+        "subject": {
+          "fr": "Recherche de logement à louer",
+          "en": "Looking for a rental"
+        }
+      },
+      "action2": {
+        "label": {
+          "fr": "Mettre ma propriété en location",
+          "en": "Rent out my property"
+        },
+        "subject": {
+          "fr": "Mise en location de ma propriété",
+          "en": "Renting out my property"
+        }
+      }
+    }
+  },
+  "properties": {
+    "heading": {
+      "fr": "Mes propriétés",
+      "en": "My properties"
+    },
+    "all": {
+      "fr": "Toutes les propriétés",
+      "en": "All properties"
+    }
+  },
+  "contact": {
+    "heading": {
+      "fr": "Me contacter",
+      "en": "Contact me"
+    },
+    "intro": {
+      "fr": "Écrivez-moi et je vous réponds.",
+      "en": "Write to me and I will get back to you."
+    },
+    "name": {
+      "fr": "Nom",
+      "en": "Name"
+    },
+    "email": {
+      "fr": "Courriel",
+      "en": "Email"
+    },
+    "phone": {
+      "fr": "Téléphone",
+      "en": "Phone"
+    },
+    "either": {
+      "fr": "Indiquez un courriel ou un numéro de téléphone.",
+      "en": "Enter an email address or a phone number."
+    },
+    "message": {
+      "fr": "Message",
+      "en": "Message"
+    },
+    "consentBefore": {
+      "fr": "J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la ",
+      "en": "I agree that this information is sent to Cedrik Ferland to answer my request, as described in the "
+    },
+    "privacy": {
+      "fr": "politique de confidentialité",
+      "en": "privacy policy"
+    },
+    "consentAfter": {
+      "fr": ".",
+      "en": "."
+    },
+    "submit": {
+      "fr": "Envoyer",
+      "en": "Send"
+    },
+    "subject": {
+      "fr": "Nouveau message du site web",
+      "en": "New message from the website"
+    }
+  },
+  "office": {
+    "type": {
+      "fr": "Agence immobilière",
+      "en": "Real estate agency"
+    },
+    "phoneLabel": {
+      "fr": "Bureau",
+      "en": "Office"
+    }
+  }
+}

@@ -1,8 +1,8 @@
 {
-  "initials": "Cf",
-  "subtitle": "Residential & commercial real estate broker",
-  "hero_image": "https://picsum.photos/seed/ced-hero/1400/1600",
-  "hero_image_alt": "",
-  "hero_image_secondary": "https://picsum.photos/seed/ced-aerial/1000/1600",
-  "cta_label": "Contact me"
+  "signature": "/images/signature.svg",
+  "hero_photo": "/images/cedrik.webp",
+  "hero_photo_alt": "Cedrik Ferland",
+  "side_image": "/images/pannorama.jpg",
+  "side_image_alt": "",
+  "about_backdrop": ""
 }

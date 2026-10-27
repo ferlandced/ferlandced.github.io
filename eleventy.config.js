@@ -13,10 +13,27 @@ export default function (eleventyConfig) {
   ["admin", "css", "js", "images", "fonts"].forEach((dir) => eleventyConfig.addPassthroughCopy(dir));
   eleventyConfig.ignores.add("admin/**");
   eleventyConfig.ignores.add("README.md");
+  eleventyConfig.ignores.add("CLAUDE.md");
 
   // CMS-managed single files (Decap "file" collections).
   eleventyConfig.addGlobalData("agent", () => readJson("content/agent.json"));
   eleventyConfig.addGlobalData("home", () => readJson("content/home.json"));
+  // Site copy: content/i18n.json holds {fr, en} pairs at every leaf. Templates read it per
+  // language as i18n[lang], e.g. i18n.fr.nav.about. Office identity is merged from site.json.
+  eleventyConfig.addGlobalData("i18n", () => {
+    const copy = readJson("content/i18n.json");
+    const site = readJson("_data/site.json");
+    const isPair = (v) => v && typeof v === "object" && typeof v.fr === "string" && typeof v.en === "string";
+    const pick = (node, lang) => isPair(node) ? node[lang]
+      : Object.fromEntries(Object.entries(node).map(([k, v]) => [k, pick(v, lang)]));
+    return Object.fromEntries(site.languages.map((lang) => {
+      const t = pick(copy, lang);
+      const o = site.office;
+      t.office = { ...t.office, name: o.name, nameSuffix: o.nameSuffix, address: o.address, phone: o.phone,
+        independence: o.independence[lang], independenceLang: o.independenceLang[lang] };
+      return [lang, t];
+    }));
+  });
   eleventyConfig.addWatchTarget("content/");
 
   // CMS-managed listings (Decap "folder" collection), newest first.
