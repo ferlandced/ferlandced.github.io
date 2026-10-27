@@ -1,0 +1,49 @@
+/* ==========================================================================
+   Brand tokens. Single source for colours and type (see CLAUDE.md).
+   Loaded by the site (base layout), the CMS admin chrome and the CMS preview.
+   Do not hardcode colours or fonts anywhere else; reference these variables.
+   ========================================================================== */
+
+/* Montserrat, self-hosted (SIL OFL, see /fonts/OFL.txt). Latin subset covers French. */
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 300; font-display: swap; src: url("../fonts/montserrat-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/montserrat-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/montserrat-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+  /* Brand palette (REMAX brand identity manual) */
+  --color-primary-red: #FF1200;
+  --color-primary-blue: #0043FF;
+  --color-dark-red: #660000;
+  --color-dark-blue: #000E35;
+  --color-bridge-red: #AA1120;
+  --color-bridge-blue: #0C2749;
+  --color-black: #000000;
+  --color-charcoal: #232323;    /* Dark Charcoal Gray */
+  --color-cream: #F7F5EE;
+  --color-white: #FFFFFF;
+  --color-sky-blue: #A3D4F2;
+
+  /* Typography: Montserrat, Arial fallback. Weights: Light, Medium, Bold only. */
+  --font-family: "Montserrat", Arial, sans-serif;
+  --font-light: 300;
+  --font-medium: 500;
+  --font-bold: 700;
+
+  /* Semantic roles. WCAG 2.1 AA contrast checked for each text pairing. */
+  --brand-bg: var(--color-cream);
+  --brand-surface: var(--color-white);
+  --brand-ink: var(--color-charcoal);                                                 /* 14.4:1 on cream */
+  --brand-muted: color-mix(in srgb, var(--color-charcoal) 75%, var(--color-cream));  /* ≈6.5:1 on cream */
+  --brand-dark: var(--color-dark-blue);         /* header, hero, footer backgrounds */
+  --brand-on-dark: var(--color-white);
+  --brand-on-dark-muted: color-mix(in srgb, var(--color-white) 75%, var(--color-dark-blue)); /* ≈10.7:1 */
+  --brand-primary: var(--color-dark-blue);      /* headings, prices */
+  --brand-link: var(--color-primary-blue);      /* 5.9:1 on cream, 6.5:1 on white */
+  --brand-accent: var(--color-bridge-red);      /* buttons, pills, eyebrows: white text 7.5:1 */
+  --brand-highlight: var(--color-primary-red);  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
+  --brand-focus: var(--color-primary-blue);
+  --brand-shadow: color-mix(in srgb, var(--color-black) 8%, transparent);
+  --brand-shadow-strong: color-mix(in srgb, var(--color-black) 14%, transparent);
+  --brand-placeholder: color-mix(in srgb, var(--color-charcoal) 12%, var(--color-cream));
+  --brand-radius: 6px;
+}

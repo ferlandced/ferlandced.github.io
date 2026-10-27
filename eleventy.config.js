@@ -10,7 +10,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addPlugin(RenderPlugin);
 
   // Static files, copied as-is. /admin is the Decap CMS and must not be processed.
-  ["admin", "css", "js", "images"].forEach((dir) => eleventyConfig.addPassthroughCopy(dir));
+  ["admin", "css", "js", "images", "fonts"].forEach((dir) => eleventyConfig.addPassthroughCopy(dir));
   eleventyConfig.ignores.add("admin/**");
   eleventyConfig.ignores.add("README.md");
 

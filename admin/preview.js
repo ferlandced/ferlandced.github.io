@@ -1,6 +1,6 @@
 /* global CMS, h, createClass */
 // Preview uses the site's real stylesheet (served under the /ced/ base path).
-CMS.registerPreviewStyle('https://fonts.googleapis.com/css2?family=Allura&family=Barlow+Condensed:wght@500;600&family=Manrope:wght@400;600;700&display=swap');
+CMS.registerPreviewStyle('/ced/css/tokens.css');
 CMS.registerPreviewStyle('/ced/css/site.css');
 
 var ListingPreview = createClass({

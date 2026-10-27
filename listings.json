@@ -1,0 +1,869 @@
+{
+  "ranges": [],
+  "current_route": {
+    "fr": "/resultats?BrokerId=1050",
+    "en": "/results?BrokerId=1050"
+  },
+  "current_filters": {
+    "BrokerId": 1050,
+    "PageSize": 8
+  },
+  "data": [
+    {
+      "no_inscription": 14845493,
+      "slug": {
+        "fr": "maison-a-vendre-monteregie/1409-rue-laplante-st-valerien-de-milton-14845493",
+        "en": "house-for-sale-monteregie/1409-rue-laplante-st-valerien-de-milton-14845493"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison à étages",
+        "en": "Two or more storey house"
+      },
+      "address": {
+        "latitude": 45.56821558,
+        "longitude": -72.71013927,
+        "display": {
+          "fr": "1409 Rue Laplante, Saint-Valérien-de-Milton",
+          "en": "1409 Rue Laplante, Saint-Valérien-de-Milton"
+        },
+        "short_display": {
+          "fr": "1409 Rue Laplante",
+          "en": "1409 Rue Laplante"
+        },
+        "full_display": {
+          "fr": "1409 Rue Laplante, Saint-Valérien-de-Milton, J0H2B0",
+          "en": "1409 Rue Laplante, Saint-Valérien-de-Milton, J0H2B0"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": {
+        "fr": "146,09 m²",
+        "en": "146.09 m²"
+      },
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "2 424,40 m²",
+        "en": "2,424.40 m²",
+        "tooltip_fr": "26 096,02 pi²",
+        "tooltip_en": "26,096.02 ft²"
+      },
+      "nb_of_rooms": 14,
+      "nb_of_bedrooms": 5,
+      "nb_of_bedrooms_above": 3,
+      "nb_of_bedrooms_basement": 2,
+      "nb_of_bathrooms": 2,
+      "nb_of_powder_rooms": 1,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m14845493-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m14845493-far02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m14845493-aer03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m14845493-cou04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m14845493-ext05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m14845493-boi06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 57,
+      "last_modified": "2026-10-20 09:36:53.078589-04",
+      "photo_last_modified": "2026-09-20 10:59:19-04"
+    },
+    {
+      "no_inscription": 9065742,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/285-rue-avery-granby-9065742",
+        "en": "house-for-sale-estrie/285-rue-avery-granby-9065742"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison de plain-pied",
+        "en": "Bungalow on one floor"
+      },
+      "address": {
+        "latitude": 45.382515,
+        "longitude": -72.695719,
+        "display": {
+          "fr": "285 Rue Avery, Granby",
+          "en": "285 Rue Avery, Granby"
+        },
+        "short_display": {
+          "fr": "285 Rue Avery",
+          "en": "285 Rue Avery"
+        },
+        "full_display": {
+          "fr": "285 Rue Avery, Granby, J2H0R5",
+          "en": "285 Rue Avery, Granby, J2H0R5"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": null,
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "2 130,20 m²",
+        "en": "2,130.20 m²",
+        "tooltip_fr": "22 929,28 pi²",
+        "tooltip_en": "22,929.28 ft²"
+      },
+      "nb_of_rooms": 10,
+      "nb_of_bedrooms": 2,
+      "nb_of_bedrooms_above": 2,
+      "nb_of_bedrooms_basement": 0,
+      "nb_of_bathrooms": 1,
+      "nb_of_powder_rooms": 0,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m9065742-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m9065742-far02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m9065742-cou03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m9065742-aer04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m9065742-aer05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m9065742-aer06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 34,
+      "last_modified": "2026-10-02 08:43:54.974463-04",
+      "photo_last_modified": "2026-09-14 11:18:32-04"
+    },
+    {
+      "no_inscription": 13216628,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/85-rue-wolfe-granby-13216628",
+        "en": "house-for-sale-estrie/85-rue-wolfe-granby-13216628"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison de plain-pied",
+        "en": "Bungalow on one floor"
+      },
+      "address": {
+        "latitude": 45.412117,
+        "longitude": -72.713033,
+        "display": {
+          "fr": "85 Rue Wolfe, Granby",
+          "en": "85 Rue Wolfe, Granby"
+        },
+        "short_display": {
+          "fr": "85 Rue Wolfe",
+          "en": "85 Rue Wolfe"
+        },
+        "full_display": {
+          "fr": "85 Rue Wolfe, Granby, J2G1J7",
+          "en": "85 Rue Wolfe, Granby, J2G1J7"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": {
+        "fr": "113,20 m²",
+        "en": "113.20 m²"
+      },
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "557,40 m²",
+        "en": "557.40 m²",
+        "tooltip_fr": "5 999,80 pi²",
+        "tooltip_en": "5,999.80 ft²"
+      },
+      "nb_of_rooms": 14,
+      "nb_of_bedrooms": 5,
+      "nb_of_bedrooms_above": 3,
+      "nb_of_bedrooms_basement": 2,
+      "nb_of_bathrooms": 2,
+      "nb_of_powder_rooms": 0,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m13216628-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m13216628-fac02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m13216628-fac03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m13216628-fac04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m13216628-aer05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m13216628-hal06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 45,
+      "last_modified": "2026-10-02 17:14:29.967841-04",
+      "photo_last_modified": "2026-09-14 14:13:27-04"
+    },
+    {
+      "no_inscription": 28250446,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/452-1-rue-duchesneau-granby-28250446",
+        "en": "house-for-sale-estrie/452-1-rue-duchesneau-granby-28250446"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison de plain-pied",
+        "en": "Bungalow on one floor"
+      },
+      "address": {
+        "latitude": 45.385291,
+        "longitude": -72.732451,
+        "display": {
+          "fr": "452-1 Rue Duchesneau, Granby",
+          "en": "452-1 Rue Duchesneau, Granby"
+        },
+        "short_display": {
+          "fr": "452-1 Rue Duchesneau",
+          "en": "452-1 Rue Duchesneau"
+        },
+        "full_display": {
+          "fr": "452-1 Rue Duchesneau, Granby, J2G8H6",
+          "en": "452-1 Rue Duchesneau, Granby, J2G8H6"
+        }
+      },
+      "status": null,
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": 699000,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "699 000$ +TPS/TVQ",
+        "en": "$699,000 +GST/QST"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "699k$+tx",
+          "en": "$699k+tx"
+        },
+        "is_rental": {
+          "fr": null,
+          "en": null
+        }
+      },
+      "superficie_habitable": {
+        "fr": "2 184 pi²",
+        "en": "2,184 ft²"
+      },
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "850 m²",
+        "en": "850 m²",
+        "tooltip_fr": "9 149,32 pi²",
+        "tooltip_en": "9,149.32 ft²"
+      },
+      "nb_of_rooms": 13,
+      "nb_of_bedrooms": 4,
+      "nb_of_bedrooms_above": 2,
+      "nb_of_bedrooms_basement": 2,
+      "nb_of_bathrooms": 2,
+      "nb_of_powder_rooms": 0,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m28250446-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m28250446-fac02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m28250446-fac03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m28250446-fac04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m28250446-far05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m28250446-far06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 42,
+      "last_modified": "2026-10-13 11:29:39.799361-04",
+      "photo_last_modified": "2026-09-04 11:44:17-04"
+    },
+    {
+      "no_inscription": 28866207,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/533-rue-denison-o-granby-28866207",
+        "en": "house-for-sale-estrie/533-rue-denison-o-granby-28866207"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison de plain-pied",
+        "en": "Bungalow on one floor"
+      },
+      "address": {
+        "latitude": 45.385455,
+        "longitude": -72.741343,
+        "display": {
+          "fr": "533 Rue Denison O., Granby",
+          "en": "533 Rue Denison O., Granby"
+        },
+        "short_display": {
+          "fr": "533 Rue Denison O.",
+          "en": "533 Rue Denison O."
+        },
+        "full_display": {
+          "fr": "533 Rue Denison O., Granby, J2G8C2",
+          "en": "533 Rue Denison O., Granby, J2G8C2"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": null,
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "762,50 m²",
+        "en": "762.50 m²",
+        "tooltip_fr": "8 207,48 pi²",
+        "tooltip_en": "8,207.48 ft²"
+      },
+      "nb_of_rooms": 13,
+      "nb_of_bedrooms": 4,
+      "nb_of_bedrooms_above": 2,
+      "nb_of_bedrooms_basement": 2,
+      "nb_of_bathrooms": 1,
+      "nb_of_powder_rooms": 1,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m28866207-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m28866207-fac02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m28866207-far03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m28866207-far04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m28866207-tse05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m28866207-aer06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 43,
+      "last_modified": "2026-09-22 08:34:39.982503-04",
+      "photo_last_modified": "2026-09-04 13:38:12-04"
+    },
+    {
+      "no_inscription": 14875416,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/448-rue-du-petunia-granby-14875416",
+        "en": "house-for-sale-estrie/448-rue-du-petunia-granby-14875416"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison à étages",
+        "en": "Two or more storey house"
+      },
+      "address": {
+        "latitude": 45.399277978,
+        "longitude": -72.68518737,
+        "display": {
+          "fr": "448 Rue du Pétunia, Granby",
+          "en": "448 Rue du Pétunia, Granby"
+        },
+        "short_display": {
+          "fr": "448 Rue du Pétunia",
+          "en": "448 Rue du Pétunia"
+        },
+        "full_display": {
+          "fr": "448 Rue du Pétunia, Granby, J2H0B1",
+          "en": "448 Rue du Pétunia, Granby, J2H0B1"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": {
+        "fr": "140 m²",
+        "en": "140 m²"
+      },
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "1 019,60 m²",
+        "en": "1,019.60 m²",
+        "tooltip_fr": "10 974,88 pi²",
+        "tooltip_en": "10,974.88 ft²"
+      },
+      "nb_of_rooms": 12,
+      "nb_of_bedrooms": 5,
+      "nb_of_bedrooms_above": 3,
+      "nb_of_bedrooms_basement": 2,
+      "nb_of_bathrooms": 1,
+      "nb_of_powder_rooms": 2,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m14875416-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m14875416-far02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m14875416-far03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m14875416-cou04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m14875416-aer05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m14875416-aer06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 51,
+      "last_modified": "2026-08-23 08:44:34.390739-04",
+      "photo_last_modified": "2026-07-27 09:35:34-04"
+    },
+    {
+      "no_inscription": 10514056,
+      "slug": {
+        "fr": "commerciale-a-vendre/36-rue-tetro-granby-10514056",
+        "en": "commercial-for-sale/36-rue-tetro-granby-10514056"
+      },
+      "category_id": 4,
+      "category": {
+        "fr": "Commerciale / Industrielle",
+        "en": "Commercial / Industrial"
+      },
+      "property_kind": {
+        "fr": "Commerciale",
+        "en": "Commercial"
+      },
+      "address": {
+        "latitude": 45.45119171,
+        "longitude": -72.70826639,
+        "display": {
+          "fr": "36 Rue Tétro, Granby",
+          "en": "36 Rue Tétro, Granby"
+        },
+        "short_display": {
+          "fr": "36 Rue Tétro",
+          "en": "36 Rue Tétro"
+        },
+        "full_display": {
+          "fr": "36 Rue Tétro, Granby, J2G9H8",
+          "en": "36 Rue Tétro, Granby, J2G9H8"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": true,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": false,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": null,
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "3 353,50 m²",
+        "en": "3,353.50 m²",
+        "tooltip_fr": "36 096,77 pi²",
+        "tooltip_en": "36,096.77 ft²"
+      },
+      "nb_of_rooms": null,
+      "nb_of_bedrooms": null,
+      "nb_of_bedrooms_above": null,
+      "nb_of_bedrooms_basement": 0,
+      "nb_of_bathrooms": 0,
+      "nb_of_powder_rooms": 0,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m10514056-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m10514056-gar02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m10514056-gar03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m10514056-gar04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m10514056-gar05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m10514056-gar06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 20,
+      "last_modified": "2026-10-10 07:56:09.195008-04",
+      "photo_last_modified": "2026-07-06 15:43:58-04"
+    },
+    {
+      "no_inscription": 18112287,
+      "slug": {
+        "fr": "maison-a-vendre-estrie/408-rue-lehoux-granby-18112287",
+        "en": "house-for-sale-estrie/408-rue-lehoux-granby-18112287"
+      },
+      "category_id": 1,
+      "category": {
+        "fr": "Résidentielle",
+        "en": "Residential"
+      },
+      "property_kind": {
+        "fr": "Maison à étages",
+        "en": "Two or more storey house"
+      },
+      "address": {
+        "latitude": 45.3911386,
+        "longitude": -72.69665536,
+        "display": {
+          "fr": "408 Rue Lehoux, Granby",
+          "en": "408 Rue Lehoux, Granby"
+        },
+        "short_display": {
+          "fr": "408 Rue Lehoux",
+          "en": "408 Rue Lehoux"
+        },
+        "full_display": {
+          "fr": "408 Rue Lehoux, Granby, J2H0R2",
+          "en": "408 Rue Lehoux, Granby, J2H0R2"
+        }
+      },
+      "status": "sold",
+      "next_open_house": null,
+      "is_collection": false,
+      "is_commercial": false,
+      "is_rental": false,
+      "is_for_sale": true,
+      "is_new_build": null,
+      "price_sale": null,
+      "price_rental": null,
+      "flag_show_addresse": true,
+      "flag_show_map": true,
+      "display_price": {
+        "fr": "Vendu",
+        "en": "Sold"
+      },
+      "display_price_short": {
+        "is_for_sale": {
+          "fr": "Vendu",
+          "en": "Sold"
+        },
+        "is_rental": {
+          "fr": "Loué",
+          "en": "Rented"
+        }
+      },
+      "superficie_habitable": {
+        "fr": "1 647 pi²",
+        "en": "1,647 ft²"
+      },
+      "superficie_terrain": {
+        "unite": "MC",
+        "fr": "1 671,40 m²",
+        "en": "1,671.40 m²",
+        "tooltip_fr": "17 990,80 pi²",
+        "tooltip_en": "17,990.80 ft²"
+      },
+      "nb_of_rooms": 12,
+      "nb_of_bedrooms": 3,
+      "nb_of_bedrooms_above": 3,
+      "nb_of_bedrooms_basement": 0,
+      "nb_of_bathrooms": 1,
+      "nb_of_powder_rooms": 2,
+      "photos": [
+        {
+          "seq": 1,
+          "url": "0154/m18112287-pri01-01.jpg"
+        },
+        {
+          "seq": 2,
+          "url": "0154/m18112287-far02-01.jpg"
+        },
+        {
+          "seq": 3,
+          "url": "0154/m18112287-far03-01.jpg"
+        },
+        {
+          "seq": 4,
+          "url": "0154/m18112287-fac04-01.jpg"
+        },
+        {
+          "seq": 5,
+          "url": "0154/m18112287-aer05-01.jpg"
+        },
+        {
+          "seq": 6,
+          "url": "0154/m18112287-aer06-01.jpg"
+        }
+      ],
+      "nb_of_photos": 53,
+      "last_modified": "2026-08-23 08:46:42.266719-04",
+      "photo_last_modified": "2026-06-05 13:49:17-04"
+    }
+  ],
+  "links": {
+    "first": "http://api.remax-quebec.com/api/inscriptions/search?page=1",
+    "last": "http://api.remax-quebec.com/api/inscriptions/search?page=2",
+    "prev": null,
+    "next": "http://api.remax-quebec.com/api/inscriptions/search?page=2"
+  },
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 2,
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "page": null,
+        "active": false
+      },
+      {
+        "url": "http://api.remax-quebec.com/api/inscriptions/search?page=1",
+        "label": "1",
+        "page": 1,
+        "active": true
+      },
+      {
+        "url": "http://api.remax-quebec.com/api/inscriptions/search?page=2",
+        "label": "2",
+        "page": 2,
+        "active": false
+      },
+      {
+        "url": "http://api.remax-quebec.com/api/inscriptions/search?page=2",
+        "label": "Next &raquo;",
+        "page": 2,
+        "active": false
+      }
+    ],
+    "path": "http://api.remax-quebec.com/api/inscriptions/search",
+    "per_page": 8,
+    "to": 8,
+    "total": 10
+  }
+}
