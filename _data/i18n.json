@@ -92,6 +92,11 @@
       "consentAfter": ".",
       "submit": "Envoyer",
       "subject": "Nouveau message du site web"
+    },
+    "langSwitch": {
+      "label": "Langue",
+      "fr": "Français",
+      "en": "English"
     }
   },
   "en": {
@@ -187,6 +192,11 @@
       "consentAfter": ".",
       "submit": "Send",
       "subject": "New message from the website"
+    },
+    "langSwitch": {
+      "label": "Language",
+      "fr": "Français",
+      "en": "English"
     }
   }
 }

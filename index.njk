@@ -1,8 +1,12 @@
 ---
 layout: layouts/base.njk
 bodyClass: home
-lang: fr
-permalink: /
+pagination:
+  data: site.languages
+  size: 1
+  alias: lang
+permalink: "/{{ lang }}/"
+translated: true
 ---
 {%- set t = i18n[lang] -%}
 {%- set photo = home.hero_photo or agent.photo -%}
@@ -11,10 +15,11 @@ permalink: /
      .stage__track stays pinned while it travels from the hero centre to the About column. #}
   <div class="stage">
     <section class="hero" aria-labelledby="hero-name">
-      <div class="hero__band" aria-hidden="true">
-        <span class="hero__stripe hero__stripe--red"></span>
-        <span class="hero__stripe hero__stripe--dark"></span>
-        {% if home.side_image %}<span class="hero__side"><img src="{{ home.side_image }}" alt="" fetchpriority="low"></span>{% endif %}
+      {# Stripes are decorative. The side image uses the CMS description; empty keeps it silent. #}
+      <div class="hero__band">
+        <span class="hero__stripe hero__stripe--red" aria-hidden="true"></span>
+        <span class="hero__stripe hero__stripe--dark" aria-hidden="true"></span>
+        {% if home.side_image %}<span class="hero__side"><img src="{{ home.side_image }}" alt="{{ home.side_image_alt }}" fetchpriority="low"></span>{% endif %}
       </div>
       <div class="hero__inner">
         <div class="hero__id">

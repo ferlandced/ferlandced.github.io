@@ -9,7 +9,9 @@
   <meta name="description" content="{{ description or t.hero.role }}">
   <link rel="preload" href="/fonts/montserrat-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/montserrat-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/css/tokens.css">
+  {% if translated %}{% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="/{{ l }}/">
+  {% endfor %}<link rel="alternate" hreflang="x-default" href="/{{ site.defaultLang }}/">
+  {% endif %}<link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/site.css">
   <script src="/js/site.js" defer></script>
 </head>

@@ -1,5 +1,5 @@
 <header class="site-header" data-nav-root>
-  <a class="brand" href="/" aria-label="{{ t.office.name }}, {{ t.nav.home }}">
+  <a class="brand" href="/{{ lang }}/" aria-label="{{ t.office.name }}, {{ t.nav.home }}">
     <img class="brand__logo" src="/images/REMAX_logo_RGB_dark.svg" alt="" width="1200" height="600">
     <span class="brand__office" aria-hidden="true">{{ t.office.nameSuffix }}</span>
   </a>
@@ -8,8 +8,19 @@
     <span class="nav-toggle__bars" aria-hidden="true"></span>
   </button>
   <nav class="site-nav" id="site-nav" aria-label="{{ t.nav.label }}">
-    <a href="/#about">{{ t.nav.about }}</a>
-    <a href="/#services">{{ t.nav.services }}</a>
+    <a href="/{{ lang }}/#about">{{ t.nav.about }}</a>
+    <a href="/{{ lang }}/#services">{{ t.nav.services }}</a>
     <a href="/listings/">{{ t.nav.properties }}</a>
+  </nav>
+  {# Maps to the same page in the other language. Pages without a translation link to that language's home. #}
+  <nav class="lang-switch" aria-label="{{ t.langSwitch.label }}">
+    {%- for l in site.languages -%}
+    {%- if not loop.first %}<span class="lang-switch__sep" aria-hidden="true">|</span>{% endif -%}
+    {%- if l == lang -%}
+    <span class="lang-switch__current" lang="{{ l }}" aria-current="true" title="{{ t.langSwitch[l] }}">{{ l | upper }}</span>
+    {%- else -%}
+    <a href="/{{ l }}/" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.langSwitch[l] }}"><span class="visually-hidden">{{ t.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
+    {%- endif -%}
+    {%- endfor -%}
   </nav>
 </header>

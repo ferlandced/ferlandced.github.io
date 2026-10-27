@@ -1,4 +1,12 @@
 {
   "web3formsKey": "ff2d76e3-ab1e-4f77-9bc7-df314f30fe08",
-  "privacyUrl": { "fr": "", "en": "" }
+  "privacyUrl": {
+    "fr": "",
+    "en": ""
+  },
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "defaultLang": "fr"
 }
