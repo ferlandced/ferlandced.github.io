@@ -18,7 +18,7 @@ site_url: https://matteougolini.net/ced/
 display_url: https://matteougolini.net/ced/
 
 collections:
-  # Home page hero (read by index.njk as `home`).
+  # Home page images (read by index.njk as `home`). Text lives in _data/i18n.json.
   - name: home
     label: Home page
     files:
@@ -27,12 +27,11 @@ collections:
         file: content/home.json
         format: json
         fields:
-          - { name: initials, label: "Signature initials", widget: string, hint: "Shown large in the script font" }
-          - { name: subtitle, label: Subtitle, widget: string }
-          - { name: hero_image, label: "Main photo", widget: image }
-          - { name: hero_image_alt, label: "Main photo description", widget: string, required: false }
-          - { name: hero_image_secondary, label: "Side photo", widget: image, required: false }
-          - { name: cta_label, label: "Contact button label", widget: string, default: "Contact me" }
+          - { name: signature, label: "Signature", widget: image, hint: "Agent mark (house + signature). SVG preferred, trimmed tight to the drawing." }
+          - { name: hero_photo, label: "Agent photo", widget: image, hint: "Clipped photo with a transparent background, portrait, at least 1200 px tall. Also used in the About section." }
+          - { name: hero_photo_alt, label: "Agent photo description", widget: string, required: false }
+          - { name: side_image, label: "Side image", widget: image, required: false, hint: "Shown right of the red band on desktop only. Portrait, at least 1600 px tall, usage rights confirmed." }
+          - { name: side_image_alt, label: "Side image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
 
   # a) Agent profile. Placeholder fields; adjust to the real site.
   - name: agent

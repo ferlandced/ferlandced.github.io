@@ -1,5 +1,19 @@
 <footer class="site-footer">
-  <div class="container">
-    <p>© {{ "" | year }} {{ agent.name }}{% if agent.title %} · {{ agent.title }}{% endif %}</p>
+  <div class="container site-footer__inner">
+    <div>
+      <p class="site-footer__office">{{ t.office.name }}</p>
+      <p>{{ t.office.type }}</p>
+      <address>{{ t.office.address }}</address>
+      <p>{{ t.office.phoneLabel }} <a href="tel:+1{{ t.office.phone | replace(' ', '') }}">{{ t.office.phone }}</a></p>
+      {# French wording must come from REMAX Québec (CLAUDE.md open item). Until then the English notice is shown, marked as English. #}
+      <p class="site-footer__notice" lang="{{ t.office.independenceLang }}">{{ t.office.independence }}</p>
+    </div>
+    <div>
+      <p class="site-footer__office">{{ agent.name }}</p>
+      <p>{{ t.footer.agent }}</p>
+      {% if agent.phone %}<p><a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></p>{% endif %}
+      {% if agent.email %}<p><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></p>{% endif %}
+      <p class="site-footer__copy">© {{ "" | year }} {{ agent.name }}</p>
+    </div>
   </div>
 </footer>

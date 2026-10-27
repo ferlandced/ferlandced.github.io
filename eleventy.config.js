@@ -13,6 +13,7 @@ export default function (eleventyConfig) {
   ["admin", "css", "js", "images", "fonts"].forEach((dir) => eleventyConfig.addPassthroughCopy(dir));
   eleventyConfig.ignores.add("admin/**");
   eleventyConfig.ignores.add("README.md");
+  eleventyConfig.ignores.add("CLAUDE.md");
 
   // CMS-managed single files (Decap "file" collections).
   eleventyConfig.addGlobalData("agent", () => readJson("content/agent.json"));

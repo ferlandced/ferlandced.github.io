@@ -1,0 +1,192 @@
+{
+  "fr": {
+    "locale": "fr-CA",
+    "office": {
+      "name": "REMAX Privilège",
+      "nameSuffix": "Privilège",
+      "type": "Agence immobilière",
+      "address": "103-7750 Boul. Cousineau, St-Hubert, Qc, J3Z 0C8",
+      "phone": "450 678 3150",
+      "phoneLabel": "Bureau",
+      "independence": "Each Office Independently Owned and Operated.",
+      "independenceLang": "en"
+    },
+    "nav": {
+      "label": "Menu principal",
+      "home": "Accueil",
+      "about": "À propos",
+      "services": "Services",
+      "properties": "Propriétés",
+      "contact": "Me contacter",
+      "open": "Ouvrir le menu",
+      "close": "Fermer le menu"
+    },
+    "hero": {
+      "role": "Courtier immobilier résidentiel",
+      "agency": "REMAX Privilège, agence immobilière"
+    },
+    "about": {
+      "heading": "À propos",
+      "cellLabel": "Cellulaire",
+      "contact": "Me contacter"
+    },
+    "services": {
+      "heading": "Services",
+      "items": [
+        {
+          "id": "buy",
+          "title": "Acheter",
+          "text": "Dites-moi ce que vous cherchez. Je vous envoie les nouvelles propriétés qui correspondent à vos critères dès leur arrivée sur le marché.",
+          "actions": [
+            {
+              "label": "Créer ma recherche personnalisée",
+              "subject": "Recherche personnalisée"
+            }
+          ]
+        },
+        {
+          "id": "sell",
+          "title": "Vendre",
+          "text": "Je vous aide à fixer le bon prix et je vous accompagne jusqu'à la signature chez le notaire.",
+          "actions": [
+            {
+              "label": "Combien vaut ma propriété ?",
+              "subject": "Évaluation de ma propriété"
+            }
+          ]
+        },
+        {
+          "id": "rent",
+          "title": "Louer",
+          "text": "Vous cherchez un logement ou vous voulez louer votre propriété ? Je vous aide à trouver le bon endroit ou le bon locataire.",
+          "actions": [
+            {
+              "label": "Trouver un logement à louer",
+              "subject": "Recherche de logement à louer"
+            },
+            {
+              "label": "Mettre ma propriété en location",
+              "subject": "Mise en location de ma propriété"
+            }
+          ]
+        }
+      ]
+    },
+    "properties": {
+      "heading": "Mes propriétés",
+      "all": "Toutes les propriétés"
+    },
+    "footer": {
+      "agent": "Courtier immobilier résidentiel"
+    },
+    "contact": {
+      "heading": "Me contacter",
+      "intro": "Écrivez-moi et je vous réponds.",
+      "name": "Nom",
+      "email": "Courriel",
+      "phone": "Téléphone",
+      "message": "Message",
+      "either": "Indiquez un courriel ou un numéro de téléphone.",
+      "consentBefore": "J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la ",
+      "privacy": "politique de confidentialité",
+      "consentAfter": ".",
+      "submit": "Envoyer",
+      "subject": "Nouveau message du site web"
+    }
+  },
+  "en": {
+    "locale": "en-CA",
+    "office": {
+      "name": "REMAX Privilège",
+      "nameSuffix": "Privilège",
+      "type": "Real estate agency",
+      "address": "103-7750 Boul. Cousineau, St-Hubert, Qc, J3Z 0C8",
+      "phone": "450 678 3150",
+      "phoneLabel": "Office",
+      "independence": "Each Office Independently Owned and Operated.",
+      "independenceLang": "en"
+    },
+    "nav": {
+      "label": "Main menu",
+      "home": "Home",
+      "about": "About",
+      "services": "Services",
+      "properties": "Properties",
+      "contact": "Contact me",
+      "open": "Open menu",
+      "close": "Close menu"
+    },
+    "hero": {
+      "role": "Residential Real Estate Broker",
+      "agency": "REMAX Privilège, real estate agency"
+    },
+    "about": {
+      "heading": "About",
+      "cellLabel": "Cell",
+      "contact": "Contact me"
+    },
+    "services": {
+      "heading": "Services",
+      "items": [
+        {
+          "id": "buy",
+          "title": "Buy",
+          "text": "Tell me what you are looking for. I send you new properties that match your criteria as soon as they come on the market.",
+          "actions": [
+            {
+              "label": "Set up my property search",
+              "subject": "Property search"
+            }
+          ]
+        },
+        {
+          "id": "sell",
+          "title": "Sell",
+          "text": "I help you set the right price and guide you all the way to the notary signing.",
+          "actions": [
+            {
+              "label": "What is my property worth?",
+              "subject": "Property valuation"
+            }
+          ]
+        },
+        {
+          "id": "rent",
+          "title": "Rent",
+          "text": "Looking for a place, or want to rent out your property? I help you find the right place or the right tenant.",
+          "actions": [
+            {
+              "label": "Find a place to rent",
+              "subject": "Looking for a rental"
+            },
+            {
+              "label": "Rent out my property",
+              "subject": "Renting out my property"
+            }
+          ]
+        }
+      ]
+    },
+    "properties": {
+      "heading": "My properties",
+      "all": "All properties"
+    },
+    "footer": {
+      "agent": "Residential Real Estate Broker"
+    },
+    "contact": {
+      "heading": "Contact me",
+      "intro": "Write to me and I will get back to you.",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "either": "Enter an email address or a phone number.",
+      "consentBefore": "I agree that this information is sent to Cedrik Ferland to answer my request, as described in the ",
+      "privacy": "privacy policy",
+      "consentAfter": ".",
+      "submit": "Send",
+      "subject": "New message from the website"
+    }
+  }
+}

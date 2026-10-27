@@ -1,10 +1,15 @@
-<header class="site-header">
-  <a class="site-header__brand" href="/">
-    <img src="/images/logo-light.svg" alt="{{ agent.name }}" width="120" height="30">
+<header class="site-header" data-nav-root>
+  <a class="brand" href="/" aria-label="{{ t.office.name }}, {{ t.nav.home }}">
+    <img class="brand__logo" src="/images/REMAX_logo_RGB_dark.svg" alt="" width="1200" height="600">
+    <span class="brand__office" aria-hidden="true">{{ t.office.nameSuffix }}</span>
   </a>
-  <nav class="site-header__nav" aria-label="Main">
-    <a href="/#about">About</a>
-    <a href="/listings/">Properties</a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-label-open="{{ t.nav.open }}" data-label-close="{{ t.nav.close }}">
+    <span class="visually-hidden">{{ t.nav.open }}</span>
+    <span class="nav-toggle__bars" aria-hidden="true"></span>
+  </button>
+  <nav class="site-nav" id="site-nav" aria-label="{{ t.nav.label }}">
+    <a href="/#about">{{ t.nav.about }}</a>
+    <a href="/#services">{{ t.nav.services }}</a>
+    <a href="/listings/">{{ t.nav.properties }}</a>
   </nav>
-  {% if agent.email %}<a class="btn btn--accent site-header__cta" href="mailto:{{ agent.email }}">{{ home.cta_label or "Contact" }}</a>{% endif %}
 </header>
