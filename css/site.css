@@ -51,8 +51,9 @@ a:hover { color: var(--brand-link-hover); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* Ghost button: Primary Red border, Dark Red text, no fill. Fills Dark Red with white text on hover. */
-.btn { display: inline-block; padding: 9px 18px; border: 2px solid var(--brand-button-border); border-radius: var(--brand-radius); background: transparent; color: var(--brand-button); font: inherit; font-size: .875rem; font-weight: var(--font-bold); line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform .2s, background-color .2s, border-color .2s, color .2s; }
-.btn:hover { transform: translateY(-1px); background: var(--brand-button); border-color: var(--brand-button); color: var(--brand-on-dark); }
+.btn { display: inline-block; padding: 9px 0; border: 0; border-radius: 0; background: none; color: var(--brand-button); font: inherit; font-size: .875rem; font-weight: var(--font-bold); line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; text-align: left; text-decoration: none; cursor: pointer; transition: color .2s; }
+/* No border or fill: text aligns with the content's left edge; hover underlines in Bridge Red */
+.btn:hover { color: var(--brand-link-hover); text-decoration: underline; text-underline-offset: .3em; }
 
 /* ==========================================================================
    Header: fixed, white. On desktop the logo shrinks as the page scrolls.
@@ -138,7 +139,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .menu-corner, .site-nav__lang, .brand__logo--light { display: none; }
 @media (max-width: 767.98px) {
   .site-header { --cx: 50vw; --cx-stripe: 14px; transition: --cx .45s cubic-bezier(.22, 1, .36, 1), background-color .3s; }
-  .site-header[data-past-hero], body:not(.home) .site-header { --cx: 68vw; }
+  .site-header[data-past-hero], body:not(.home) .site-header { --cx: 82vw; }   /* small corner after the hero */
   .site-header[data-open] { --cx: -45vw; }
   .menu-corner { display: block; position: fixed; inset: 0; pointer-events: none; }
   .menu-corner > span { position: absolute; inset: 0; }
@@ -150,7 +151,15 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   /* Burger: white, bottom right, on the Dark Red */
   .js-nav .nav-toggle { position: fixed; right: 12px; bottom: 12px; z-index: 1; margin: 0; background: none; color: var(--brand-on-dark); }
   /* Language and contact icons move into the menu */
-  .site-header__tools { display: none; }
+  /* Language lives in the menu. The contact icons stack above the burger on the hero only,
+     and fade out once the visitor scrolls past it (or opens the menu, which has its own). */
+  .site-header__tools .lang-switch { display: none; }
+  .site-header__tools .contact-icons--header { display: flex; flex-direction: column; position: fixed; right: 12px; bottom: 64px; z-index: 1;
+    gap: 0; padding: 0; background: none; opacity: 1; visibility: visible; }
+  .site-header__tools .contact-icons--header a { color: var(--brand-on-dark); }
+  .site-header[data-past-hero] .contact-icons--header, .site-header[data-open] .contact-icons--header,
+  body:not(.home) .contact-icons--header { opacity: 0 !important; visibility: hidden !important; }
+  .hero .contact-icons--hero { display: none; }
 
   /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
   /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
@@ -474,6 +483,11 @@ body:not(.home) .site-header { background: var(--brand-surface); }
    ========================================================================== */
 .site-footer { background: var(--brand-dark); color: var(--brand-on-dark-muted); font-size: .9rem; }
 .site-footer__inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; padding-block: 40px; }
+/* Phones: one column, kept left of the fixed red corner (which starts at 82% of the width) */
+@media (max-width: 767.98px) {
+  .site-footer__inner { grid-template-columns: 1fr; gap: 28px; padding-bottom: 48px; }
+  .site-footer__inner > div { max-width: calc(82vw - var(--gutter) - 8px); }
+}
 .site-footer p, .site-footer address { margin: 0 0 2px; font-style: normal; }
 .site-footer a { color: var(--brand-on-dark); }
 .site-footer__office { color: var(--brand-on-dark); font-weight: var(--font-bold); }
