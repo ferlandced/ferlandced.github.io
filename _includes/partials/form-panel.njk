@@ -1,0 +1,10 @@
+{# Form card: title, close link and the form fragment for this language.
+   Expects formKey (key in site.pages and i18n forms), formFile (fragment name), titleTag and titleId.
+   Used by the form pages (h1, close goes home) and the home page dialogs (close shuts the dialog). #}
+<div class="form-panel">
+  <div class="form-panel__head">
+    <{{ titleTag }} class="form-panel__title" id="{{ titleId }}">{{ t.forms[formKey].title }}</{{ titleTag }}>
+    <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.close }}"><span data-icon="x" aria-hidden="true"></span></a>
+  </div>
+  {% include "forms/" + lang + "/" + formFile + ".html" %}
+</div>

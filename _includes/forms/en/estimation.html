@@ -1,0 +1,249 @@
+<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
+  <input type="hidden" name="form_type" value="estimation">
+  <input type="hidden" name="subject" value="Property valuation request" data-subject-location="Renting out my property">
+  <input type="hidden" name="intent" value="">
+  <input type="hidden" name="from_name" value="Cedrik Ferland website">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <p class="form-progress" data-progress hidden>Step <span data-current></span> of <span data-total></span></p>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">What is the address of your property?</h2>
+    <div class="form-field">
+      <label for="est-address"><span data-icon="map-pin" aria-hidden="true"></span> Address</label>
+      <input id="est-address" name="address" type="text" autocomplete="street-address" required>
+    </div>
+    <h3>Your contact information</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="est-first-name"><span data-icon="user" aria-hidden="true"></span> First name</label>
+        <input id="est-first-name" name="first_name" type="text" autocomplete="given-name" required>
+      </div>
+      <div class="form-field">
+        <label for="est-last-name"><span data-icon="user" aria-hidden="true"></span> Last name</label>
+        <input id="est-last-name" name="last_name" type="text" autocomplete="family-name" required>
+      </div>
+    </div>
+    <p class="form-hint form-hint--group" id="est-either">A phone number or an email is enough.</p>
+    <div class="form-row form-row--phone">
+      <div class="form-field">
+        <label for="est-phone"><span data-icon="phone" aria-hidden="true"></span> Phone</label>
+        <input id="est-phone" name="phone" type="tel" autocomplete="tel" placeholder="514 555-0123" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="est-either est-phone-hint" data-one-of="contact" data-one-of-message="Enter a phone number or an email.">
+        <p class="form-hint" id="est-phone-hint">At least 10 digits, including the area code.</p>
+      </div>
+      <div class="form-field">
+        <label for="est-phone-ext">Extension</label>
+        <input id="est-phone-ext" name="phone_ext" type="text" inputmode="numeric" autocomplete="tel-extension" placeholder="Ext">
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="est-email"><span data-icon="mail" aria-hidden="true"></span> Email</label>
+      <input id="est-email" name="email" type="email" autocomplete="email" aria-describedby="est-either" data-one-of="contact">
+    </div>
+    <!-- Link “privacy policy” to the policy once it is published (site.json privacyUrl). -->
+    <label class="form-consent" for="est-consent"><input id="est-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the privacy policy.</span></label>
+    <div class="form-actions">
+      <a class="form-cancel" href="/en/" data-close>Cancel</a>
+      <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">What type of property do you have? (optional)</h2>
+    <div class="form-tabs" role="tablist" aria-label="Categories" data-tabs hidden>
+      <button type="button" role="tab" id="est-tabtype-residentiel" aria-controls="est-cat-residentiel">Residential</button>
+      <button type="button" role="tab" id="est-tabtype-commercial" aria-controls="est-cat-commercial">Commercial</button>
+      <button type="button" role="tab" id="est-tabtype-terrain-ferme" aria-controls="est-cat-terrain-ferme">Land and farm</button>
+    </div>
+    <fieldset class="form-tiles" id="est-cat-residentiel" role="tabpanel" aria-labelledby="est-tabtype-residentiel">
+      <legend>Residential</legend>
+      <label for="est-type-two-or-more-storey-house"><input id="est-type-two-or-more-storey-house" type="radio" name="property_type" value="Two or more storey house"> <span data-icon="house" aria-hidden="true"></span> Two or more storey house</label>
+      <label for="est-type-split-level-house"><input id="est-type-split-level-house" type="radio" name="property_type" value="Split-level house"> <span data-icon="house" aria-hidden="true"></span> Split-level house</label>
+      <label for="est-type-one-and-a-half-storey-house"><input id="est-type-one-and-a-half-storey-house" type="radio" name="property_type" value="One-and-a-half-storey house"> <span data-icon="house" aria-hidden="true"></span> One-and-a-half-storey house</label>
+      <label for="est-type-mobile-home"><input id="est-type-mobile-home" type="radio" name="property_type" value="Mobile home"> <span data-icon="house" aria-hidden="true"></span> Mobile home</label>
+      <label for="est-type-one-storey-house"><input id="est-type-one-storey-house" type="radio" name="property_type" value="One-storey house"> <span data-icon="house" aria-hidden="true"></span> One-storey house</label>
+      <label for="est-type-loft-studio"><input id="est-type-loft-studio" type="radio" name="property_type" value="Loft/Studio"> <span data-icon="building-2" aria-hidden="true"></span> Loft/Studio</label>
+      <label for="est-type-duplex"><input id="est-type-duplex" type="radio" name="property_type" value="Duplex"> <span data-icon="building-2" aria-hidden="true"></span> Duplex</label>
+      <label for="est-type-triplex"><input id="est-type-triplex" type="radio" name="property_type" value="Triplex"> <span data-icon="building-2" aria-hidden="true"></span> Triplex</label>
+      <label for="est-type-quadruplex"><input id="est-type-quadruplex" type="radio" name="property_type" value="Quadruplex"> <span data-icon="building-2" aria-hidden="true"></span> Quadruplex</label>
+      <label for="est-type-quintuplex"><input id="est-type-quintuplex" type="radio" name="property_type" value="Quintuplex"> <span data-icon="building-2" aria-hidden="true"></span> Quintuplex</label>
+      <label for="est-type-apartment"><input id="est-type-apartment" type="radio" name="property_type" value="Apartment"> <span data-icon="building-2" aria-hidden="true"></span> Apartment</label>
+      <label for="est-type-cottage"><input id="est-type-cottage" type="radio" name="property_type" value="Cottage"> <span data-icon="house" aria-hidden="true"></span> Cottage</label>
+      <label for="est-type-revenue-property"><input id="est-type-revenue-property" type="radio" name="property_type" value="Revenue property"> <span data-icon="building-2" aria-hidden="true"></span> Revenue property</label>
+    </fieldset>
+    <fieldset class="form-tiles" id="est-cat-commercial" role="tabpanel" aria-labelledby="est-tabtype-commercial">
+      <legend>Commercial</legend>
+      <label for="est-type-commercial-condo"><input id="est-type-commercial-condo" type="radio" name="property_type" value="Commercial condo"> <span data-icon="store" aria-hidden="true"></span> Commercial condo</label>
+      <label for="est-type-industrial-condo"><input id="est-type-industrial-condo" type="radio" name="property_type" value="Industrial condo"> <span data-icon="store" aria-hidden="true"></span> Industrial condo</label>
+      <label for="est-type-commercial-building-office"><input id="est-type-commercial-building-office" type="radio" name="property_type" value="Commercial building/Office"> <span data-icon="store" aria-hidden="true"></span> Commercial building/Office</label>
+      <label for="est-type-industrial-building"><input id="est-type-industrial-building" type="radio" name="property_type" value="Industrial building"> <span data-icon="store" aria-hidden="true"></span> Industrial building</label>
+      <label for="est-type-commercial-building-and-land"><input id="est-type-commercial-building-and-land" type="radio" name="property_type" value="Commercial building and land"> <span data-icon="store" aria-hidden="true"></span> Commercial building and land</label>
+      <label for="est-type-industrial-building-and-land"><input id="est-type-industrial-building-and-land" type="radio" name="property_type" value="Industrial building and land"> <span data-icon="store" aria-hidden="true"></span> Industrial building and land</label>
+    </fieldset>
+    <fieldset class="form-tiles" id="est-cat-terrain-ferme" role="tabpanel" aria-labelledby="est-tabtype-terrain-ferme">
+      <legend>Land and farm</legend>
+      <label for="est-type-hobby-farm"><input id="est-type-hobby-farm" type="radio" name="property_type" value="Hobby farm"> <span data-icon="house" aria-hidden="true"></span> Hobby farm</label>
+      <label for="est-type-farm"><input id="est-type-farm" type="radio" name="property_type" value="Farm"> <span data-icon="trees" aria-hidden="true"></span> Farm</label>
+      <label for="est-type-vacant-lot"><input id="est-type-vacant-lot" type="radio" name="property_type" value="Vacant lot"> <span data-icon="trees" aria-hidden="true"></span> Vacant lot</label>
+      <label for="est-type-woodland"><input id="est-type-woodland" type="radio" name="property_type" value="Woodland"> <span data-icon="trees" aria-hidden="true"></span> Woodland</label>
+    </fieldset>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
+      <button type="submit" class="form-skip">Skip and send</button>
+      <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">Your property (optional)</h2>
+    <div class="form-field">
+      <label for="est-year"><span data-icon="calendar" aria-hidden="true"></span> Year built</label>
+      <input id="est-year" name="construction_year" type="number" inputmode="numeric" min="1000" max="9999" step="1">
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="est-living-area"><span data-icon="ruler" aria-hidden="true"></span> Living area (sq ft)</label>
+        <input id="est-living-area" name="living_area_sqft" type="number" inputmode="numeric" min="0" step="1">
+      </div>
+      <div class="form-field">
+        <label for="est-lot-size"><span data-icon="ruler" aria-hidden="true"></span> Lot size (sq ft)</label>
+        <input id="est-lot-size" name="lot_size_sqft" type="number" inputmode="numeric" min="0" step="1">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
+      <button type="submit" class="form-skip">Skip and send</button>
+      <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">Features (optional)</h2>
+    <div class="form-row">
+      <fieldset class="form-field form-segmented">
+        <legend><span data-icon="bed-double" aria-hidden="true"></span> Bedrooms</legend>
+        <div class="form-segments">
+          <label for="est-bedrooms-0"><input id="est-bedrooms-0" type="radio" name="bedrooms" value="0"> 0</label>
+          <label for="est-bedrooms-1"><input id="est-bedrooms-1" type="radio" name="bedrooms" value="1"> 1</label>
+          <label for="est-bedrooms-2"><input id="est-bedrooms-2" type="radio" name="bedrooms" value="2"> 2</label>
+          <label for="est-bedrooms-3"><input id="est-bedrooms-3" type="radio" name="bedrooms" value="3"> 3</label>
+          <label for="est-bedrooms-4"><input id="est-bedrooms-4" type="radio" name="bedrooms" value="4"> 4</label>
+          <label for="est-bedrooms-5"><input id="est-bedrooms-5" type="radio" name="bedrooms" value="5"> 5</label>
+          <label for="est-bedrooms-5-plus"><input id="est-bedrooms-5-plus" type="radio" name="bedrooms" value="5+"> 5+</label>
+        </div>
+      </fieldset>
+      <fieldset class="form-field form-segmented">
+        <legend><span data-icon="bath" aria-hidden="true"></span> Bathrooms</legend>
+        <div class="form-segments">
+          <label for="est-bathrooms-0"><input id="est-bathrooms-0" type="radio" name="bathrooms" value="0"> 0</label>
+          <label for="est-bathrooms-1"><input id="est-bathrooms-1" type="radio" name="bathrooms" value="1"> 1</label>
+          <label for="est-bathrooms-2"><input id="est-bathrooms-2" type="radio" name="bathrooms" value="2"> 2</label>
+          <label for="est-bathrooms-3"><input id="est-bathrooms-3" type="radio" name="bathrooms" value="3"> 3</label>
+          <label for="est-bathrooms-3-plus"><input id="est-bathrooms-3-plus" type="radio" name="bathrooms" value="3+"> 3+</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="form-row">
+      <fieldset class="form-field form-segmented">
+        <legend><span data-icon="car" aria-hidden="true"></span> Outdoor parking spaces</legend>
+        <div class="form-segments">
+          <label for="est-parking-0"><input id="est-parking-0" type="radio" name="outdoor_parking" value="0"> 0</label>
+          <label for="est-parking-1"><input id="est-parking-1" type="radio" name="outdoor_parking" value="1"> 1</label>
+          <label for="est-parking-2"><input id="est-parking-2" type="radio" name="outdoor_parking" value="2"> 2</label>
+          <label for="est-parking-3"><input id="est-parking-3" type="radio" name="outdoor_parking" value="3"> 3</label>
+          <label for="est-parking-3-plus"><input id="est-parking-3-plus" type="radio" name="outdoor_parking" value="3+"> 3+</label>
+        </div>
+      </fieldset>
+      <fieldset class="form-field form-segmented">
+        <legend><span data-icon="warehouse" aria-hidden="true"></span> Garages</legend>
+        <div class="form-segments">
+          <label for="est-garages-0"><input id="est-garages-0" type="radio" name="garages" value="0"> 0</label>
+          <label for="est-garages-1"><input id="est-garages-1" type="radio" name="garages" value="1"> 1</label>
+          <label for="est-garages-2"><input id="est-garages-2" type="radio" name="garages" value="2"> 2</label>
+          <label for="est-garages-3"><input id="est-garages-3" type="radio" name="garages" value="3"> 3</label>
+          <label for="est-garages-3-plus"><input id="est-garages-3-plus" type="radio" name="garages" value="3+"> 3+</label>
+        </div>
+      </fieldset>
+    </div>
+    <fieldset class="form-field form-segmented">
+      <legend><span data-icon="arrow-down-to-line" aria-hidden="true"></span> Basement</legend>
+      <div class="form-segments">
+        <label for="est-basement-none"><input id="est-basement-none" type="radio" name="basement" value="None"> None</label>
+        <label for="est-basement-unfinished"><input id="est-basement-unfinished" type="radio" name="basement" value="Unfinished"> Unfinished</label>
+        <label for="est-basement-partially-finished"><input id="est-basement-partially-finished" type="radio" name="basement" value="Partially finished"> Partially finished</label>
+        <label for="est-basement-finished"><input id="est-basement-finished" type="radio" name="basement" value="Finished"> Finished</label>
+      </div>
+    </fieldset>
+    <fieldset class="form-field form-segmented">
+      <legend><span data-icon="waves" aria-hidden="true"></span> Pool</legend>
+      <div class="form-segments">
+        <label for="est-pool-none"><input id="est-pool-none" type="radio" name="pool" value="None"> None</label>
+        <label for="est-pool-above-ground"><input id="est-pool-above-ground" type="radio" name="pool" value="Above-ground"> Above-ground</label>
+        <label for="est-pool-in-ground"><input id="est-pool-in-ground" type="radio" name="pool" value="In-ground"> In-ground</label>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
+      <button type="submit" class="form-skip">Skip and send</button>
+      <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">Your project (optional)</h2>
+    <div class="form-field">
+      <label for="est-sale-reason">Reason for selling</label>
+      <input id="est-sale-reason" name="sale_reason" type="text">
+    </div>
+    <div class="form-field">
+      <label for="est-renovations"><span data-icon="hammer" aria-hidden="true"></span> What major renovations and improvements have been made to your property, and in what year?</label>
+      <textarea id="est-renovations" name="renovations"></textarea>
+    </div>
+    <div class="form-field">
+      <label for="est-purpose"><span data-icon="target" aria-hidden="true"></span> Purpose of the request</label>
+      <select id="est-purpose" name="request_purpose">
+        <option value="">Select</option>
+        <option>Selling the property</option>
+        <option>Refinancing the property</option>
+        <option>Just knowing the market value</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="est-moving"><span data-icon="clock" aria-hidden="true"></span> When do you plan to move?</label>
+      <select id="est-moving" name="moving_timeline">
+        <option value="">Select</option>
+        <option>Now</option>
+        <option>Within 3 months</option>
+        <option>In 3 to 6 months</option>
+        <option>In 6 months to a year</option>
+        <option>1 year or more</option>
+      </select>
+    </div>
+    <fieldset class="form-field">
+      <legend><span data-icon="file-check" aria-hidden="true"></span> Have you had a certified appraisal done in the last 5 years?</legend>
+      <label for="est-appraisal-yes"><input id="est-appraisal-yes" type="radio" name="certified_appraisal_5y" value="Yes"> Yes</label>
+      <label for="est-appraisal-no"><input id="est-appraisal-no" type="radio" name="certified_appraisal_5y" value="No"> No</label>
+      <label for="est-appraisal-older"><input id="est-appraisal-older" type="radio" name="certified_appraisal_5y" value="Yes, more than 5 years ago"> Yes, more than 5 years ago</label>
+    </fieldset>
+    <div class="form-field">
+      <label for="est-listing"><span data-icon="clock" aria-hidden="true"></span> When do you plan to put your property on the market?</label>
+      <select id="est-listing" name="listing_timeline">
+        <option value="">Select</option>
+        <option>Now</option>
+        <option>Within 3 months</option>
+        <option>In 3 to 6 months</option>
+        <option>In 6 months to a year</option>
+        <option>1 year or more</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
+      <button type="submit">Send my request</button>
+    </div>
+  </section>
+
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> Something went wrong. Please try again or reach me by phone.</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> Thank you! I'll get back to you very soon.</section>
+</form>

@@ -1,4 +1,4 @@
-# Decap CMS config. Served at https://mt81.github.io/ced/admin/
+# Decap CMS config. Served at https://matteougolini.net/ced/admin/
 backend:
   name: turbo-github
   turbo_site_id: 22f1b961-cfd9-45c3-9abf-f120a44b4ac5
@@ -360,6 +360,42 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
+          - name: forms
+            label: "Pages des formulaires"
+            widget: object
+            collapsed: true
+            fields:
+              - name: close
+                label: "Bouton X qui ferme le formulaire, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: estimation
+                label: "Estimation"
+                widget: object
+                collapsed: false
+                fields:
+                  - name: title
+                    label: "Titre de la page d'estimation"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+              - name: propertyAlert
+                label: "Alerte immobilière"
+                widget: object
+                collapsed: false
+                fields:
+                  - name: title
+                    label: "Titre de la page d'alerte immobilière"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
           - name: contact
             label: "Formulaire de contact"
             widget: object

@@ -49,3 +49,59 @@
   update();
   window.addEventListener("scroll", update, { passive: true });
 })();
+
+// Form dialogs: a link with data-dialog="<id>" opens that <dialog> on the home page. Without JS
+// (or without <dialog> support) the link opens the form page. [data-close] links and the backdrop close it.
+// The form inside gets "wizard:open" with the link's data-intent (see js/forms.js).
+(() => {
+  document.querySelectorAll("a[data-dialog]").forEach((link) => {
+    const dialog = document.getElementById(link.dataset.dialog);
+    if (!dialog || typeof dialog.showModal !== "function") return;
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      dialog.querySelector("form[data-wizard]")?.dispatchEvent(new CustomEvent("wizard:open", { detail: { intent: link.dataset.intent } }));
+      dialog.showModal();
+    });
+  });
+  // Backdrop: only a click outside the dialog's box closes it. Clicks on the dialog's own empty
+  // area (e.g. below the form on a full-screen phone dialog) also target the <dialog>, so check the position.
+  const outside = (dialog, e) => {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  };
+  document.querySelectorAll("dialog.form-dialog").forEach((dialog) => {
+    dialog.addEventListener("click", (e) => {
+      if (e.target.closest("[data-close]")) { e.preventDefault(); dialog.close(); }
+      else if (e.target === dialog && outside(dialog, e)) dialog.close();
+    });
+  });
+})();
+
+// Tabs (property alert regions): one panel at a time. Without JS the tab list stays hidden and every panel shows.
+(() => {
+  document.querySelectorAll("[data-tabs]").forEach((list) => {
+    const tabs = [...list.querySelectorAll('[role="tab"]')];
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls")));
+    const select = (i, focus) => {
+      tabs.forEach((t, n) => {
+        t.setAttribute("aria-selected", String(n === i));
+        t.tabIndex = n === i ? 0 : -1;
+        panels[n].hidden = n !== i;
+      });
+      if (focus) tabs[i].focus();
+    };
+    list.addEventListener("click", (e) => {
+      const i = tabs.indexOf(e.target.closest('[role="tab"]'));
+      if (i >= 0) select(i, false);
+    });
+    list.addEventListener("keydown", (e) => {
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      select((tabs.indexOf(document.activeElement) + step + tabs.length) % tabs.length, true);
+    });
+    list.hidden = false;
+    list.parentElement.setAttribute("data-tabs-active", "");
+    select(0, false);
+  });
+})();

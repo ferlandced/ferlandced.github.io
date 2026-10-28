@@ -1,5 +1,7 @@
 {%- set lang = lang or "en" -%}
 {%- set t = i18n[lang] -%}
+{#- Pages listed in site.pages (pageKey) have their own URL per language; the others share the home's. -#}
+{%- set altUrls = site.pages[pageKey] if pageKey else {} -%}
 <!doctype html>
 <html lang="{{ lang }}">
 <head>
@@ -9,10 +11,13 @@
   <meta name="description" content="{{ description or agent.title[lang] }}">
   <link rel="preload" href="/fonts/montserrat-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/montserrat-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  {% if translated %}{% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="/{{ l }}/">
-  {% endfor %}<link rel="alternate" hreflang="x-default" href="/{{ site.defaultLang }}/">
+  {% if translated %}{% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="{{ altUrls[l] or '/' ~ l ~ '/' }}">
+  {% endfor %}<link rel="alternate" hreflang="x-default" href="{{ altUrls[site.defaultLang] or '/' ~ site.defaultLang ~ '/' }}">
   {% endif %}<link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/forms.css">
+  {# Marks JS support before the first paint, so multi-step forms do not flash as one long form (css/forms.css). #}
+  <script>document.documentElement.classList.add("js");</script>
   <script src="/js/site.js" defer></script>
 </head>
 <body class="{{ bodyClass }}">

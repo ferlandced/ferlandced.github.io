@@ -17,7 +17,7 @@
     {% set iconsClass = "contact-icons--menu" %}{% include "partials/contact-icons.njk" %}
     {# Phone menu: the language switch lives here instead of the header #}
     {%- for l in site.languages %}{% if l != lang %}
-    <a class="site-nav__lang" href="/{{ l }}/" hreflang="{{ l }}" lang="{{ l }}">{{ t.langSwitch[l] }}</a>
+    <a class="site-nav__lang" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}">{{ t.langSwitch[l] }}</a>
     {%- endif %}{% endfor %}
   </nav>
   {# Phones: the slash as a fixed bottom-right corner. Tapping the burger grows it into the menu. #}
@@ -25,9 +25,9 @@
   <div class="site-header__tools">
     {# Contact icons: fade in once the visitor scrolls past the hero (see js/site.js) #}
     {% set iconsClass = "contact-icons--header" %}{% include "partials/contact-icons.njk" %}
-    {# Shows only the other language. Pages without a translation link to that language's home. #}
+    {# Shows only the other language: the same page when it is in site.pages, otherwise that language's home. #}
     {%- for l in site.languages %}{% if l != lang %}
-    <a class="lang-switch" href="/{{ l }}/" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.langSwitch[l] }}"><span class="visually-hidden">{{ t.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
+    <a class="lang-switch" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.langSwitch[l] }}"><span class="visually-hidden">{{ t.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
     {%- endif %}{% endfor %}
   </div>
 </header>

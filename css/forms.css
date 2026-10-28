@@ -1,0 +1,170 @@
+/* ==========================================================================
+   Forms (_includes/forms/*, partials/form-panel.njk): the card on the form pages
+   and the home page dialogs. Hooks only; the HTML holds all text.
+   Colours come from tokens.css.
+   ========================================================================== */
+
+:root {
+  --form-line: color-mix(in srgb, var(--color-charcoal) 55%, var(--color-white));     /* field and tile borders, ≈3.6:1 on white */
+  --form-rule: color-mix(in srgb, var(--color-charcoal) 15%, var(--color-white));     /* decorative separators */
+  --form-tint: color-mix(in srgb, var(--color-primary-blue) 8%, var(--color-white));  /* selected tile and tab */
+  --form-track: color-mix(in srgb, var(--color-sky-blue) 45%, var(--color-white));
+  --form-radius: 10px;
+  --form-pad: 32px;
+}
+@media (max-width: 767.98px) { :root { --form-pad: 20px; } }
+
+.form-panel [hidden] { display: none !important; }
+
+/* Card */
+.form-panel { background: var(--brand-surface); color: var(--brand-ink); padding: var(--form-pad); }
+.form-page .form-panel { max-width: 760px; margin: 24px auto; border: 1px solid var(--form-rule); border-radius: 16px; box-shadow: 0 12px 40px var(--brand-shadow); }
+@media (max-width: 767.98px) { .form-page .form-panel { margin: 0 calc(-1 * var(--form-pad)); border: 0; border-radius: 0; box-shadow: none; } }
+
+.form-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.form-panel__title { margin: 0; font-size: 1.375rem; font-weight: var(--font-bold); line-height: 1.3; }
+.form-panel__close { display: inline-grid; place-items: center; width: 40px; height: 40px; margin-right: -8px; border-radius: 50%; color: var(--brand-ink); }
+.form-panel__close:hover { background: var(--form-tint); }
+
+/* Dialog: centred card, full screen on phones */
+dialog.form-dialog { width: min(760px, 100% - 32px); max-width: none; max-height: calc(100dvh - 48px); padding: 0; border: 0; border-radius: 16px; box-shadow: 0 24px 64px var(--brand-shadow-strong); overflow: auto; overscroll-behavior: contain; }
+dialog.form-dialog::backdrop { background: color-mix(in srgb, var(--color-charcoal) 45%, transparent); }
+html:has(dialog.form-dialog[open]) { overflow: hidden; }
+@media (max-width: 767.98px) {
+  dialog.form-dialog { width: 100%; height: 100dvh; max-height: none; margin: 0; border-radius: 0; box-shadow: none; }
+  dialog.form-dialog > .form-panel { box-sizing: border-box; min-height: 100%; }
+}
+
+/* Progress: a bar (width from --progress, set by js/forms.js) above "Étape 1 sur 3" */
+.form-progress { margin: 0 0 24px; font-size: .8125rem; color: var(--brand-muted); text-align: right; }
+.form-progress::before { content: ""; display: block; height: 6px; margin-bottom: 8px; border-radius: 3px;
+  background: linear-gradient(var(--color-primary-blue), var(--color-primary-blue)) 0 0 / calc(var(--progress, 0) * 100%) 100% no-repeat, var(--form-track); }
+@media (prefers-reduced-motion: no-preference) { .form-progress::before { transition: background-size .3s; } }
+
+/* Steps */
+.form-step { display: grid; gap: 16px; }
+.form-step h2 { margin: 0; font-size: 1.5rem; font-weight: var(--font-bold); line-height: 1.3; }
+.form-step h2:focus { outline: none; }
+.form-step h3 { margin: 8px 0 0; font-size: 1.125rem; font-weight: var(--font-bold); }
+.form-hint { margin: -8px 0 0; font-size: .875rem; color: var(--brand-muted); }
+.form-field .form-hint, .form-hint--group { margin: 0; }
+
+/* Without JS (forms.js not run, no data-wizard-ready): one long form. Step navigation is hidden;
+   the last step's submit button sends everything. */
+form[data-wizard]:not([data-wizard-ready]) :is([data-next], [data-back], .form-skip) { display: none; }
+form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step { margin-top: 32px; }
+.js form[data-wizard]:not([data-wizard-ready]) [data-step]:not(:first-of-type) { display: none; }   /* JS on its way: no flash of the long form */
+
+/* Consent (required, step 1) */
+.form-consent { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: .875rem; line-height: 1.5; cursor: pointer; }
+.form-consent input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--color-primary-blue); }
+
+/* Fields */
+.form-field { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.form-field > label, .form-field > legend { padding: 0; font-size: .9375rem; font-weight: var(--font-medium); }
+.form-panel input:not([type="checkbox"]):not([type="radio"]),
+.form-panel select, .form-panel textarea {
+  width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 14px; border: 1px solid var(--form-line); border-radius: var(--form-radius);
+  background: var(--brand-surface); color: var(--brand-ink); font: inherit; font-size: 1rem;
+}
+.form-panel textarea { min-height: 140px; resize: vertical; }
+/* Selects: drop the native look (Safari ignores height and padding on it) and draw our own arrow */
+.form-panel select { -webkit-appearance: none; appearance: none; padding-right: 44px; line-height: 1.5; cursor: pointer;
+  background: var(--brand-surface) url("../images/icons/chevron-down.svg") right 14px center / 20px 20px no-repeat; }
+.form-panel input::placeholder { color: var(--brand-muted); }
+.form-panel input:focus-visible, .form-panel select:focus-visible, .form-panel textarea:focus-visible {
+  outline: none; border-color: var(--color-primary-blue); box-shadow: 0 0 0 3px var(--form-tint);
+}
+.form-panel input[type="radio"] { accent-color: var(--color-primary-blue); width: 18px; height: 18px; margin: 0; }
+.form-field:not(.form-tiles) > label:has(input[type="radio"]) { display: flex; align-items: center; gap: 10px; font-weight: var(--font-light); }
+
+.form-row { display: grid; gap: 16px; }
+.form-row--phone { grid-template-columns: minmax(0, 1fr) 6.5rem; align-items: start; }   /* phone and extension share a line on every screen */
+@media (min-width: 768px) {
+  .form-row { grid-template-columns: 1fr 1fr; }
+  .form-row--phone { grid-template-columns: 2fr 1fr; }
+}
+
+/* Amount with its currency sign (before or after the input, as written in the HTML) */
+.form-affix { display: flex; align-items: center; border: 1px solid var(--form-line); border-radius: var(--form-radius); }
+.form-affix:focus-within { border-color: var(--color-primary-blue); box-shadow: 0 0 0 3px var(--form-tint); }
+.form-panel .form-affix input:not([type]), .form-panel .form-affix input[type="number"] { border: 0; box-shadow: none; }
+.form-affix__unit { padding: 0 14px; font-weight: var(--font-medium); }
+
+/* Tabs (regions) */
+.form-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--form-rule); }
+.form-tabs [role="tab"] { flex: 0 0 auto; padding: 8px 16px; border: 1px solid var(--form-line); border-radius: 999px; background: var(--brand-surface); color: var(--brand-ink); font: inherit; font-size: .875rem; font-weight: var(--font-medium); cursor: pointer; }
+.form-tabs [role="tab"][aria-selected="true"] { border-color: var(--color-primary-blue); background: var(--form-tint); }
+.form-tabs [role="tab"]:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
+[data-tabs-active] > .form-tiles > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Tiles: checkbox groups (cities, property types). The checkbox is hidden; the label is the tile. */
+.form-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+@media (min-width: 768px) { .form-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.form-tiles > legend { grid-column: 1 / -1; margin-bottom: 10px; padding: 0; font-weight: var(--font-medium); }
+.form-budget > legend { font-weight: var(--font-bold); }
+.form-tiles > label { position: relative; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 36px 8px 12px; border: 1px solid var(--form-line); border-radius: var(--form-radius); font-size: .875rem; font-weight: var(--font-medium); line-height: 1.3; cursor: pointer; }
+.form-tiles > label > input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.form-tiles > label:hover { border-color: var(--color-primary-blue); }
+.form-tiles > label:has(input:checked) { border-color: var(--color-primary-blue); background: var(--form-tint); }
+.form-tiles > label:has(input:focus-visible) { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
+.form-tiles > label::after { content: ""; position: absolute; right: 12px; width: 16px; height: 16px; background: var(--color-primary-blue); -webkit-mask: url("../images/icons/check.svg") center / contain no-repeat; mask: url("../images/icons/check.svg") center / contain no-repeat; opacity: 0; }
+.form-tiles > label:has(input:checked)::after { opacity: 1; }
+@media (max-width: 767.98px) { .form-tiles { gap: 8px; } .form-tiles > label { gap: 8px; padding: 8px 28px 8px 10px; font-size: .8125rem; } .form-tiles > label::after { right: 9px; } }
+
+/* Segmented control: one choice among a few short values (rooms, parking, pool). The radio is hidden; the label is the segment. */
+.form-segments { display: flex; border: 1px solid var(--form-line); border-radius: var(--form-radius); overflow: hidden; }
+.form-segments > label { position: relative; flex: 1 1 auto; display: grid; place-items: center; min-width: min-content; min-height: 46px; padding: 6px 8px; font-size: .875rem; font-weight: var(--font-medium); line-height: 1.2; text-align: center; cursor: pointer; }
+.form-segments > label + label { border-left: 1px solid var(--form-line); }
+.form-segments > label > input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.form-segments > label:hover { background: var(--form-tint); }
+.form-segments > label:has(input:checked) { background: var(--color-primary-blue); color: var(--color-white); }   /* 6.1:1 */
+.form-segments > label:has(input:focus-visible) { outline: 2px solid var(--brand-focus); outline-offset: -4px; box-shadow: inset 0 0 0 4px var(--color-white); }
+@media (prefers-reduced-motion: no-preference) { .form-segments > label { transition: background-color .2s, color .2s; } }
+
+/* Actions */
+.form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+.form-actions button, .form-cancel {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 26px;
+  border: 1px solid var(--color-black); border-radius: 999px; background: var(--color-black); color: var(--color-white);
+  font: inherit; font-size: .9375rem; font-weight: var(--font-bold); text-decoration: none; cursor: pointer;
+}
+.form-actions [data-back], .form-cancel { background: var(--brand-surface); color: var(--brand-ink); border-color: var(--form-line); }
+.form-actions [type="submit"] { background: var(--color-primary-blue); border-color: var(--color-primary-blue); }
+.form-actions button:hover, .form-cancel:hover { background: var(--color-charcoal); border-color: var(--color-charcoal); color: var(--color-white); }
+.form-actions [type="submit"]:hover { background: var(--color-dark-blue); border-color: var(--color-dark-blue); }
+.form-actions button:focus-visible, .form-cancel:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
+.form-actions button:disabled { opacity: .5; cursor: progress; }
+.form-cancel { margin-right: auto; }   /* step 1: Annuler on the left of Suivant, as in the mockup */
+@media (min-width: 768px) { .form-cancel { margin-right: 0; } }
+@media (prefers-reduced-motion: no-preference) { .form-actions button, .form-cancel, .form-tiles > label { transition: background-color .2s, border-color .2s, color .2s; } }
+
+/* "Skip and send" on optional steps: a quieter text button between Back and Next.
+   Phones: Back and Next share the first line, skip takes its own line below. */
+.form-actions .form-skip, .form-actions .form-skip:hover { border-color: transparent; background: none; color: var(--brand-ink); text-decoration: underline; text-underline-offset: .25em; }
+.form-actions .form-skip:hover { color: var(--brand-link-hover); }
+@media (max-width: 767.98px) {
+  .form-actions > * { flex: 1 1 auto; }
+  .form-actions .form-skip { order: 1; flex-basis: 100%; }
+  .form-cancel { margin-right: 0; }
+}
+
+/* Messages */
+.form-error { display: flex; gap: 10px; margin-top: 16px; padding: 12px 16px; border: 1px solid var(--color-bridge-red); border-radius: var(--form-radius); color: var(--color-bridge-red); font-weight: var(--font-medium); }
+.form-success { padding: 24px 0; font-size: 1.125rem; font-weight: var(--font-medium); }
+.form-success:focus { outline: none; }
+
+/* Icons: Lucide files drawn as masks in the text colour. Only the ones the design shows are drawn;
+   other [data-icon] placeholders stay empty. Add the file in images/icons/ and a rule here to show one. */
+[data-icon] { display: none; }
+.form-tiles > label [data-icon], .form-panel__close [data-icon] {
+  display: inline-block; flex: 0 0 auto; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+}
+.form-panel__close [data-icon] { width: 22px; height: 22px; }
+[data-icon="x"] { --icon: url("../images/icons/x.svg"); }
+[data-icon="map-pin"] { --icon: url("../images/icons/map-pin.svg"); }
+[data-icon="house"] { --icon: url("../images/icons/house.svg"); }
+[data-icon="building-2"] { --icon: url("../images/icons/building-2.svg"); }
+[data-icon="store"] { --icon: url("../images/icons/store.svg"); }
+[data-icon="trees"] { --icon: url("../images/icons/trees.svg"); }

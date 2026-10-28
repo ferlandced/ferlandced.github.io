@@ -4,6 +4,16 @@
     "fr": "",
     "en": ""
   },
+  "pages": {
+    "estimation": {
+      "fr": "/fr/estimation/",
+      "en": "/en/estimation/"
+    },
+    "propertyAlert": {
+      "fr": "/fr/alerte-immobiliere/",
+      "en": "/en/property-alert/"
+    }
+  },
   "languages": [
     "fr",
     "en"
