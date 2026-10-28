@@ -1,0 +1,155 @@
+<!-- Property alert sign-up. The locations below are the reference's list: replace them with the real service area.
+     A city listed in two regions is sent once. -->
+<form class="form form--property-alert" data-wizard action="https://api.web3forms.com/submit" method="POST" novalidate>
+  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
+  <input type="hidden" name="form_type" value="property_alert">
+  <input type="hidden" name="subject" value="Inscription à l'alerte immobilière">
+  <input type="hidden" name="from_name" value="Site web Cedrik Ferland">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <p class="form-progress" data-progress hidden>Étape <span data-current></span> / <span data-total></span></p>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Où désirez-vous acheter?</h2>
+    <fieldset>
+      <legend><span data-icon="map" aria-hidden="true"></span> Lanaudière</legend>
+      <label for="pa-loc-lanaudiere-lavaltrie"><input id="pa-loc-lanaudiere-lavaltrie" type="checkbox" name="locations" value="Lavaltrie"> Lavaltrie</label>
+      <label for="pa-loc-lanaudiere-le-gardeur"><input id="pa-loc-lanaudiere-le-gardeur" type="checkbox" name="locations" value="Le Gardeur"> Le Gardeur</label>
+      <label for="pa-loc-lanaudiere-saint-jean-de-matha"><input id="pa-loc-lanaudiere-saint-jean-de-matha" type="checkbox" name="locations" value="Saint-Jean-de-Matha"> Saint-Jean-de-Matha</label>
+      <label for="pa-loc-lanaudiere-saint-sulpice"><input id="pa-loc-lanaudiere-saint-sulpice" type="checkbox" name="locations" value="Saint-Sulpice"> Saint-Sulpice</label>
+    </fieldset>
+    <fieldset>
+      <legend><span data-icon="map" aria-hidden="true"></span> Montérégie</legend>
+      <label for="pa-loc-monteregie-contrecoeur"><input id="pa-loc-monteregie-contrecoeur" type="checkbox" name="locations" value="Contrecoeur"> Contrecoeur</label>
+      <label for="pa-loc-monteregie-marieville"><input id="pa-loc-monteregie-marieville" type="checkbox" name="locations" value="Marieville"> Marieville</label>
+      <label for="pa-loc-monteregie-otterburn-park"><input id="pa-loc-monteregie-otterburn-park" type="checkbox" name="locations" value="Otterburn Park"> Otterburn Park</label>
+      <label for="pa-loc-monteregie-roxton"><input id="pa-loc-monteregie-roxton" type="checkbox" name="locations" value="Roxton"> Roxton</label>
+      <label for="pa-loc-monteregie-roxton-falls"><input id="pa-loc-monteregie-roxton-falls" type="checkbox" name="locations" value="Roxton Falls"> Roxton Falls</label>
+      <label for="pa-loc-monteregie-saint-amable"><input id="pa-loc-monteregie-saint-amable" type="checkbox" name="locations" value="Saint-Amable"> Saint-Amable</label>
+      <label for="pa-loc-monteregie-saint-antoine-sur-richelieu"><input id="pa-loc-monteregie-saint-antoine-sur-richelieu" type="checkbox" name="locations" value="Saint-Antoine-sur-Richelieu"> Saint-Antoine-sur-Richelieu</label>
+      <label for="pa-loc-monteregie-saint-basile-le-grand"><input id="pa-loc-monteregie-saint-basile-le-grand" type="checkbox" name="locations" value="Saint-Basile-le-Grand"> Saint-Basile-le-Grand</label>
+      <label for="pa-loc-monteregie-saint-hubert"><input id="pa-loc-monteregie-saint-hubert" type="checkbox" name="locations" value="Saint-Hubert"> Saint-Hubert</label>
+      <label for="pa-loc-monteregie-saint-hyacinthe"><input id="pa-loc-monteregie-saint-hyacinthe" type="checkbox" name="locations" value="Saint-Hyacinthe"> Saint-Hyacinthe</label>
+      <label for="pa-loc-monteregie-saint-jean-sur-richelieu"><input id="pa-loc-monteregie-saint-jean-sur-richelieu" type="checkbox" name="locations" value="Saint-Jean-sur-Richelieu"> Saint-Jean-sur-Richelieu</label>
+      <label for="pa-loc-monteregie-saint-lambert"><input id="pa-loc-monteregie-saint-lambert" type="checkbox" name="locations" value="Saint-Lambert"> Saint-Lambert</label>
+      <label for="pa-loc-monteregie-saint-roch-de-richelieu"><input id="pa-loc-monteregie-saint-roch-de-richelieu" type="checkbox" name="locations" value="Saint-Roch-de-Richelieu"> Saint-Roch-de-Richelieu</label>
+      <label for="pa-loc-monteregie-sorel-tracy"><input id="pa-loc-monteregie-sorel-tracy" type="checkbox" name="locations" value="Sorel-Tracy"> Sorel-Tracy</label>
+    </fieldset>
+    <fieldset>
+      <legend><span data-icon="map" aria-hidden="true"></span> Montréal (île)</legend>
+      <label for="pa-loc-montreal-ile-ahuntsic-cartierville"><input id="pa-loc-montreal-ile-ahuntsic-cartierville" type="checkbox" name="locations" value="Ahuntsic-Cartierville"> Ahuntsic-Cartierville</label>
+      <label for="pa-loc-montreal-ile-cote-des-neiges-notre-dame-de-grace"><input id="pa-loc-montreal-ile-cote-des-neiges-notre-dame-de-grace" type="checkbox" name="locations" value="Côte-des-Neiges/Notre-Dame-de-Grâce"> Côte-des-Neiges/Notre-Dame-de-Grâce</label>
+      <label for="pa-loc-montreal-ile-le-sud-ouest"><input id="pa-loc-montreal-ile-le-sud-ouest" type="checkbox" name="locations" value="Le Sud-Ouest"> Le Sud-Ouest</label>
+      <label for="pa-loc-montreal-ile-mercier-hochelaga-maisonneuve"><input id="pa-loc-montreal-ile-mercier-hochelaga-maisonneuve" type="checkbox" name="locations" value="Mercier/Hochelaga-Maisonneuve"> Mercier/Hochelaga-Maisonneuve</label>
+      <label for="pa-loc-montreal-ile-pierrefonds-roxboro"><input id="pa-loc-montreal-ile-pierrefonds-roxboro" type="checkbox" name="locations" value="Pierrefonds-Roxboro"> Pierrefonds-Roxboro</label>
+      <label for="pa-loc-montreal-ile-riviere-des-prairies-pointe-aux-trembles"><input id="pa-loc-montreal-ile-riviere-des-prairies-pointe-aux-trembles" type="checkbox" name="locations" value="Rivière-des-Prairies/Pointe-aux-Trembles"> Rivière-des-Prairies/Pointe-aux-Trembles</label>
+      <label for="pa-loc-montreal-ile-verdun-ile-des-soeurs"><input id="pa-loc-montreal-ile-verdun-ile-des-soeurs" type="checkbox" name="locations" value="Verdun/Île-des-Soeurs"> Verdun/Île-des-Soeurs</label>
+      <label for="pa-loc-montreal-ile-ville-marie"><input id="pa-loc-montreal-ile-ville-marie" type="checkbox" name="locations" value="Ville-Marie"> Ville-Marie</label>
+    </fieldset>
+    <fieldset>
+      <legend><span data-icon="map" aria-hidden="true"></span> Montréal (Rive-Nord)</legend>
+      <label for="pa-loc-montreal-rive-nord-le-gardeur"><input id="pa-loc-montreal-rive-nord-le-gardeur" type="checkbox" name="locations" value="Le Gardeur"> Le Gardeur</label>
+      <label for="pa-loc-montreal-rive-nord-mirabel"><input id="pa-loc-montreal-rive-nord-mirabel" type="checkbox" name="locations" value="Mirabel"> Mirabel</label>
+      <label for="pa-loc-montreal-rive-nord-saint-sulpice"><input id="pa-loc-montreal-rive-nord-saint-sulpice" type="checkbox" name="locations" value="Saint-Sulpice"> Saint-Sulpice</label>
+    </fieldset>
+    <fieldset>
+      <legend><span data-icon="map" aria-hidden="true"></span> Montréal (Rive-Sud)</legend>
+      <label for="pa-loc-montreal-rive-sud-beloeil"><input id="pa-loc-montreal-rive-sud-beloeil" type="checkbox" name="locations" value="Beloeil"> Beloeil</label>
+      <label for="pa-loc-montreal-rive-sud-boucherville"><input id="pa-loc-montreal-rive-sud-boucherville" type="checkbox" name="locations" value="Boucherville"> Boucherville</label>
+      <label for="pa-loc-montreal-rive-sud-brossard"><input id="pa-loc-montreal-rive-sud-brossard" type="checkbox" name="locations" value="Brossard"> Brossard</label>
+      <label for="pa-loc-montreal-rive-sud-candiac"><input id="pa-loc-montreal-rive-sud-candiac" type="checkbox" name="locations" value="Candiac"> Candiac</label>
+      <label for="pa-loc-montreal-rive-sud-carignan"><input id="pa-loc-montreal-rive-sud-carignan" type="checkbox" name="locations" value="Carignan"> Carignan</label>
+      <label for="pa-loc-montreal-rive-sud-chambly"><input id="pa-loc-montreal-rive-sud-chambly" type="checkbox" name="locations" value="Chambly"> Chambly</label>
+      <label for="pa-loc-montreal-rive-sud-chateauguay"><input id="pa-loc-montreal-rive-sud-chateauguay" type="checkbox" name="locations" value="Châteauguay"> Châteauguay</label>
+      <label for="pa-loc-montreal-rive-sud-le-vieux-longueuil"><input id="pa-loc-montreal-rive-sud-le-vieux-longueuil" type="checkbox" name="locations" value="Le Vieux-Longueuil"> Le Vieux-Longueuil</label>
+      <label for="pa-loc-montreal-rive-sud-longueuil"><input id="pa-loc-montreal-rive-sud-longueuil" type="checkbox" name="locations" value="Longueuil"> Longueuil</label>
+      <label for="pa-loc-montreal-rive-sud-mont-saint-hilaire"><input id="pa-loc-montreal-rive-sud-mont-saint-hilaire" type="checkbox" name="locations" value="Mont-Saint-Hilaire"> Mont-Saint-Hilaire</label>
+      <label for="pa-loc-montreal-rive-sud-otterburn-park"><input id="pa-loc-montreal-rive-sud-otterburn-park" type="checkbox" name="locations" value="Otterburn Park"> Otterburn Park</label>
+      <label for="pa-loc-montreal-rive-sud-richelieu"><input id="pa-loc-montreal-rive-sud-richelieu" type="checkbox" name="locations" value="Richelieu"> Richelieu</label>
+      <label for="pa-loc-montreal-rive-sud-saint-amable"><input id="pa-loc-montreal-rive-sud-saint-amable" type="checkbox" name="locations" value="Saint-Amable"> Saint-Amable</label>
+      <label for="pa-loc-montreal-rive-sud-saint-bruno-de-montarville"><input id="pa-loc-montreal-rive-sud-saint-bruno-de-montarville" type="checkbox" name="locations" value="Saint-Bruno-de-Montarville"> Saint-Bruno-de-Montarville</label>
+      <label for="pa-loc-montreal-rive-sud-saint-hubert"><input id="pa-loc-montreal-rive-sud-saint-hubert" type="checkbox" name="locations" value="Saint-Hubert"> Saint-Hubert</label>
+      <label for="pa-loc-montreal-rive-sud-saint-lambert"><input id="pa-loc-montreal-rive-sud-saint-lambert" type="checkbox" name="locations" value="Saint-Lambert"> Saint-Lambert</label>
+      <label for="pa-loc-montreal-rive-sud-saint-mathias-sur-richelieu"><input id="pa-loc-montreal-rive-sud-saint-mathias-sur-richelieu" type="checkbox" name="locations" value="Saint-Mathias-sur-Richelieu"> Saint-Mathias-sur-Richelieu</label>
+      <label for="pa-loc-montreal-rive-sud-saint-mathieu-de-beloeil"><input id="pa-loc-montreal-rive-sud-saint-mathieu-de-beloeil" type="checkbox" name="locations" value="Saint-Mathieu-de-Beloeil"> Saint-Mathieu-de-Beloeil</label>
+      <label for="pa-loc-montreal-rive-sud-sainte-catherine"><input id="pa-loc-montreal-rive-sud-sainte-catherine" type="checkbox" name="locations" value="Sainte-Catherine"> Sainte-Catherine</label>
+      <label for="pa-loc-montreal-rive-sud-sainte-julie"><input id="pa-loc-montreal-rive-sud-sainte-julie" type="checkbox" name="locations" value="Sainte-Julie"> Sainte-Julie</label>
+      <label for="pa-loc-montreal-rive-sud-varennes"><input id="pa-loc-montreal-rive-sud-varennes" type="checkbox" name="locations" value="Varennes"> Varennes</label>
+      <label for="pa-loc-montreal-rive-sud-vercheres"><input id="pa-loc-montreal-rive-sud-vercheres" type="checkbox" name="locations" value="Verchères"> Verchères</label>
+    </fieldset>
+    <div class="form-actions">
+      <button type="button" data-next>Suivant <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step hidden>
+    <h2 tabindex="-1">Quel type de propriété recherchez-vous?</h2>
+    <fieldset class="form-field">
+      <legend><span data-icon="house" aria-hidden="true"></span> Type de propriété</legend>
+      <label for="pa-type-bungalow"><input id="pa-type-bungalow" type="checkbox" name="property_types" value="Bungalow"> Bungalow</label>
+      <label for="pa-type-bungalow-semi-detache"><input id="pa-type-bungalow-semi-detache" type="checkbox" name="property_types" value="Bungalow semi-détaché"> Bungalow semi-détaché</label>
+      <label for="pa-type-condo"><input id="pa-type-condo" type="checkbox" name="property_types" value="Condo"> Condo</label>
+      <label for="pa-type-copropriete-indivisee"><input id="pa-type-copropriete-indivisee" type="checkbox" name="property_types" value="Copropriété indivisée"> Copropriété indivisée</label>
+      <label for="pa-type-cottage"><input id="pa-type-cottage" type="checkbox" name="property_types" value="Cottage"> Cottage</label>
+      <label for="pa-type-cottage-semi-detache"><input id="pa-type-cottage-semi-detache" type="checkbox" name="property_types" value="Cottage semi-détaché"> Cottage semi-détaché</label>
+      <label for="pa-type-duplex"><input id="pa-type-duplex" type="checkbox" name="property_types" value="Duplex"> Duplex</label>
+      <label for="pa-type-immeuble-a-revenus"><input id="pa-type-immeuble-a-revenus" type="checkbox" name="property_types" value="Immeuble à revenus"> Immeuble à revenus</label>
+      <label for="pa-type-immeuble-commercial"><input id="pa-type-immeuble-commercial" type="checkbox" name="property_types" value="Immeuble commercial"> Immeuble commercial</label>
+      <label for="pa-type-maison-de-ville"><input id="pa-type-maison-de-ville" type="checkbox" name="property_types" value="Maison de ville"> Maison de ville</label>
+      <label for="pa-type-quadruplex-et-plus"><input id="pa-type-quadruplex-et-plus" type="checkbox" name="property_types" value="Quadruplex et plus"> Quadruplex et plus</label>
+      <label for="pa-type-paliers-multiples"><input id="pa-type-paliers-multiples" type="checkbox" name="property_types" value="Paliers multiples"> Paliers multiples</label>
+      <label for="pa-type-terrain"><input id="pa-type-terrain" type="checkbox" name="property_types" value="Terrain"> Terrain</label>
+      <label for="pa-type-triplex"><input id="pa-type-triplex" type="checkbox" name="property_types" value="Triplex"> Triplex</label>
+      <label for="pa-type-vente-d-entreprise"><input id="pa-type-vente-d-entreprise" type="checkbox" name="property_types" value="Vente d'entreprise"> Vente d'entreprise</label>
+    </fieldset>
+    <div class="form-field">
+      <label for="pa-other">Autre?</label>
+      <input id="pa-other" name="other" type="text">
+    </div>
+    <div class="form-field">
+      <label for="pa-budget-min"><span data-icon="wallet" aria-hidden="true"></span> Budget minimum ($ CAD)</label>
+      <input id="pa-budget-min" name="budget_min" type="number" inputmode="numeric" min="0" step="1">
+    </div>
+    <div class="form-field">
+      <label for="pa-budget-max"><span data-icon="wallet" aria-hidden="true"></span> Budget maximum ($ CAD)</label>
+      <input id="pa-budget-max" name="budget_max" type="number" inputmode="numeric" min="0" step="1" data-gte="budget_min" data-gte-message="Le budget maximum doit être égal ou supérieur au budget minimum.">
+    </div>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Précédent</button>
+      <button type="button" data-next>Suivant <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="form-step" data-step hidden>
+    <h2 tabindex="-1">Vos coordonnées</h2>
+    <div class="form-field">
+      <label for="pa-first-name"><span data-icon="user" aria-hidden="true"></span> Prénom</label>
+      <input id="pa-first-name" name="first_name" type="text" autocomplete="given-name" required>
+    </div>
+    <div class="form-field">
+      <label for="pa-last-name"><span data-icon="user" aria-hidden="true"></span> Nom</label>
+      <input id="pa-last-name" name="last_name" type="text" autocomplete="family-name" required>
+    </div>
+    <div class="form-field">
+      <label for="pa-phone"><span data-icon="phone" aria-hidden="true"></span> Téléphone</label>
+      <input id="pa-phone" name="phone" type="tel" autocomplete="tel-national" placeholder="000-000-0000" pattern="[0-9]{3}[\- ]?[0-9]{3}[\- ]?[0-9]{4}" aria-describedby="pa-phone-hint" required>
+      <p class="form-hint" id="pa-phone-hint">Format : 000-000-0000</p>
+    </div>
+    <div class="form-field">
+      <label for="pa-phone-ext">Poste</label>
+      <input id="pa-phone-ext" name="phone_ext" type="text" inputmode="numeric" autocomplete="tel-extension" placeholder="Ext">
+    </div>
+    <div class="form-field">
+      <label for="pa-email"><span data-icon="mail" aria-hidden="true"></span> Courriel</label>
+      <input id="pa-email" name="email" type="email" autocomplete="email" required>
+    </div>
+    <p class="form-notice">En cliquant sur «Envoyer», vous confirmez que vous êtes intéressé à être contacté.</p>
+    <div class="form-actions">
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Précédent</button>
+      <button type="submit">Envoyer la demande</button>
+    </div>
+  </section>
+
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> Une erreur est survenue. Veuillez réessayer ou me joindre par téléphone.</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> Merci! Je vous reviens très bientôt.</section>
+</form>
