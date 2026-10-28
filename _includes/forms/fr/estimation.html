@@ -1,9 +1,8 @@
-<!-- Estimation request. Web3Forms: file attachments (the photos field) require a paid Web3Forms plan;
-     the free plan rejects them. Multiple files need their Advanced File Uploader. -->
-<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" novalidate>
+<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST">
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="estimation">
-  <input type="hidden" name="subject" value="Demande d'estimation immobilière">
+  <input type="hidden" name="subject" value="Demande d'estimation immobilière" data-subject-location="Mise en location de ma propriété">
+  <input type="hidden" name="intent" value="">
   <input type="hidden" name="from_name" value="Site web Cedrik Ferland">
   <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 
@@ -42,14 +41,15 @@
       <label for="est-email"><span data-icon="mail" aria-hidden="true"></span> Courriel</label>
       <input id="est-email" name="email" type="email" autocomplete="email" aria-describedby="est-either" data-one-of="contact">
     </div>
-    <p class="form-notice">En cliquant sur «Envoyer», vous confirmez que vous êtes intéressé à être contacté.</p>
+    <!-- Lier « politique de confidentialité » à la politique une fois publiée (site.json privacyUrl). -->
+    <label class="form-consent" for="est-consent"><input id="est-consent" type="checkbox" name="consent" value="yes" required> <span>J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la politique de confidentialité.</span></label>
     <div class="form-actions">
       <a class="form-cancel" href="/fr/" data-close>Annuler</a>
       <button type="button" data-next>Suivant <span data-icon="arrow-right" aria-hidden="true"></span></button>
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Quel type de propriété avez-vous? (facultatif)</h2>
     <div class="form-tabs" role="tablist" aria-label="Catégories" data-tabs hidden>
       <button type="button" role="tab" id="est-tabtype-residentiel" aria-controls="est-cat-residentiel">Résidentiel</button>
@@ -95,7 +95,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Votre propriété (facultatif)</h2>
     <div class="form-field">
       <label for="est-year"><span data-icon="calendar" aria-hidden="true"></span> Année de construction</label>
@@ -111,12 +111,6 @@
         <input id="est-lot-size" name="lot_size_sqft" type="number" inputmode="numeric" min="0" step="1">
       </div>
     </div>
-    <div class="form-field">
-      <!-- Paid Web3Forms plan required for attachments (see note at the top of this file). -->
-      <label for="est-photos"><span data-icon="image-plus" aria-hidden="true"></span> Photos de la propriété</label>
-      <input id="est-photos" name="attachment" type="file" multiple accept="image/*" aria-describedby="est-photos-hint">
-      <p class="form-hint" id="est-photos-hint">2 Mo maximum par photo, 16 Mo au total.</p>
-    </div>
     <div class="form-actions">
       <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Précédent</button>
       <button type="submit" class="form-skip">Passer et envoyer</button>
@@ -124,7 +118,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Caractéristiques (facultatif)</h2>
     <div class="form-row">
       <fieldset class="form-field form-segmented">
@@ -196,7 +190,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Votre projet (facultatif)</h2>
     <div class="form-field">
       <label for="est-sale-reason">Raison de la vente</label>

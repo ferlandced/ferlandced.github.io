@@ -1,4 +1,4 @@
-<form class="form form--contact" data-wizard action="https://api.web3forms.com/submit" method="POST" novalidate>
+<form class="form form--contact" data-wizard action="https://api.web3forms.com/submit" method="POST">
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="contact">
   <input type="hidden" name="subject" value="Message from the contact form">
@@ -36,7 +36,8 @@
       <label for="ct-message"><span data-icon="message-square" aria-hidden="true"></span> Message</label>
       <textarea id="ct-message" name="message" required></textarea>
     </div>
-    <p class="form-notice">By clicking “Send”, you confirm that you are interested in being contacted.</p>
+    <!-- Link “privacy policy” to the policy once it is published (site.json privacyUrl). -->
+    <label class="form-consent" for="ct-consent"><input id="ct-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the privacy policy.</span></label>
     <div class="form-actions">
       <button type="submit">Send</button>
     </div>

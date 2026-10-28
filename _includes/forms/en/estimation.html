@@ -1,9 +1,8 @@
-<!-- Estimation request. Web3Forms: file attachments (the photos field) require a paid Web3Forms plan;
-     the free plan rejects them. Multiple files need their Advanced File Uploader. -->
-<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" novalidate>
+<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST">
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="estimation">
-  <input type="hidden" name="subject" value="Property valuation request">
+  <input type="hidden" name="subject" value="Property valuation request" data-subject-location="Renting out my property">
+  <input type="hidden" name="intent" value="">
   <input type="hidden" name="from_name" value="Cedrik Ferland website">
   <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 
@@ -42,14 +41,15 @@
       <label for="est-email"><span data-icon="mail" aria-hidden="true"></span> Email</label>
       <input id="est-email" name="email" type="email" autocomplete="email" aria-describedby="est-either" data-one-of="contact">
     </div>
-    <p class="form-notice">By clicking “Send”, you confirm that you are interested in being contacted.</p>
+    <!-- Link “privacy policy” to the policy once it is published (site.json privacyUrl). -->
+    <label class="form-consent" for="est-consent"><input id="est-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the privacy policy.</span></label>
     <div class="form-actions">
       <a class="form-cancel" href="/en/" data-close>Cancel</a>
       <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">What type of property do you have? (optional)</h2>
     <div class="form-tabs" role="tablist" aria-label="Categories" data-tabs hidden>
       <button type="button" role="tab" id="est-tabtype-residentiel" aria-controls="est-cat-residentiel">Residential</button>
@@ -95,7 +95,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Your property (optional)</h2>
     <div class="form-field">
       <label for="est-year"><span data-icon="calendar" aria-hidden="true"></span> Year built</label>
@@ -111,12 +111,6 @@
         <input id="est-lot-size" name="lot_size_sqft" type="number" inputmode="numeric" min="0" step="1">
       </div>
     </div>
-    <div class="form-field">
-      <!-- Paid Web3Forms plan required for attachments (see note at the top of this file). -->
-      <label for="est-photos"><span data-icon="image-plus" aria-hidden="true"></span> Property photos</label>
-      <input id="est-photos" name="attachment" type="file" multiple accept="image/*" aria-describedby="est-photos-hint">
-      <p class="form-hint" id="est-photos-hint">2 MB max per photo, 16 MB in total.</p>
-    </div>
     <div class="form-actions">
       <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
       <button type="submit" class="form-skip">Skip and send</button>
@@ -124,7 +118,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Features (optional)</h2>
     <div class="form-row">
       <fieldset class="form-field form-segmented">
@@ -196,7 +190,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">Your project (optional)</h2>
     <div class="form-field">
       <label for="est-sale-reason">Reason for selling</label>

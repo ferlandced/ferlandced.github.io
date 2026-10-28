@@ -1,5 +1,6 @@
 // Multi-step forms. Everything the visitor sees lives in the HTML (see _includes/forms/).
-// This file only shows/hides steps, validates, submits and shows the success or error message.
+// Without JS the HTML is one long form with browser validation that posts straight to Web3Forms.
+// This file turns it into steps: shows/hides steps, validates, submits and shows the success or error message.
 (() => {
   const FIELDS = "input, select, textarea";
 
@@ -147,12 +148,42 @@
       el.setSelectionRange(caret, caret);
     };
 
+    // Intent (e.g. rental): ?intent=<name> on the page URL, or "wizard:open" with { intent } from the home page
+    // dialog (js/site.js). Applied only when the subject field has data-subject-<name>: the intent field is
+    // set and that subject is used. Anything else falls back to the default subject and an empty intent.
+    // The original subject is kept here: on a hidden input, setting .value also changes its default value.
+    const subject = form.elements.subject;
+    const baseSubject = subject?.value;
+    const setIntent = (intent) => {
+      const field = form.elements.intent;
+      const key = intent ? `subject${intent[0].toUpperCase()}${intent.slice(1)}` : "";
+      const known = !!(key && subject?.dataset[key]);
+      if (field) field.value = known ? intent : "";
+      if (subject) subject.value = known ? subject.dataset[key] : baseSubject;
+    };
+
+    // Reset (e.g. reopening a dialog after a sent request): back to step 1, messages hidden.
+    form.addEventListener("reset", () => {
+      if (error) error.hidden = true;
+      success.hidden = true;
+      show(0, false);
+    });
+
+    // Opened from a link. A sent form starts over; one being filled in, sending or failed is kept as is.
+    form.addEventListener("wizard:open", (e) => {
+      if (!success.hidden) form.reset();
+      setIntent(e.detail?.intent);
+    });
+
     form.addEventListener("input", (e) => {
       if (e.target.dataset.allow) filter(e.target);
       if (e.target.matches("[data-gte]") || form.querySelector(`[data-gte="${e.target.name}"]`)) checkGte();
       if (e.target.matches("[data-one-of]")) checkOneOf();
     });
 
+    form.noValidate = true;                     // validation is run per step above
+    form.setAttribute("data-wizard-ready", ""); // css/forms.css shows the step buttons
+    setIntent(new URLSearchParams(location.search).get("intent"));
     show(0, false);
   };
 

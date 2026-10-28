@@ -52,11 +52,16 @@
 
 // Form dialogs: a link with data-dialog="<id>" opens that <dialog> on the home page. Without JS
 // (or without <dialog> support) the link opens the form page. [data-close] links and the backdrop close it.
+// The form inside gets "wizard:open" with the link's data-intent (see js/forms.js).
 (() => {
   document.querySelectorAll("a[data-dialog]").forEach((link) => {
     const dialog = document.getElementById(link.dataset.dialog);
     if (!dialog || typeof dialog.showModal !== "function") return;
-    link.addEventListener("click", (e) => { e.preventDefault(); dialog.showModal(); });
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      dialog.querySelector("form[data-wizard]")?.dispatchEvent(new CustomEvent("wizard:open", { detail: { intent: link.dataset.intent } }));
+      dialog.showModal();
+    });
   });
   // Backdrop: only a click outside the dialog's box closes it. Clicks on the dialog's own empty
   // area (e.g. below the form on a full-screen phone dialog) also target the <dialog>, so check the position.

@@ -1,9 +1,10 @@
 <!-- Property alert sign-up. The locations below are the reference's list: replace them with the real service area.
      A city listed in two regions is sent once. -->
-<form class="form form--property-alert" data-wizard action="https://api.web3forms.com/submit" method="POST" novalidate>
+<form class="form form--property-alert" data-wizard action="https://api.web3forms.com/submit" method="POST">
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="property_alert">
-  <input type="hidden" name="subject" value="Property alert sign-up">
+  <input type="hidden" name="subject" value="Property alert sign-up" data-subject-location="Looking for a rental">
+  <input type="hidden" name="intent" value="">
   <input type="hidden" name="from_name" value="Cedrik Ferland website">
   <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 
@@ -37,14 +38,15 @@
       <label for="pa-email"><span data-icon="mail" aria-hidden="true"></span> Email</label>
       <input id="pa-email" name="email" type="email" autocomplete="email" aria-describedby="pa-either" data-one-of="contact">
     </div>
-    <p class="form-notice">By clicking “Send”, you confirm that you are interested in being contacted.</p>
+    <!-- Link “privacy policy” to the policy once it is published (site.json privacyUrl). -->
+    <label class="form-consent" for="pa-consent"><input id="pa-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the privacy policy.</span></label>
     <div class="form-actions">
       <a class="form-cancel" href="/en/" data-close>Cancel</a>
       <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Where do you want to buy?</h2>
     <p class="form-hint">Choose one or more regions and cities.</p>
     <div class="form-tabs" role="tablist" aria-label="Regions" data-tabs hidden>
@@ -127,7 +129,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">What type of property are you looking for?</h2>
     <div class="form-tabs" role="tablist" aria-label="Categories" data-tabs hidden>
       <button type="button" role="tab" id="pa-tabtype-residentiel" aria-controls="pa-cat-residentiel">Residential</button>
@@ -169,7 +171,7 @@
     </div>
   </section>
 
-  <section class="form-step" data-step hidden>
+  <section class="form-step" data-step>
     <h2 tabindex="-1">What is your budget?</h2>
     <fieldset class="form-field form-budget">
       <legend class="visually-hidden"><span data-icon="wallet" aria-hidden="true"></span> Budget</legend>

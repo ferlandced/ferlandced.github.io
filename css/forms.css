@@ -48,7 +48,16 @@ html:has(dialog.form-dialog[open]) { overflow: hidden; }
 .form-step h3 { margin: 8px 0 0; font-size: 1.125rem; font-weight: var(--font-bold); }
 .form-hint { margin: -8px 0 0; font-size: .875rem; color: var(--brand-muted); }
 .form-field .form-hint, .form-hint--group { margin: 0; }
-.form-notice { margin: 0; font-size: .8125rem; color: var(--brand-muted); }
+
+/* Without JS (forms.js not run, no data-wizard-ready): one long form. Step navigation is hidden;
+   the last step's submit button sends everything. */
+form[data-wizard]:not([data-wizard-ready]) :is([data-next], [data-back], .form-skip) { display: none; }
+form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step { margin-top: 32px; }
+.js form[data-wizard]:not([data-wizard-ready]) [data-step]:not(:first-of-type) { display: none; }   /* JS on its way: no flash of the long form */
+
+/* Consent (required, step 1) */
+.form-consent { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: .875rem; line-height: 1.5; cursor: pointer; }
+.form-consent input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--color-primary-blue); }
 
 /* Fields */
 .form-field { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
@@ -66,7 +75,6 @@ html:has(dialog.form-dialog[open]) { overflow: hidden; }
 .form-panel input:focus-visible, .form-panel select:focus-visible, .form-panel textarea:focus-visible {
   outline: none; border-color: var(--color-primary-blue); box-shadow: 0 0 0 3px var(--form-tint);
 }
-.form-panel input[type="file"] { padding: 10px; }
 .form-panel input[type="radio"] { accent-color: var(--color-primary-blue); width: 18px; height: 18px; margin: 0; }
 .form-field:not(.form-tiles) > label:has(input[type="radio"]) { display: flex; align-items: center; gap: 10px; font-weight: var(--font-light); }
 
