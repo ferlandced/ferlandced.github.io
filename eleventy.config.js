@@ -14,6 +14,11 @@ export default function (eleventyConfig) {
   eleventyConfig.ignores.add("admin/**");
   eleventyConfig.ignores.add("README.md");
   eleventyConfig.ignores.add("CLAUDE.md");
+  // Tests (Playwright) and their outputs: not site content, and their writes must not trigger rebuilds.
+  ["tests/**", "test-results/**", "playwright-report/**", "screenshots/**", "coverage/**", "_site-test/**"].forEach((glob) => {
+    eleventyConfig.ignores.add(glob);
+    eleventyConfig.watchIgnores.add(glob);
+  });
 
   // CMS-managed single files (Decap "file" collections).
   eleventyConfig.addGlobalData("agent", () => readJson("content/agent.json"));
