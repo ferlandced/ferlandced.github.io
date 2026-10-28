@@ -71,8 +71,10 @@ translated: true
           <h3 class="service__title">{{ s.title }}</h3>
           <p class="service__text">{{ s.text }}</p>
           <div class="service__actions">
-            {# Later: each button opens its own in-place form. For now they open an email with a preset subject. #}
-            {% for a in [s.action1, s.action2] %}{% if a and a.label %}<a class="btn" href="mailto:{{ agent.email }}?subject={{ a.subject | urlencode }}">{{ a.label }}</a>{% endif %}{% endfor %}
+            {# Each button links to a form page (site.pages); with JS it opens the same form in a dialog below.
+               Renting reuses the property alert and estimation forms. #}
+            {% set actionPages = { buy: { action1: "propertyAlert" }, sell: { action1: "estimation" }, rent: { action1: "propertyAlert", action2: "estimation" } } %}
+            {% for key in ["action1", "action2"] %}{% set a = s[key] %}{% if a and a.label %}<a class="btn" href="{{ site.pages[actionPages[id][key]][lang] }}" data-dialog="dialog-{{ actionPages[id][key] }}">{{ a.label }}</a>{% endif %}{% endfor %}
           </div>
         </li>
         {% endfor %}
@@ -128,4 +130,13 @@ translated: true
       </form>
     </div>
   </section>
+
+  {# Form dialogs, opened by the service buttons (see js/site.js). Full screen on phones. #}
+  {% for formKey, formFile in { propertyAlert: "property-alert", estimation: "estimation" } %}
+  <dialog class="form-dialog" id="dialog-{{ formKey }}" aria-labelledby="dialog-{{ formKey }}-title">
+    {% set titleTag = "h2" %}{% set titleId = "dialog-" ~ formKey ~ "-title" %}
+    {% include "partials/form-panel.njk" %}
+  </dialog>
+  {% endfor %}
 </main>
+<script src="/js/forms.js" defer></script>

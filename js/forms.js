@@ -18,6 +18,7 @@
       if (progress && steps.length > 1) {
         progress.querySelector("[data-current]").textContent = i + 1;
         progress.querySelector("[data-total]").textContent = steps.length;
+        progress.style.setProperty("--progress", (i + 1) / steps.length);   // bar width, see css/forms.css
         progress.hidden = false;
       }
       if (focus) steps[i].querySelector("h2")?.focus();
@@ -31,10 +32,23 @@
       el.setCustomValidity(low ? el.dataset.gteMessage || el.title || "​" : "");
     });
 
+    // data-one-of="<group>": at least one field of the group must be filled (e.g. phone or email).
+    // The message is set on the group's first field and comes from the HTML (data-one-of-message).
+    const checkOneOf = () => {
+      const groups = {};
+      form.querySelectorAll("[data-one-of]").forEach((el) => (groups[el.dataset.oneOf] ||= []).push(el));
+      Object.values(groups).forEach((fields) => {
+        const empty = fields.every((el) => el.value.trim() === "");
+        fields[0].setCustomValidity(empty ? fields[0].dataset.oneOfMessage || fields[0].title || "​" : "");
+      });
+    };
+
+    const checkCustom = () => { checkGte(); checkOneOf(); };
+
     const firstInvalid = (step) => [...step.querySelectorAll(FIELDS)].find((el) => el.willValidate && !el.checkValidity());
 
     const next = () => {
-      checkGte();
+      checkCustom();
       const bad = firstInvalid(steps[current]);
       if (bad) return bad.reportValidity();
       if (current < last) show(current + 1, true);
@@ -74,7 +88,7 @@
     };
 
     const submit = async () => {
-      checkGte();
+      checkCustom();
       for (let i = 0; i <= last; i++) {
         const bad = firstInvalid(steps[i]);
         if (bad) {
@@ -114,15 +128,29 @@
       next();
     });
 
+    // A submit button sends from any step (e.g. "skip and send" on optional steps).
+    // Without one (Enter in a field), a step before the last one moves on instead.
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       if (pending) return;
-      if (current < last) next();
-      else submit();
+      if (e.submitter || current === last) submit();
+      else next();
     });
 
+    // data-allow="<character class>": characters outside it are dropped while typing or pasting.
+    const filter = (el) => {
+      const allowed = new RegExp(el.dataset.allow, "g");
+      const value = (el.value.match(allowed) || []).join("");
+      if (value === el.value) return;
+      const caret = el.selectionStart - (el.value.slice(0, el.selectionStart).length - (el.value.slice(0, el.selectionStart).match(allowed) || []).length);
+      el.value = value;
+      el.setSelectionRange(caret, caret);
+    };
+
     form.addEventListener("input", (e) => {
+      if (e.target.dataset.allow) filter(e.target);
       if (e.target.matches("[data-gte]") || form.querySelector(`[data-gte="${e.target.name}"]`)) checkGte();
+      if (e.target.matches("[data-one-of]")) checkOneOf();
     });
 
     show(0, false);

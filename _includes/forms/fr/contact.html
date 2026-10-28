@@ -1,0 +1,47 @@
+<form class="form form--contact" data-wizard action="https://api.web3forms.com/submit" method="POST" novalidate>
+  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
+  <input type="hidden" name="form_type" value="contact">
+  <input type="hidden" name="subject" value="Message via le formulaire de contact">
+  <input type="hidden" name="from_name" value="Site web Cedrik Ferland">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <section class="form-step" data-step>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="ct-first-name"><span data-icon="user" aria-hidden="true"></span> Prénom</label>
+        <input id="ct-first-name" name="first_name" type="text" autocomplete="given-name" required>
+      </div>
+      <div class="form-field">
+        <label for="ct-last-name"><span data-icon="user" aria-hidden="true"></span> Nom</label>
+        <input id="ct-last-name" name="last_name" type="text" autocomplete="family-name" required>
+      </div>
+    </div>
+    <p class="form-hint form-hint--group" id="ct-either">Un téléphone ou un courriel suffit.</p>
+    <div class="form-row form-row--phone">
+      <div class="form-field">
+        <label for="ct-phone"><span data-icon="phone" aria-hidden="true"></span> Téléphone</label>
+        <input id="ct-phone" name="phone" type="tel" autocomplete="tel" placeholder="514 555-0123" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="ct-either ct-phone-hint" data-one-of="contact" data-one-of-message="Indiquez un téléphone ou un courriel.">
+        <p class="form-hint" id="ct-phone-hint">Au moins 10 chiffres, indicatif régional compris.</p>
+      </div>
+      <div class="form-field">
+        <label for="ct-phone-ext">Poste</label>
+        <input id="ct-phone-ext" name="phone_ext" type="text" inputmode="numeric" autocomplete="tel-extension" placeholder="Ext">
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="ct-email"><span data-icon="mail" aria-hidden="true"></span> Courriel</label>
+      <input id="ct-email" name="email" type="email" autocomplete="email" aria-describedby="ct-either" data-one-of="contact">
+    </div>
+    <div class="form-field">
+      <label for="ct-message"><span data-icon="message-square" aria-hidden="true"></span> Message</label>
+      <textarea id="ct-message" name="message" required></textarea>
+    </div>
+    <p class="form-notice">En cliquant sur «Envoyer», vous confirmez que vous êtes intéressé à être contacté.</p>
+    <div class="form-actions">
+      <button type="submit">Envoyer</button>
+    </div>
+  </section>
+
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> Une erreur est survenue. Veuillez réessayer ou me joindre par téléphone.</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> Merci! Je vous reviens très bientôt.</section>
+</form>

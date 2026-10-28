@@ -167,6 +167,24 @@
       "en": "All properties"
     }
   },
+  "forms": {
+    "close": {
+      "fr": "Fermer",
+      "en": "Close"
+    },
+    "estimation": {
+      "title": {
+        "fr": "Estimation de ma propriété",
+        "en": "Property valuation"
+      }
+    },
+    "propertyAlert": {
+      "title": {
+        "fr": "Alerte immobilière",
+        "en": "Property alert"
+      }
+    }
+  },
   "contact": {
     "heading": {
       "fr": "Me contacter",
