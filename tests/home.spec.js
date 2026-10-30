@@ -74,10 +74,8 @@ for (const lang of languages) {
   });
 }
 
-test("reduced motion: the agent photo shows in About without the travelling copy", async ({ browser }, testInfo) => {
-  const context = await browser.newContext({ ...testInfo.project.use, reducedMotion: "reduce", baseURL: testInfo.project.use.baseURL });
-  const page = await context.newPage();
+test("reduced motion: the agent photo shows in About without the travelling copy", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("fr/#about");
   await expect(page.locator(".about__card img")).toBeVisible();
-  await context.close();
 });

@@ -8,8 +8,9 @@ for (const p of pages) {
   test(`${p.name}: trademark text`, async ({ page }) => {
     await page.goto(p.path);
     const text = await page.locator("body").innerText();
-    // "REMAX" in capitals, no slash, no plural or possessive
-    expect(text, "RE/MAX or a mixed-case variant").not.toMatch(/RE\s*[\/\\|]\s*MAX|\bRe[\/]?Max\b|\bremax\b/);
+    // "REMAX" in capitals, no slash, no plural or possessive: every spelling, in any case and with any separator, must be exactly "REMAX"
+    const spellings = text.match(/\bre\s*[\/\\|]?\s*max\b/gi) || [];
+    expect(spellings.filter((m) => m !== "REMAX"), "RE/MAX or a mixed-case variant").toEqual([]);
     expect(text, "REMAX plural or possessive").not.toMatch(/REMAX(?:'s|’s|s)\b/i);
     // ® at most once per page, never with the office name
     expect((text.match(/®/g) || []).length, "® count").toBeLessThanOrEqual(1);

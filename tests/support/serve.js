@@ -14,10 +14,11 @@ http.createServer((req, res) => {
   const url = decodeURIComponent(new URL(req.url, "http://x").pathname);
   if (url === "/" || !url.startsWith(prefix)) { res.writeHead(404).end("Not found"); return; }
   let file = path.join(root, url.slice(prefix.length));
-  if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
+  const rel = path.relative(root, file);
+  if (rel.startsWith("..") || path.isAbsolute(rel)) { res.writeHead(403).end(); return; }
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, "index.html");
   fs.readFile(file, (err, body) => {
     if (err) { res.writeHead(404).end("Not found"); return; }
     res.writeHead(200, { "content-type": types[path.extname(file)] || "application/octet-stream" }).end(body);
   });
-}).listen(port, () => console.log(`Serving _site at http://localhost:${port}${prefix}`));
+}).listen(port, "localhost", () => console.log(`Serving ${path.basename(root)} at http://localhost:${port}${prefix}`));
