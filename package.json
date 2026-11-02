@@ -4,9 +4,13 @@
   "type": "module",
   "scripts": {
     "start": "eleventy --serve --port=8080",
-    "build": "eleventy"
+    "build": "eleventy",
+    "test": "playwright test",
+    "test:report": "playwright show-report"
   },
   "devDependencies": {
-    "@11ty/eleventy": "3.1.6"
+    "@11ty/eleventy": "3.1.6",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.1"
   }
 }
