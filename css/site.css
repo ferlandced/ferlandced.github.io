@@ -54,6 +54,9 @@ a:hover { color: var(--brand-link-hover); }
 .btn { display: inline-block; padding: 9px 0; border: 0; border-radius: 0; background: none; color: var(--brand-button); font: inherit; font-size: .875rem; font-weight: var(--font-bold); line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; text-align: left; text-decoration: none; cursor: pointer; transition: color .2s; }
 /* No border or fill: text aligns with the content's left edge; hover underlines in Bridge Red */
 .btn:hover { color: var(--brand-link-hover); text-decoration: underline; text-underline-offset: .3em; }
+/* Solid: the page's main action. White on Dark Red (13.4:1), Bridge Red on hover (7.5:1); readable on light and dark. */
+.btn--solid { padding: 14px 24px; background: var(--brand-button); color: var(--brand-on-dark); transition: background-color .2s; }
+.btn--solid:hover { background: var(--brand-accent); color: var(--brand-on-dark); text-decoration: none; }
 
 /* ==========================================================================
    Header: fixed, white. On desktop the logo shrinks as the page scrolls.
@@ -92,7 +95,6 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .contact-icons a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--brand-radius); color: var(--brand-ink); }
 .contact-icons a:hover { color: var(--brand-link-hover); }
 .icon { width: 20px; height: 20px; }
-.contact-icons--hero { margin: 16px 0 0 -12px; }   /* optically aligns the first glyph with the text */
 .contact-icons--header { padding: 0 4px; border-radius: var(--brand-radius); background: var(--brand-surface); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
 [data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { opacity: 1; visibility: visible; }
 .contact-icons--menu { display: none; }
@@ -159,7 +161,6 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   .site-header__tools .contact-icons--header a { color: var(--brand-on-dark); }
   .site-header[data-past-hero] .contact-icons--header, .site-header[data-open] .contact-icons--header,
   body:not(.home) .contact-icons--header { opacity: 0 !important; visibility: hidden !important; }
-  .hero .contact-icons--hero { display: none; }
 
   /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
   /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
@@ -237,6 +238,8 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .hero__name { margin: 0; font-size: var(--name-size); text-transform: uppercase; letter-spacing: .04em; }
 .hero__role { margin: 6px 0 0; font-weight: var(--font-medium); font-size: clamp(1rem, 1.3vw, 1.2rem); color: var(--brand-ink); }
 .hero__agency { margin: 2px 0 0; font-size: .95rem; color: var(--brand-muted); }
+.hero__tagline { margin: 8px 0 12px; font-size: clamp(1.05rem, 1.5vw, 1.35rem); font-weight: var(--font-medium); line-height: 1.35; color: var(--brand-ink); }
+.hero__cta { margin: 20px 0 0; }
 
 .hero__photo, .stage__agent img { height: var(--photo-h); width: var(--photo-w); max-width: none; object-fit: contain; object-position: top center; }
 /* Photo layer: under the text (z 2) and the band (z 4) */
@@ -311,7 +314,6 @@ body:not(.home) .site-header { background: var(--brand-surface); }
     calc(50% + var(--band-roff) - (var(--hero-h) - var(--band-y2)) * tan(var(--slash-angle))) 100%, 0 100%); }
   .hero__id { left: auto; right: 0; bottom: 24px; max-width: min(100%, 22rem); text-align: right; }
   .hero__signature { margin-left: auto; }
-  .contact-icons--hero { justify-content: flex-end; margin: 12px -12px 0 0; }
 }
 
 /* Phones only: no agent in the hero (he appears directly in About). The side image fills the
@@ -332,10 +334,8 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   .hero::before { display: block; z-index: 1; left: 0; width: 100%; transform: none;
     background: linear-gradient(to right, color-mix(in srgb, var(--color-black) 70%, transparent), color-mix(in srgb, var(--color-black) 35%, transparent) 60%, transparent); }
   .hero__id { top: 50%; bottom: auto; left: 0; right: auto; translate: 0 -50%; max-width: 100%; text-align: left; color: var(--brand-on-dark); }
-  .hero__name, .hero__role, .hero__agency { color: var(--brand-on-dark); }
+  .hero__name, .hero__tagline, .hero__role, .hero__agency { color: var(--brand-on-dark); }
   .hero__signature { margin-left: 0; filter: invert(1); }
-  .contact-icons--hero { justify-content: flex-start; margin: 12px 0 0 -12px; }
-  .contact-icons--hero a { color: var(--brand-on-dark); }
 }
 
 /* Desktop: agent on white at the left, two thin lines (Primary Red, then Dark Red), and the side
@@ -361,8 +361,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
                    50vw + var(--photo-x) + var(--photo-w) + 24px) - var(--wrap-left));   /* clear of both the lines and the agent */
     right: auto; bottom: var(--id-bottom); max-width: 34rem; text-align: left; }
   .hero__signature { margin-left: 0; filter: invert(1); }
-  .contact-icons--hero { justify-content: flex-start; margin: 16px 0 0 -12px; }
-  .hero__id, .hero__name, .hero__role, .hero__agency, .contact-icons--hero a { color: var(--brand-on-dark); }
+  .hero__id, .hero__name, .hero__tagline, .hero__role, .hero__agency { color: var(--brand-on-dark); }
 
   /* Header: menu on the right, next to the icons and language; language without its white chip */
   .site-nav { margin-left: auto; }
@@ -410,6 +409,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   .about__card { justify-self: center; }
 }
 .about__body { max-width: 68ch; }
+.about__actions { display: flex; flex-wrap: wrap; gap: 8px 32px; }
 .about__contact { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 4px; color: var(--brand-muted); }
 .stage__track { display: none; }
 
@@ -418,11 +418,12 @@ body:not(.home) .site-header { background: var(--brand-surface); }
    ========================================================================== */
 .services { background: var(--brand-surface); }
 /* Subgrid keeps titles, texts and buttons aligned across the three columns */
-.services__list { --svc-gap: clamp(64px, 7vw, 104px); list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; column-gap: var(--svc-gap); }
-.service { position: relative; display: grid; grid-row: span 3; grid-template-rows: subgrid; }
+.services__list { --svc-gap: clamp(64px, 7vw, 104px); list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto auto; column-gap: var(--svc-gap); }
+.service { position: relative; display: grid; grid-row: span 4; grid-template-rows: subgrid; }
 .service__title { margin: 0 0 12px; font-size: clamp(1.5rem, 2.4vw, 2rem); }
 .service__text { margin: 0 0 24px; }
 .service__actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.service__more { justify-self: start; margin-top: 16px; font-weight: var(--font-medium); }
 /* Slash between titles: 20px, Primary Red 1/4 + Dark Red 3/4, fixed angle (skew keeps vertical lines at the slash angle) */
 .service + .service::before {
   content: ""; position: absolute; top: -14px; left: calc(var(--svc-gap) / -2 - 10px);
@@ -436,6 +437,30 @@ body:not(.home) .site-header { background: var(--brand-surface); }
   /* Plain horizontal divider, not a rotated slash */
   .service + .service::before { top: -38px; left: 0; width: 64px; height: 4px; transform: none; }
 }
+
+/* ==========================================================================
+   Trust strip: cream band after About. Four short facts in a row; stacked on phones.
+   ========================================================================== */
+.trust { background: var(--brand-bg); border-block: 1px solid var(--brand-placeholder); }
+.trust__list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px 40px; padding-block: 32px; }
+.trust__item p { margin: 0; color: var(--brand-muted); font-size: .95rem; }
+.trust__item .trust__title { margin-bottom: 4px; color: var(--brand-ink); font-weight: var(--font-bold); font-size: 1rem; }
+/* Short Primary Red rule above each fact (decorative) */
+.trust__item::before { content: ""; display: block; width: 32px; height: 4px; margin-bottom: 12px; background: var(--brand-highlight); }
+
+/* ==========================================================================
+   Content pages (About, services, legal): one readable column.
+   ========================================================================== */
+.page-content { max-width: 72ch; padding-block: clamp(32px, 6vw, 72px); }
+.page-content h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 0 0 24px; }
+.page-content h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); margin: 40px 0 12px; }
+.page-content li + li { margin-top: 6px; }
+.page-content__updated { color: var(--brand-muted); }
+/* Legal drafts: impossible to miss, before and after the text */
+.legal-banner { margin: 0 0 32px; padding: 24px; border: 4px solid var(--brand-highlight); background: var(--brand-bg); color: var(--color-dark-red); }
+.legal-banner:last-child { margin: 40px 0 0; }
+.legal-banner p { margin: 0; }
+.legal-banner .legal-banner__title { margin-bottom: 6px; font-size: clamp(1.5rem, 4vw, 2.4rem); font-weight: var(--font-bold); line-height: 1.1; text-transform: uppercase; letter-spacing: .02em; }
 
 /* ==========================================================================
    My properties: cream. Grid on tablet and up, card list on phones.
@@ -492,6 +517,7 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .site-footer a { color: var(--brand-on-dark); }
 .site-footer__office { color: var(--brand-on-dark); font-weight: var(--font-bold); }
 .site-footer__notice, .site-footer__copy { margin-top: 12px !important; }
+.site-footer__legal { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 
 /* Listing page, also used by the CMS preview template */
 .listing { background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px var(--brand-shadow); }

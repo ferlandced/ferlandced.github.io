@@ -8,18 +8,6 @@
       "fr": "Accueil",
       "en": "Home"
     },
-    "about": {
-      "fr": "À propos",
-      "en": "About"
-    },
-    "services": {
-      "fr": "Services",
-      "en": "Services"
-    },
-    "properties": {
-      "fr": "Propriétés",
-      "en": "Properties"
-    },
     "open": {
       "fr": "Ouvrir le menu",
       "en": "Open menu"
@@ -47,6 +35,18 @@
     "agency": {
       "fr": "REMAX Privilège, agence immobilière",
       "en": "REMAX Privilège, real estate agency"
+    },
+    "tagline": {
+      "fr": "C'est l'humain derrière chaque transaction qui compte.",
+      "en": "It's the person behind every transaction that matters."
+    },
+    "area": {
+      "fr": "Rive-Sud",
+      "en": "South Shore"
+    },
+    "cta": {
+      "fr": "Évaluation gratuite",
+      "en": "Free valuation"
     }
   },
   "contactIcons": {
@@ -79,6 +79,52 @@
     "contact": {
       "fr": "Me contacter",
       "en": "Contact me"
+    },
+    "more": {
+      "fr": "Lire mon histoire",
+      "en": "Read my story"
+    }
+  },
+  "trust": {
+    "label": {
+      "fr": "En bref",
+      "en": "At a glance"
+    },
+    "licence": {
+      "fr": "Courtier titulaire d'un permis de l'OACIQ",
+      "en": "Broker licensed by the OACIQ"
+    },
+    "licenceNumber": {
+      "fr": "Permis no",
+      "en": "Licence no."
+    },
+    "register": {
+      "fr": "Vérifier au registre de l'OACIQ",
+      "en": "Check the OACIQ register"
+    },
+    "backingTitle": {
+      "fr": "Appuyé par REMAX Privilège",
+      "en": "Backed by REMAX Privilège"
+    },
+    "backingText": {
+      "fr": "Une agence, une équipe et des outils derrière chaque dossier.",
+      "en": "An agency, a team and tools behind every file."
+    },
+    "responseTitle": {
+      "fr": "Réponse sous 24 heures ouvrables",
+      "en": "Reply within one business day"
+    },
+    "responseText": {
+      "fr": "Chaque demande reçoit une réponse, par courriel ou par téléphone.",
+      "en": "Every request gets an answer, by email or by phone."
+    },
+    "languagesTitle": {
+      "fr": "En français et en anglais",
+      "en": "In French and English"
+    },
+    "languagesText": {
+      "fr": "Je vous accompagne dans la langue de votre choix.",
+      "en": "I work with you in the language you prefer."
     }
   },
   "services": {
@@ -104,6 +150,10 @@
           "fr": "Recherche personnalisée",
           "en": "Property search"
         }
+      },
+      "more": {
+        "fr": "En savoir plus sur l'achat",
+        "en": "More about buying"
       }
     },
     "sell": {
@@ -124,6 +174,10 @@
           "fr": "Évaluation de ma propriété",
           "en": "Property valuation"
         }
+      },
+      "more": {
+        "fr": "En savoir plus sur la vente",
+        "en": "More about selling"
       }
     },
     "rent": {
@@ -154,6 +208,10 @@
           "fr": "Mise en location de ma propriété",
           "en": "Renting out my property"
         }
+      },
+      "more": {
+        "fr": "En savoir plus sur la location",
+        "en": "More about renting"
       }
     }
   },
@@ -176,12 +234,20 @@
       "title": {
         "fr": "Estimation de ma propriété",
         "en": "Property valuation"
+      },
+      "next": {
+        "fr": "Après l'envoi : je vous réponds sous 24 heures ouvrables pour préciser votre projet, puis je vous remets mon opinion de la valeur marchande de votre propriété.",
+        "en": "After you send it: I reply within one business day to go over your project, then give you my opinion of your property's market value."
       }
     },
     "propertyAlert": {
       "title": {
         "fr": "Alerte immobilière",
         "en": "Property alert"
+      },
+      "next": {
+        "fr": "Après l'envoi : je vous réponds sous 24 heures ouvrables pour confirmer vos critères, puis je vous envoie les propriétés qui y correspondent.",
+        "en": "After you send it: I reply within one business day to confirm your criteria, then send you the properties that match them."
       }
     }
   },
@@ -191,8 +257,8 @@
       "en": "Contact me"
     },
     "intro": {
-      "fr": "Écrivez-moi et je vous réponds.",
-      "en": "Write to me and I will get back to you."
+      "fr": "Écrivez-moi. Je vous réponds sous 24 heures ouvrables, par courriel ou par téléphone.",
+      "en": "Write to me. I reply within one business day, by email or by phone."
     },
     "name": {
       "fr": "Nom",
@@ -243,6 +309,32 @@
     "phoneLabel": {
       "fr": "Bureau",
       "en": "Office"
+    },
+    "legalLabel": {
+      "fr": "Liens juridiques",
+      "en": "Legal"
+    },
+    "privacy": {
+      "fr": "Politique de confidentialité",
+      "en": "Privacy policy"
+    },
+    "terms": {
+      "fr": "Conditions d'utilisation",
+      "en": "Terms of use"
+    }
+  },
+  "legal": {
+    "pending": {
+      "fr": "En attente de révision juridique",
+      "en": "Pending legal review"
+    },
+    "pendingText": {
+      "fr": "Ce texte est une ébauche. Il n'est pas encore en vigueur.",
+      "en": "This text is a draft. It is not in effect yet."
+    },
+    "updated": {
+      "fr": "Dernière mise à jour :",
+      "en": "Last updated:"
     }
   }
 }

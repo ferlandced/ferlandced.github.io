@@ -25,9 +25,11 @@ translated: true
         <div class="hero__id">
           {% if home.signature %}<img class="hero__signature" src="{{ home.signature }}" alt="" width="2160" height="1960">{% endif %}
           <h1 class="hero__name" id="hero-name">{{ agent.name }}</h1>
+          <p class="hero__tagline">{{ t.hero.tagline }}</p>
           <p class="hero__role">{{ agent.title[lang] }}</p>
-          <p class="hero__agency">{{ t.hero.agency }}</p>
-          {% set iconsClass = "contact-icons--hero" %}{% include "partials/contact-icons.njk" %}
+          <p class="hero__agency">{{ t.hero.agency }}{% if t.hero.area %}, {{ t.hero.area }}{% endif %}</p>
+          {# One action: the estimation form, in a dialog with JS, on its own page without #}
+          <p class="hero__cta"><a class="btn btn--solid" href="{{ site.pages.estimation[lang] }}" data-dialog="dialog-estimation">{{ t.hero.cta }}</a></p>
         </div>
       </div>
       {# Own layer so it can be cut along the slash on phones and tablets #}
@@ -56,11 +58,28 @@ translated: true
             {% if agent.phone %}<li>{{ t.about.cellLabel }} <a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></li>{% endif %}
             {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
           </ul>
-          <p><a class="btn" href="#contact">{{ t.about.contact }}</a></p>
+          <p class="about__actions"><a class="btn" href="{{ site.pages.about[lang] }}">{{ t.about.more }}</a> <a class="btn" href="#contact">{{ t.about.contact }}</a></p>
         </div>
       </div>
     </section>
   </div>
+
+  {# Trust strip: what is true today (OACIQ: advertising must be accurate and provable).
+     The licence item shows only once the licence number is filled in (Agent profile in the CMS).
+     Placed after About, not directly under the hero: the photo travels from the hero into About. #}
+  <section class="trust" aria-label="{{ t.trust.label }}">
+    <ul class="container trust__list">
+      {% if agent.licence %}
+      <li class="trust__item trust__item--licence">
+        <p class="trust__title">{{ t.trust.licence }}</p>
+        <p>{{ t.trust.licenceNumber }} {{ agent.licence }}{% if agent.licenceRegisterUrl %}<br><a href="{{ agent.licenceRegisterUrl }}">{{ t.trust.register }}</a>{% endif %}</p>
+      </li>
+      {% endif %}
+      <li class="trust__item"><p class="trust__title">{{ t.trust.backingTitle }}</p><p>{{ t.trust.backingText }}</p></li>
+      <li class="trust__item"><p class="trust__title">{{ t.trust.responseTitle }}</p><p>{{ t.trust.responseText }}</p></li>
+      <li class="trust__item"><p class="trust__title">{{ t.trust.languagesTitle }}</p><p>{{ t.trust.languagesText }}</p></li>
+    </ul>
+  </section>
 
   <section id="services" class="services" aria-labelledby="services-heading">
     <div class="container">
@@ -78,6 +97,7 @@ translated: true
                                rent: { action1: { form: "propertyAlert", intent: "location" }, action2: { form: "estimation", intent: "location" } } } %}
             {% for key in ["action1", "action2"] %}{% set a = s[key] %}{% set act = actions[id][key] %}{% if a and a.label %}<a class="btn" href="{{ site.pages[act.form][lang] }}{% if act.intent %}?intent={{ act.intent }}{% endif %}" data-dialog="dialog-{{ act.form }}"{% if act.intent %} data-intent="{{ act.intent }}"{% endif %}>{{ a.label }}</a>{% endif %}{% endfor %}
           </div>
+          <a class="service__more" href="{{ site.pages[id][lang] }}">{{ s.more }}</a>
         </li>
         {% endfor %}
       </ul>
@@ -126,7 +146,7 @@ translated: true
         </div>
         <label class="consent">
           <input type="checkbox" name="consent" value="yes" required>
-          <span>{{ t.contact.consentBefore }}{% if site.privacyUrl[lang] %}<a href="{{ site.privacyUrl[lang] }}">{{ t.contact.privacy }}</a>{% else %}{{ t.contact.privacy }}{% endif %}{{ t.contact.consentAfter }}</span>
+          <span>{{ t.contact.consentBefore }}<a href="{{ site.pages.privacy[lang] }}">{{ t.contact.privacy }}</a>{{ t.contact.consentAfter }}</span>
         </label>
         <button class="btn" type="submit">{{ t.contact.submit }}</button>
       </form>

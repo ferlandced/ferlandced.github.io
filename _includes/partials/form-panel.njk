@@ -6,5 +6,6 @@
     <{{ titleTag }} class="form-panel__title" id="{{ titleId }}">{{ t.forms[formKey].title }}</{{ titleTag }}>
     <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.close }}"><span data-icon="x" aria-hidden="true"></span></a>
   </div>
+  {% if t.forms[formKey].next %}<p class="form-panel__next">{{ t.forms[formKey].next }}</p>{% endif %}
   {% include "forms/" + lang + "/" + formFile + ".html" %}
 </div>

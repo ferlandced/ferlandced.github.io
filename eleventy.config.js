@@ -23,8 +23,10 @@ export default function (eleventyConfig) {
   // CMS-managed single files (Decap "file" collections).
   eleventyConfig.addGlobalData("agent", () => readJson("content/agent.json"));
   eleventyConfig.addGlobalData("home", () => readJson("content/home.json"));
+  // Header menu: a label and a URL per language for each item.
+  eleventyConfig.addGlobalData("menu", () => readJson("content/menu.json"));
   // Site copy: content/i18n.json holds {fr, en} pairs at every leaf. Templates read it per
-  // language as i18n[lang], e.g. i18n.fr.nav.about. Office identity is merged from site.json.
+  // language as i18n[lang], e.g. i18n.fr.nav.open. Office identity is merged from site.json.
   eleventyConfig.addGlobalData("i18n", () => {
     const copy = readJson("content/i18n.json");
     const site = readJson("_data/site.json");
@@ -38,6 +40,15 @@ export default function (eleventyConfig) {
         independence: o.independence[lang], independenceLang: o.independenceLang[lang] };
       return [lang, t];
     }));
+  });
+  // Content pages (About, services, legal): content/pages/<key>.json, listed in site.contentPages.
+  // One entry per page and language, so page.njk paginates over a flat list.
+  eleventyConfig.addGlobalData("contentPages", () => {
+    const site = readJson("_data/site.json");
+    return site.contentPages.flatMap((key) => {
+      const data = readJson(`content/pages/${key}.json`);
+      return site.languages.map((lang) => ({ key, lang, data }));
+    });
   });
   eleventyConfig.addWatchTarget("content/");
 

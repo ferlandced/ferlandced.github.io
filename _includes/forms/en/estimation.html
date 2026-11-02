@@ -41,8 +41,7 @@
       <label for="est-email"><span data-icon="mail" aria-hidden="true"></span> Email</label>
       <input id="est-email" name="email" type="email" autocomplete="email" aria-describedby="est-either" data-one-of="contact">
     </div>
-    <!-- Link “privacy policy” to the policy once it is published (site.json privacyUrl). -->
-    <label class="form-consent" for="est-consent"><input id="est-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the privacy policy.</span></label>
+    <label class="form-consent" for="est-consent"><input id="est-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the <a href="{{ site.pages.privacy.en }}">privacy policy</a>.</span></label>
     <div class="form-actions">
       <a class="form-cancel" href="/en/" data-close>Cancel</a>
       <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>

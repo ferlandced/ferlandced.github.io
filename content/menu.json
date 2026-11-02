@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "label": {
+        "fr": "À propos",
+        "en": "About"
+      },
+      "url": {
+        "fr": "/fr/#about",
+        "en": "/en/#about"
+      }
+    },
+    {
+      "label": {
+        "fr": "Services",
+        "en": "Services"
+      },
+      "url": {
+        "fr": "/fr/#services",
+        "en": "/en/#services"
+      }
+    },
+    {
+      "label": {
+        "fr": "Propriétés",
+        "en": "Properties"
+      },
+      "url": {
+        "fr": "/listings/",
+        "en": "/listings/"
+      }
+    }
+  ]
+}

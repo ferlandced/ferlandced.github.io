@@ -2,7 +2,7 @@
 // content, nothing loaded from outside the site. Saves a full-page screenshot per page and device
 // in screenshots/<project>/ for visual review.
 import { test, expect } from "./support/fixtures.js";
-import { pages, site, agent, t, url } from "./support/site.js";
+import { pages, site, agent, t, url, menuLinks } from "./support/site.js";
 
 test.describe("every page", () => {
   for (const p of pages) {
@@ -28,12 +28,14 @@ test.describe("every page", () => {
         await expect(page.locator(".site-nav__lang")).toHaveAttribute("href", url(p.alternates[other]));
       }
 
-      // Header: logo to this language's home, menu links
+      // Header: logo to this language's home, menu links from content/menu.json, in order
       await expect(page.locator(".site-header .brand")).toHaveAttribute("href", url(`/${p.lang}/`));
-      const nav = page.locator(".site-nav");
-      await expect(nav.locator(`a[href="${url(`/${p.lang}/#about`)}"]`)).toHaveText(tr.nav.about);
-      await expect(nav.locator(`a[href="${url(`/${p.lang}/#services`)}"]`)).toHaveText(tr.nav.services);
-      await expect(nav.locator(`a[href="${url("/listings/")}"]`)).toHaveText(tr.nav.properties);
+      const links = menuLinks(p.lang);
+      const navLinks = page.locator(".site-nav > a:not(.site-nav__lang)");
+      await expect(navLinks).toHaveText(links.map((l) => l.label));
+      for (const [i, l] of links.entries()) {
+        await expect(navLinks.nth(i)).toHaveAttribute("href", /^https?:/.test(l.href) ? l.href : url(l.href));
+      }
 
       // Footer on every page: office name, address, phone, independence notice (CLAUDE.md)
       const footer = page.locator(".site-footer");
@@ -45,6 +47,9 @@ test.describe("every page", () => {
       await expect(notice).toHaveAttribute("lang", site.office.independenceLang[p.lang]);
       await expect(footer).toContainText(agent.name);
       await expect(footer).toContainText(agent.title[p.lang]);
+      // Legal links on every page
+      await expect(footer.locator(`a[href="${url(site.pages.privacy[p.lang])}"]`)).toHaveText(tr.office.privacy);
+      await expect(footer.locator(`a[href="${url(site.pages.terms[p.lang])}"]`)).toHaveText(tr.office.terms);
 
       await expect(page.locator("body")).not.toContainText(/lorem ipsum/i);
       expect(external, "requests leaving the site").toEqual([]);

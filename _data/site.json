@@ -1,9 +1,5 @@
 {
   "web3formsKey": "ff2d76e3-ab1e-4f77-9bc7-df314f30fe08",
-  "privacyUrl": {
-    "fr": "",
-    "en": ""
-  },
   "pages": {
     "estimation": {
       "fr": "/fr/estimation/",
@@ -12,6 +8,30 @@
     "propertyAlert": {
       "fr": "/fr/alerte-immobiliere/",
       "en": "/en/property-alert/"
+    },
+    "about": {
+      "fr": "/fr/a-propos/",
+      "en": "/en/about/"
+    },
+    "buy": {
+      "fr": "/fr/acheter/",
+      "en": "/en/buy/"
+    },
+    "sell": {
+      "fr": "/fr/vendre/",
+      "en": "/en/sell/"
+    },
+    "rent": {
+      "fr": "/fr/louer/",
+      "en": "/en/rent/"
+    },
+    "privacy": {
+      "fr": "/fr/confidentialite/",
+      "en": "/en/privacy/"
+    },
+    "terms": {
+      "fr": "/fr/conditions/",
+      "en": "/en/terms/"
     }
   },
   "languages": [
@@ -33,5 +53,13 @@
       "en": "en"
     }
   },
-  "_comment": "office.independence.fr must be replaced by the wording from REMAX Québec; set independenceLang.fr to fr at the same time."
+  "_comment": "office.independence.fr must be replaced by the wording from REMAX Québec; set independenceLang.fr to fr at the same time.",
+  "contentPages": [
+    "about",
+    "buy",
+    "sell",
+    "rent",
+    "privacy",
+    "terms"
+  ]
 }

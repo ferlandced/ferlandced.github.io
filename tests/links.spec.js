@@ -4,9 +4,9 @@
 import { test, expect, WEB3FORMS } from "./support/fixtures.js";
 import { pages, agent } from "./support/site.js";
 
-// CLAUDE.md: outbound links to the REMAX website, plus legal/required links. The agent's own social
-// profiles are listed in content/agent.json.
-const ALLOWED_HOSTS = [/(^|\.)remax\.ca$/, /(^|\.)remax\.com$/, /(^|\.)remax-quebec\.com$/];
+// CLAUDE.md: outbound links to the REMAX website, plus legal/required links (OACIQ register, Quebec's
+// privacy commission). The agent's own social profiles are listed in content/agent.json.
+const ALLOWED_HOSTS = [/(^|\.)remax\.ca$/, /(^|\.)remax\.com$/, /(^|\.)remax-quebec\.com$/, /(^|\.)oaciq\.com$/, /(^|\.)cai\.gouv\.qc\.ca$/];
 const allowedOutbound = (href) => Object.values(agent.social || {}).includes(href) || ALLOWED_HOSTS.some((re) => re.test(new URL(href).hostname));
 
 for (const p of pages) {

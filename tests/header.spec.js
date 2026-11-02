@@ -1,6 +1,6 @@
 // Header: phone burger menu, desktop navigation, scroll states, language switch.
 import { test, expect } from "./support/fixtures.js";
-import { site, t, url } from "./support/site.js";
+import { site, t, url, menuLinks } from "./support/site.js";
 
 const isPhone = (testInfo) => testInfo.project.name.endsWith("-phone");
 
@@ -25,10 +25,13 @@ test("phone menu opens, closes with the button, Escape and a link", async ({ pag
   await expect(root).not.toHaveAttribute("data-open", "");
   await expect(toggle).toBeFocused();
 
+  // A link closes the menu and goes to its target (first home-page section in the menu)
+  const section = menuLinks("fr").find((l) => l.href.startsWith("/fr/#"));
+  test.skip(!section, "no home-page section in the menu");
   await toggle.click();
-  await page.locator(`.site-nav a[href="${url("/fr/#services")}"]`).click();
+  await page.locator(`.site-nav a[href="${url(section.href)}"]`).click();
   await expect(root).not.toHaveAttribute("data-open", "");
-  await expect(page).toHaveURL(/#services$/);
+  await expect(page).toHaveURL(new RegExp(`${section.href.split("#")[1]}$`));
 });
 
 test("desktop shows the menu without a burger", async ({ page }, testInfo) => {

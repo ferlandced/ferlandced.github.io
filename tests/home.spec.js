@@ -1,5 +1,5 @@
-// Home page content: hero, contact links, About, service buttons, the existing contact form,
-// and the reduced-motion layout.
+// Home page content: hero, contact links, About, trust strip, service buttons and info links,
+// the existing contact form, and the reduced-motion layout.
 import { test, expect } from "./support/fixtures.js";
 import { site, agent, t, url, languages } from "./support/site.js";
 
@@ -7,22 +7,52 @@ for (const lang of languages) {
   test.describe(`home (${lang})`, () => {
     test.beforeEach(async ({ page }) => { await page.goto(`${lang}/`); });
 
-    test("hero shows the agent and the agency", async ({ page }) => {
+    test("hero shows the agent, the agency and the tagline", async ({ page }) => {
       await expect(page.locator("h1")).toHaveText(agent.name);
+      await expect(page.locator(".hero__tagline")).toHaveText(t(lang).hero.tagline);
       await expect(page.locator(".hero__role")).toHaveText(agent.title[lang]);
-      await expect(page.locator(".hero__agency")).toHaveText(t(lang).hero.agency);
+      await expect(page.locator(".hero__agency")).toHaveText([t(lang).hero.agency, t(lang).hero.area].filter(Boolean).join(", "));
+    });
+
+    test("hero has one action: the estimation form, opened in a dialog", async ({ page }) => {
+      const actions = page.locator(".hero a");
+      await expect(actions).toHaveCount(1);
+      await expect(actions).toHaveText(t(lang).hero.cta);
+      await expect(actions).toHaveAttribute("href", url(site.pages.estimation[lang]));
+      await actions.click();
+      await expect(page.locator("#dialog-estimation")).toBeVisible();
     });
 
     test("contact links call, email and open social profiles safely", async ({ page }) => {
       const tel = `tel:+1${agent.phone.replaceAll(" ", "")}`;
-      for (const area of [".contact-icons--hero", ".about__contact"]) {
+      for (const area of [".contact-icons--header", ".about__contact"]) {
         await expect(page.locator(`${area} a[href="${tel}"]`)).toHaveCount(1);
         await expect(page.locator(`${area} a[href="mailto:${agent.email}"]`)).toHaveCount(1);
       }
-      const social = page.locator('.contact-icons--hero a[target="_blank"]');
+      const social = page.locator('.contact-icons--header a[target="_blank"]');
       for (const a of await social.all()) {
         await expect(a).toHaveAttribute("rel", /noopener/);
         expect(Object.values(agent.social)).toContain(await a.getAttribute("href"));
+      }
+    });
+
+    test("About links to the story page", async ({ page }) => {
+      await expect(page.locator(`.about a[href="${url(site.pages.about[lang])}"]`)).toHaveText(t(lang).about.more);
+    });
+
+    test("trust strip: the licence shows only once filled in", async ({ page }) => {
+      const tr = t(lang).trust;
+      const strip = page.locator(".trust");
+      await expect(strip).toHaveAttribute("aria-label", tr.label);
+      await expect(strip.locator(".trust__item--licence")).toHaveCount(agent.licence ? 1 : 0);
+      for (const title of [tr.backingTitle, tr.responseTitle, tr.languagesTitle]) await expect(strip).toContainText(title);
+    });
+
+    test("each service links to its information page", async ({ page }) => {
+      for (const id of ["buy", "sell", "rent"]) {
+        const more = page.locator(`.service--${id} .service__more`);
+        await expect(more).toHaveAttribute("href", url(site.pages[id][lang]));
+        await expect(more).toHaveText(t(lang).services[id].more);
       }
     });
 

@@ -34,6 +34,39 @@ collections:
           - { name: side_image_alt, label: "Side image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
           - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Desktop only: the scene behind the agent photo in the About section. Portrait, same proportions as the agent photo. Empty shows a plain gray panel." }
 
+  # Header menu (read by header.njk as `menu`). Each item: a French and English label and URL.
+  - name: menu
+    label: Menu
+    files:
+      - name: menu
+        label: "Menu du haut"
+        file: content/menu.json
+        format: json
+        fields:
+          - name: items
+            label: "Liens du menu"
+            label_singular: "Lien"
+            widget: list
+            max: 6
+            hint: "Glissez les liens pour changer leur ordre. Au-delà de 4 ou 5 liens, le menu devient trop large sur ordinateur."
+            summary: "{{fields.label.fr}}"
+            fields:
+              - name: label
+                label: "Texte du lien"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: url
+                label: "Adresse du lien"
+                widget: object
+                collapsed: false
+                hint: "Une section de l'accueil (/fr/#about, /en/#services), une page du site (/fr/vendre/, /en/sell/) ou une page du site de REMAX (https://www.remax.ca/...)."
+                fields:
+                  - { name: fr, label: "Français", widget: string, pattern: ['^/(?![/\\])[^\s\\]*$|^https://(www\.)?remax\.(ca|com)/[^\s\\]*$', 'Une adresse du site (/fr/...) ou du site de REMAX (https://www.remax.ca/...)'] }
+                  - { name: en, label: "English", widget: string, pattern: ['^/(?![/\\])[^\s\\]*$|^https://(www\.)?remax\.(ca|com)/[^\s\\]*$', 'An address on this site (/en/...) or the REMAX website (https://www.remax.ca/...)'] }
+
   # Site copy (read by eleventy.config.js as `i18n`). Each text has a French and an English
   # version. Keys are fixed here, so editors can change the wording but not the structure.
   # Labels are the French description of where each text appears.
@@ -59,27 +92,6 @@ collections:
                   - { name: en, label: "English", widget: string }
               - name: home
                 label: "Nom de la page d'accueil, lu par les lecteurs d'écran sur le logo"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: about
-                label: "Lien du menu vers la section À propos"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: services
-                label: "Lien du menu vers la section Services"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: properties
-                label: "Lien du menu vers la page des propriétés"
                 widget: object
                 collapsed: false
                 fields:
@@ -132,6 +144,27 @@ collections:
             fields:
               - name: agency
                 label: "Ligne sous le titre du courtier : nom de l'agence"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: tagline
+                label: "Slogan sous le nom du courtier"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: area
+                label: "Secteur, ajouté après le nom de l'agence (laisser vide pour ne rien afficher)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string, required: false }
+                  - { name: en, label: "English", widget: string, required: false }
+              - name: cta
+                label: "Bouton du bandeau : mène au formulaire d'estimation"
                 widget: object
                 collapsed: false
                 fields:
@@ -196,6 +229,88 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
+              - name: more
+                label: "Bouton qui mène à la page Mon histoire"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: trust
+            label: "Bandeau de confiance (sous À propos)"
+            widget: object
+            collapsed: true
+            fields:
+              - name: label
+                label: "Nom du bandeau, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: licence
+                label: "Permis : titre (affiché seulement si le numéro de permis est rempli dans le profil)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: licenceNumber
+                label: "Permis : texte devant le numéro"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: register
+                label: "Permis : lien vers le registre de l'OACIQ"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: backingTitle
+                label: "Agence : titre"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: backingText
+                label: "Agence : texte"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
+              - name: responseTitle
+                label: "Délai de réponse : titre (engagement réel à confirmer)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: responseText
+                label: "Délai de réponse : texte"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
+              - name: languagesTitle
+                label: "Langues : titre"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: languagesText
+                label: "Langues : texte"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
           - name: services
             label: "Services"
             widget: object
@@ -227,6 +342,13 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
+                  - name: more
+                    label: "Acheter : lien vers la page d'information"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
                   - name: action1
                     label: "Bouton"
                     widget: object
@@ -265,6 +387,13 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
+                  - name: more
+                    label: "Vendre : lien vers la page d'information"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
                   - name: action1
                     label: "Bouton"
                     widget: object
@@ -303,6 +432,13 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
+                  - name: more
+                    label: "Louer : lien vers la page d'information"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
                   - name: action1
                     label: "Premier bouton"
                     widget: object
@@ -384,6 +520,13 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
+                  - name: next
+                    label: "Sous le titre du formulaire d'estimation : la suite et le délai de réponse"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
               - name: propertyAlert
                 label: "Alerte immobilière"
                 widget: object
@@ -396,6 +539,13 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
+                  - name: next
+                    label: "Sous le titre du formulaire d'alerte immobilière : la suite et le délai de réponse"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
           - name: contact
             label: "Formulaire de contact"
             widget: object
@@ -505,6 +655,231 @@ collections:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
 
+              - name: legalLabel
+                label: "Nom des liens juridiques, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: privacy
+                label: "Lien vers la politique de confidentialité"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: terms
+                label: "Lien vers les conditions d'utilisation"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: legal
+            label: "Pages juridiques"
+            widget: object
+            collapsed: true
+            fields:
+              - name: pending
+                label: "Bandeau en haut et en bas d'une ébauche : titre"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: pendingText
+                label: "Bandeau d'une ébauche : texte"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
+              - name: updated
+                label: "Texte devant la date de mise à jour"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+  # Content pages (read by page.njk). One file per page, French and English in each.
+  # URLs are fixed in _data/site.json (pages).
+  - name: pages
+    label: Pages
+    files:
+      - name: about
+        label: "Mon histoire"
+        file: content/pages/about.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+      - name: buy
+        label: "Acheter"
+        file: content/pages/buy.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+      - name: sell
+        label: "Vendre"
+        file: content/pages/sell.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+      - name: rent
+        label: "Louer"
+        file: content/pages/rent.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+      - name: privacy
+        label: "Politique de confidentialité"
+        file: content/pages/privacy.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
+          - name: updated
+            label: "Date de mise à jour"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+      - name: terms
+        label: "Conditions d'utilisation"
+        file: content/pages/terms.json
+        format: json
+        fields:
+          - name: title
+            label: "Titre de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: description
+            label: "Description pour les moteurs de recherche (une phrase)"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
+          - name: updated
+            label: "Date de mise à jour"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: string }
+              - { name: en, label: "English", widget: string }
+          - name: body
+            label: "Texte de la page"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: fr, label: "Français", widget: markdown }
+              - { name: en, label: "English", widget: markdown }
+
   # a) Agent profile. Placeholder fields; adjust to the real site.
   - name: agent
     label: Agent profile
@@ -522,6 +897,9 @@ collections:
             fields:
               - { name: fr, label: "Titre (français)", widget: string }
               - { name: en, label: "Title (English)", widget: string }
+          # OACIQ licence: the trust strip on the home page shows it only once the number is filled in.
+          - { name: licence, label: "OACIQ licence number", widget: string, required: false }
+          - { name: licenceRegisterUrl, label: "OACIQ register link", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Must be an oaciq.com link'] }
           - name: bio
             label: Bio
             widget: object

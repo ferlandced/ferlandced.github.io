@@ -1,0 +1,30 @@
+---js
+// JS front matter: computed values stay raw strings (a Nunjucks string here would be HTML-escaped twice).
+const layout = "layouts/base.njk";
+const bodyClass = "page";
+const pagination = { data: "contentPages", size: 1, alias: "entry" };
+const permalink = (data) => data.site.pages[data.entry.key][data.entry.lang];
+const translated = true;
+const eleventyComputed = {
+  lang: (data) => data.entry.lang,
+  pageKey: (data) => data.entry.key,
+  title: (data) => data.entry.data.title[data.entry.lang],
+  description: (data) => data.entry.data.description[data.entry.lang],
+};
+---
+{%- set t = i18n[lang] -%}
+{%- set d = entry.data -%}
+{#- Legal drafts: a banner before and after the text until the review is done (reviewPending in the CMS) -#}
+{%- macro pendingBanner() -%}
+<div class="legal-banner" role="note">
+  <p class="legal-banner__title">{{ t.legal.pending }}</p>
+  <p>{{ t.legal.pendingText }}</p>
+</div>
+{%- endmacro -%}
+<main class="container page-content">
+  {% if d.reviewPending %}{{ pendingBanner() }}{% endif %}
+  <h1>{{ d.title[lang] }}</h1>
+  {% if d.updated and d.updated[lang] %}<p class="page-content__updated">{{ t.legal.updated }} {{ d.updated[lang] }}</p>{% endif %}
+  {{ d.body[lang] | renderContent("md") | safe }}
+  {% if d.reviewPending %}{{ pendingBanner() }}{% endif %}
+</main>

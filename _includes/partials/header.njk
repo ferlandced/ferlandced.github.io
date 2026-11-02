@@ -10,9 +10,9 @@
     <span class="nav-toggle__bars" aria-hidden="true"></span>
   </button>
   <nav class="site-nav" id="site-nav" aria-label="{{ t.nav.label }}">
-    <a href="/{{ lang }}/#about">{{ t.nav.about }}</a>
-    <a href="/{{ lang }}/#services">{{ t.nav.services }}</a>
-    <a href="/listings/">{{ t.nav.properties }}</a>
+    {# Menu items are edited in the CMS (content/menu.json): a label and a URL per language; incomplete items are skipped #}
+    {% for item in menu.items %}{% if item.url[lang] and item.label[lang] %}
+    <a href="{{ item.url[lang] }}">{{ item.label[lang] }}</a>{% endif %}{% endfor %}
     {# Phone menu: the contact icons sit at the bottom of the burger panel #}
     {% set iconsClass = "contact-icons--menu" %}{% include "partials/contact-icons.njk" %}
     {# Phone menu: the language switch lives here instead of the header #}
