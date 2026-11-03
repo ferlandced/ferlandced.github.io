@@ -1,0 +1,97 @@
+# Fetches the agent's listings from the REMAX Québec API and opens a PR when they change.
+# main only accepts changes through a PR. Merging the PR triggers the deploy workflow.
+# Requires: repo secret REMAX_API_KEY, and repo Settings → Actions → General →
+# "Allow GitHub Actions to create and approve pull requests".
+name: Update listings
+
+on:
+  push:
+    branches: [update-listings-workflow]
+  schedule:
+    - cron: "0 8,18,20 * * *"
+      timezone: "America/Toronto"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-listings
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: automation/update-listings
+      LISTINGS_FILE: content/listings/listings.json
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch listings
+        env:
+          REMAX_API_KEY: ${{ secrets.REMAX_API_KEY }}
+        run: |
+          curl --fail --silent --show-error 'https://api.remax-quebec.com/api/inscriptions/search?BrokerId=26237&PageSize=20' --compressed \
+          -X 'GET' \
+          -H 'Pragma: no-cache' \
+          -H 'Accept: application/json, text/plain, */*' \
+          -H 'Content-Language: fr' \
+          -H 'Sec-Fetch-Site: same-site' \
+          -H 'Accept-Language: en-CA,en-US;q=0.9,en;q=0.8' \
+          -H 'Cache-Control: no-cache' \
+          -H 'Sec-Fetch-Mode: cors' \
+          -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+          -H 'Origin: https://www.remax-quebec.com' \
+          -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Safari/605.1.15' \
+          -H 'Referer: https://www.remax-quebec.com/' \
+          -H 'Sec-Fetch-Dest: empty' \
+          -H "X-Header-Api: $REMAX_API_KEY" \
+          -H 'Priority: u=3, i' > "$RUNNER_TEMP/response.json"
+
+      # Fails on an unexpected response, or on more listings than one page holds.
+      - name: Save the data array
+        run: |
+          jq -e '(.data | type) == "array" and .meta.last_page == 1' "$RUNNER_TEMP/response.json" > /dev/null
+          jq '.data' "$RUNNER_TEMP/response.json" > "$LISTINGS_FILE"
+
+      - name: Open or update the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add "$LISTINGS_FILE"
+          if git diff --cached --quiet; then
+            echo "Listings unchanged."
+            exit 0
+          fi
+          git show "HEAD:$LISTINGS_FILE" > "$RUNNER_TEMP/old.json" 2>/dev/null || echo '[]' > "$RUNNER_TEMP/old.json"
+          jq -rn --slurpfile old "$RUNNER_TEMP/old.json" --slurpfile new "$LISTINGS_FILE" '
+            def name: .address.short_display.en;
+            def by_id: map({key: (.no_inscription | tostring), value: .}) | from_entries;
+            def changes($a; $b):
+              [ (if $a.display_price.en != $b.display_price.en then "Changed the price of \($b | name) from \($a.display_price.en) to \($b.display_price.en)." else empty end),
+                (if $a.status != $b.status then "Changed the status of \($b | name) to \($b.status)." else empty end),
+                (if $a.nb_of_photos != $b.nb_of_photos then "Updated the photos on \($b | name)." else empty end) ]
+              | if length == 0 then ["Updated the details for \($b | name)."] else . end | .[];
+            ($old[0] | by_id) as $o | ($new[0] | by_id) as $n
+            | ($n | to_entries[] | .key as $k | .value as $b | $o[$k] as $a
+                | if $a == null then "Added \($b | name), listed at \($b.display_price.en)."
+                  elif $a == $b then empty
+                  else changes($a; $b) end),
+              ($o | to_entries[] | select($n[.key] == null) | "Removed \(.value | name).")
+          ' > "$RUNNER_TEMP/body.md"
+          if git fetch --quiet origin "$BRANCH" && git diff --cached --quiet FETCH_HEAD -- "$LISTINGS_FILE"; then
+            echo "Listings already on $BRANCH, nothing to push."
+          else
+            git config user.name "Cedrik Ferland"
+            git config user.email "info@cedrikferland.com"
+            git commit -m "Listing update"
+            git push --force origin "HEAD:refs/heads/$BRANCH"
+          fi
+          if [ "$(gh pr list --head "$BRANCH" --state open --json number --jq length)" = "0" ]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "Listing update" \
+              --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr edit "$BRANCH" --body-file "$RUNNER_TEMP/body.md"
+          fi
