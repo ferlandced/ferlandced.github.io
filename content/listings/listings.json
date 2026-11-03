@@ -1,0 +1,102 @@
+[
+  {
+    "no_inscription": 18560453,
+    "slug": {
+      "fr": "maison-a-vendre-montreal/31-av-broadview-pointe-claire-centre-est-18560453",
+      "en": "house-for-sale-montreal/31-av-broadview-pointe-claire-centre-est-18560453"
+    },
+    "category_id": 1,
+    "category": {
+      "fr": "Résidentielle",
+      "en": "Residential"
+    },
+    "property_kind": {
+      "fr": "Maison à étages",
+      "en": "Two or more storey house"
+    },
+    "address": {
+      "latitude": 45.45086936,
+      "longitude": -73.79541798,
+      "display": {
+        "fr": "31 Av. Broadview, Pointe-Claire (Centre Est)",
+        "en": "31 Av. Broadview, Pointe-Claire (Central East)"
+      },
+      "short_display": {
+        "fr": "31 Av. Broadview",
+        "en": "31 Av. Broadview"
+      },
+      "full_display": {
+        "fr": "31 Av. Broadview, Pointe-Claire (Centre Est), H9R3Z1",
+        "en": "31 Av. Broadview, Pointe-Claire (Central East), H9R3Z1"
+      }
+    },
+    "status": "new",
+    "next_open_house": null,
+    "is_collection": false,
+    "is_commercial": false,
+    "is_rental": false,
+    "is_for_sale": true,
+    "is_new_build": null,
+    "price_sale": 399000,
+    "price_rental": null,
+    "flag_show_addresse": true,
+    "flag_show_map": true,
+    "display_price": {
+      "fr": "399 000$",
+      "en": "$399,000"
+    },
+    "display_price_short": {
+      "is_for_sale": {
+        "fr": "399k$",
+        "en": "$399k"
+      },
+      "is_rental": {
+        "fr": null,
+        "en": null
+      }
+    },
+    "superficie_habitable": null,
+    "superficie_terrain": {
+      "unite": "PC",
+      "fr": "6 250 pi²",
+      "en": "6,250 ft²",
+      "tooltip_fr": "6 250 pi²",
+      "tooltip_en": "6,250 ft²"
+    },
+    "nb_of_rooms": 9,
+    "nb_of_bedrooms": 4,
+    "nb_of_bedrooms_above": 4,
+    "nb_of_bedrooms_basement": 0,
+    "nb_of_bathrooms": 1,
+    "nb_of_powder_rooms": 1,
+    "photos": [
+      {
+        "seq": 1,
+        "url": "0070/m18560453-pri01-01.jpg"
+      },
+      {
+        "seq": 2,
+        "url": "0070/m18560453-fac02-01.jpg"
+      },
+      {
+        "seq": 3,
+        "url": "0070/m18560453-ext03-01.jpg"
+      },
+      {
+        "seq": 4,
+        "url": "0070/m18560453-cou04-01.jpg"
+      },
+      {
+        "seq": 5,
+        "url": "0070/m18560453-ext05-01.jpg"
+      },
+      {
+        "seq": 6,
+        "url": "0070/m18560453-cou06-01.jpg"
+      }
+    ],
+    "nb_of_photos": 16,
+    "last_modified": "2026-11-03 15:09:37.217303-05",
+    "photo_last_modified": "2026-11-02 12:18:28-05"
+  }
+]
