@@ -1,9 +1,22 @@
-<a class="card" href="{{ item.url }}">
-  {% if item.data.photos and item.data.photos[0] %}<img class="card__img" src="{{ item.data.photos[0] }}" alt="" loading="lazy">{% else %}<div class="card__img card__img--empty"></div>{% endif %}
-  <div class="card__body">
-    {% if item.data.status %}<span class="listing__status">{{ item.data.status }}</span>{% endif %}
-    <h3 class="card__title">{{ item.data.title }}</h3>
-    <p class="card__meta">{{ item.data.neighbourhood or item.data.address }}</p>
-    <p class="card__price">{{ item.data.price | money }}</p>
+{%- set address = item.address.display[lang] if item.flag_show_addresse -%}
+{%- set statusLabel = t.properties.status[item.status] -%}
+<article class="card">
+  <div class="card__media">
+    {% if item.photos and item.photos[0] %}<img class="card__img" src="/images/listings/{{ item.no_inscription }}.jpg" alt="" loading="lazy">{% else %}<div class="card__img card__img--empty"></div>{% endif %}
+    {% if statusLabel %}<span class="card__status">{{ statusLabel }}</span>{% endif %}
   </div>
-</a>
+  <div class="card__body">
+    <p class="card__number">{{ t.properties.number }} {{ item.no_inscription }}</p>
+    <h3 class="card__title"><a href="{{ site.listingUrl[lang] }}{{ item.slug[lang] }}" target="_blank" rel="noopener" aria-label="{{ item.property_kind[lang] }}{% if address %}, {{ address }}{% endif %} {{ t.contactIcons.newTab }}">{{ item.property_kind[lang] }}</a></h3>
+    {% if address %}<p class="card__meta">{{ address }}</p>{% endif %}
+    <p class="card__price">{{ item.display_price[lang] | listingPrice(lang) }}</p>
+    {% if item.nb_of_bedrooms or item.nb_of_bathrooms or item.nb_of_powder_rooms or item.superficie_habitable %}
+    <ul class="card__facts">
+      {% if item.nb_of_bedrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bed-double.svg" %}</span><span class="visually-hidden">{{ t.properties.bedrooms }}</span> {{ item.nb_of_bedrooms }}</li>{% endif %}
+      {% if item.nb_of_bathrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bath.svg" %}</span><span class="visually-hidden">{{ t.properties.bathrooms }}</span> {{ item.nb_of_bathrooms }}</li>{% endif %}
+      {% if item.nb_of_powder_rooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/toilet.svg" %}</span><span class="visually-hidden">{{ t.properties.powderRooms }}</span> {{ item.nb_of_powder_rooms }}</li>{% endif %}
+      {% if item.superficie_habitable %}<li><span class="card__icon" aria-hidden="true">{% include "icons/ruler.svg" %}</span><span class="visually-hidden">{{ t.properties.area }}</span> {{ item.superficie_habitable[lang] }}</li>{% endif %}
+    </ul>
+    {% endif %}
+  </div>
+</article>

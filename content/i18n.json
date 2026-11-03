@@ -76,10 +76,6 @@
       "fr": "Cellulaire",
       "en": "Cell"
     },
-    "contact": {
-      "fr": "Me contacter",
-      "en": "Contact me"
-    },
     "more": {
       "fr": "Lire mon histoire",
       "en": "Read my story"
@@ -223,6 +219,36 @@
     "all": {
       "fr": "Toutes les propriétés",
       "en": "All properties"
+    },
+    "number": {
+      "fr": "ULS :",
+      "en": "MLS:"
+    },
+    "bedrooms": {
+      "fr": "Chambres :",
+      "en": "Bedrooms:"
+    },
+    "bathrooms": {
+      "fr": "Salles de bain :",
+      "en": "Bathrooms:"
+    },
+    "powderRooms": {
+      "fr": "Salles d'eau :",
+      "en": "Powder rooms:"
+    },
+    "area": {
+      "fr": "Superficie habitable :",
+      "en": "Living area:"
+    },
+    "status": {
+      "new": {
+        "fr": "Nouveauté",
+        "en": "New"
+      },
+      "sold": {
+        "fr": "Vendu",
+        "en": "Sold"
+      }
     }
   },
   "forms": {

@@ -50,6 +50,7 @@ export default function (eleventyConfig) {
       return site.languages.map((lang) => ({ key, lang, data }));
     });
   });
+  eleventyConfig.addGlobalData("listings", () => readJson("content/listings/listings.json"));
   eleventyConfig.addWatchTarget("content/");
 
   // CMS-managed listings (Decap "folder" collection), newest first.
@@ -60,6 +61,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("money", (n) =>
     n === undefined || n === null || n === "" ? "" : new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n)
   );
+  eleventyConfig.addFilter("listingPrice", (price, lang) => lang === "fr" ? String(price).replace(/(\d)\s*\$/, "$1\u00A0$") : price);
   eleventyConfig.addFilter("head", (arr, n) => (n < 0 ? arr.slice(n) : arr.slice(0, n)));
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
 

@@ -37,7 +37,9 @@
   --brand-dark: var(--color-dark-blue);         /* header, hero, footer backgrounds */
   --brand-on-dark: var(--color-white);
   --brand-on-dark-muted: color-mix(in srgb, var(--color-white) 75%, var(--color-dark-blue)); /* ≈10.7:1 */
-  --brand-primary: var(--color-black);          /* headings, prices */
+  --brand-primary: var(--color-black);          /* headings */
+  --brand-price: var(--color-primary-red);      /* 3.9:1 on white: large bold text only (19px and up) */
+  --brand-status: var(--color-primary-blue);    /* white text 6.5:1 */
   --brand-link: var(--color-black);             /* underlined */
   --brand-link-hover: var(--color-bridge-red);  /* 6.9:1 on cream, 7.5:1 on white */
   --brand-accent: var(--color-bridge-red);      /* pills, eyebrows, button hover: white text 7.5:1 */

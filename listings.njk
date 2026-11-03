@@ -2,13 +2,15 @@
 layout: layouts/base.njk
 title: Properties
 bodyClass: page
+lang: en
 permalink: /listings/
 ---
+{%- set t = i18n[lang] -%}
 <main class="container">
   <h1>Properties</h1>
-  {% if collections.listings.length %}
+  {% if listings.length %}
   <div class="cards">
-    {% for item in collections.listings %}{% include "partials/listing-card.njk" %}{% endfor %}
+    {% for item in listings %}{% include "partials/listing-card.njk" %}{% endfor %}
   </div>
   {% else %}
   <p class="muted">No properties listed yet.</p>

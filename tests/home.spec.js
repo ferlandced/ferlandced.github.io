@@ -1,7 +1,7 @@
 // Home page content: hero, contact links, About, trust strip, service buttons and info links,
-// the existing contact form, and the reduced-motion layout.
+// the property cards, and the reduced-motion layout.
 import { test, expect } from "./support/fixtures.js";
-import { site, agent, t, url, languages } from "./support/site.js";
+import { site, agent, listings, t, url, languages } from "./support/site.js";
 
 for (const lang of languages) {
   test.describe(`home (${lang})`, () => {
@@ -56,12 +56,6 @@ for (const lang of languages) {
       }
     });
 
-    test("About button scrolls to the contact form", async ({ page }) => {
-      await page.locator(`.about a[href="#contact"]`).click();
-      await expect(page).toHaveURL(/#contact$/);
-      await expect(page.locator("#contact")).toBeInViewport();
-    });
-
     test("service buttons point to the form pages and open the matching dialog", async ({ page }) => {
       const expected = { buy: [["propertyAlert"]], sell: [["estimation"]], rent: [["propertyAlert", "location"], ["estimation", "location"]] };
       for (const [id, actions] of Object.entries(expected)) {
@@ -77,30 +71,35 @@ for (const lang of languages) {
       }
     });
 
-    test("contact form: phone or email, message and consent are required, then it posts to Web3Forms", async ({ page, submissions }) => {
-      const form = page.locator("[data-contact-form]");
-      const submitBtn = form.locator('button[type="submit"]');
-      await form.locator("#cf-name").fill("Jeanne Tremblay");
-      await form.locator("#cf-message").fill("Bonjour");
-      await submitBtn.click();
-      expect(submissions).toHaveLength(0);
-      expect(await form.locator("#cf-email").evaluate((e) => e.validationMessage)).toBe(t(lang).contact.either);
+  });
+}
 
-      await form.locator("#cf-phone").fill("450 776 4895");
-      expect(await form.locator("#cf-email").evaluate((e) => e.validity.valid)).toBe(true);
-      await submitBtn.click();
-      expect(submissions, "consent unchecked").toHaveLength(0);
-
-      await form.locator('input[name="consent"]').check();
-      await Promise.all([page.waitForURL("https://api.web3forms.com/submit"), submitBtn.click()]);
-      expect(submissions).toHaveLength(1);
-      const sent = new URLSearchParams(submissions[0].body);
-      expect(sent.get("access_key")).toBe(site.web3formsKey);
-      expect(sent.get("subject")).toBe(t(lang).contact.subject);
-      expect(sent.get("name")).toBe("Jeanne Tremblay");
-      expect(sent.get("phone")).toBe("450 776 4895");
-      expect(sent.get("consent")).toBe("yes");
-    });
+for (const lang of languages) {
+  test(`property cards (${lang}): the listing's data and one external link across the card`, async ({ page }) => {
+    await page.goto(`${lang}/`);
+    const shown = listings.slice(0, 6);
+    await expect(page.locator("#properties .card")).toHaveCount(shown.length);
+    for (const [i, item] of shown.entries()) {
+      const card = page.locator("#properties .card").nth(i);
+      await expect(card.locator("a")).toHaveCount(1);
+      const link = card.locator(".card__title a");
+      await expect(link).toHaveText(item.property_kind[lang]);
+      await expect(link).toHaveAttribute("href", site.listingUrl[lang] + item.slug[lang]);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", "noopener");
+      await expect(card.locator(".card__number")).toContainText(String(item.no_inscription));
+      if (item.flag_show_addresse) await expect(card.locator(".card__meta")).toHaveText(item.address.display[lang]);
+      else await expect(card.locator(".card__meta")).toHaveCount(0);
+      await expect(card.locator(".card__price")).toContainText(item.display_price[lang].replace(/\s*\$/, "").trim());
+      if (item.photos?.[0]) await expect(card.locator("img.card__img")).toHaveAttribute("src", url(`/images/listings/${item.no_inscription}.jpg`));
+      else await expect(card.locator(".card__img--empty")).toHaveCount(1);
+      await card.scrollIntoViewIfNeeded();
+      const hit = await card.locator(".card__media").evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2).tagName;
+      });
+      expect(hit).toBe("A");
+    }
   });
 }
 

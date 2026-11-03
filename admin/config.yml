@@ -222,13 +222,6 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
-              - name: contact
-                label: "Bouton qui mène au formulaire de contact"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
               - name: more
                 label: "Bouton qui mène à la page Mon histoire"
                 widget: object
@@ -496,6 +489,60 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
+              - name: number
+                label: "Libellé du numéro d'inscription sur une carte"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: bedrooms
+                label: "Chambres, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: bathrooms
+                label: "Salles de bain, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: powderRooms
+                label: "Salles d'eau, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: area
+                label: "Superficie habitable, lu par les lecteurs d'écran"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: status
+                label: "Étiquette de statut sur une carte"
+                widget: object
+                collapsed: true
+                fields:
+                  - name: new
+                    label: "Nouvelle inscription"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: sold
+                    label: "Vendue"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
           - name: forms
             label: "Pages des formulaires"
             widget: object

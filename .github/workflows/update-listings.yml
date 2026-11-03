@@ -24,6 +24,7 @@ jobs:
       BASE_BRANCH: ${{ github.ref_name }}
       BRANCH: automation/update-listings-${{ github.ref_name }}
       LISTINGS_FILE: content/listings/listings.json
+      PHOTOS_DIR: images/listings
     steps:
       - uses: actions/checkout@v7
 
@@ -54,11 +55,18 @@ jobs:
           jq -e '(.data | type) == "array" and .meta.last_page == 1' "$RUNNER_TEMP/response.json" > /dev/null
           jq '.data' "$RUNNER_TEMP/response.json" > "$LISTINGS_FILE"
 
+      - name: Download the card photos
+        run: |
+          rm -f "${PHOTOS_DIR:?}"/*.jpg
+          jq -r '.[] | select(.photos[0]) | "\(.no_inscription) \(.photos[0].url)"' "$LISTINGS_FILE" | while read -r id photo; do
+            curl --fail --silent --show-error -o "$PHOTOS_DIR/$id.jpg" "https://media.remax-quebec.com/img/www_small/$photo"
+          done
+
       - name: Open or update the PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add "$LISTINGS_FILE"
+          git add -A "$LISTINGS_FILE" "$PHOTOS_DIR"
           if git diff --cached --quiet; then
             echo "Listings unchanged."
             exit 0

@@ -6,6 +6,7 @@ const readJson = (p) => JSON.parse(fs.readFileSync(p, "utf8"));
 
 export const site = readJson("_data/site.json");
 export const agent = readJson("content/agent.json");
+export const listings = readJson("content/listings/listings.json");
 const menu = readJson("content/menu.json");
 /** Header menu links for one language, as the build renders them: [{ href, label }] (href without the /ced prefix). */
 export const menuLinks = (lang) => menu.items

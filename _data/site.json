@@ -34,6 +34,10 @@
       "en": "/en/terms/"
     }
   },
+  "listingUrl": {
+    "fr": "https://www.remax-quebec.com/fr/proprietes/",
+    "en": "https://www.remax-quebec.com/en/properties/"
+  },
   "languages": [
     "fr",
     "en"
