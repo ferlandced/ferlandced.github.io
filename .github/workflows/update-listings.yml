@@ -23,7 +23,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     env:
-      BRANCH: automation/update-listings
+      BRANCH: main
       LISTINGS_FILE: content/listings/listings.json
     steps:
       - uses: actions/checkout@v7
