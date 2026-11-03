@@ -1,12 +1,10 @@
-# Fetches the agent's listings from the REMAX Québec API and opens a PR when they change.
-# main only accepts changes through a PR. Merging the PR triggers the deploy workflow.
+# Fetches the agent's listings from the REMAX Québec API and, when they change, opens a PR
+# against the branch the workflow runs on. Scheduled runs use main, where merging deploys the site.
 # Requires: repo secret REMAX_API_KEY, and repo Settings → Actions → General →
 # "Allow GitHub Actions to create and approve pull requests".
 name: Update listings
 
 on:
-  push:
-    branches: [update-listings-workflow]
   schedule:
     - cron: "0 8,18,20 * * *"
       timezone: "America/Toronto"
@@ -23,7 +21,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     env:
-      BRANCH: main
+      BASE_BRANCH: ${{ github.ref_name }}
+      BRANCH: automation/update-listings-${{ github.ref_name }}
       LISTINGS_FILE: content/listings/listings.json
     steps:
       - uses: actions/checkout@v7
@@ -80,7 +79,7 @@ jobs:
                   else changes($a; $b) end),
               ($o | to_entries[] | select($n[.key] == null) | "Removed \(.value | name).")
           ' > "$RUNNER_TEMP/body.md"
-          if git fetch --quiet origin "$BRANCH" && git diff --cached --quiet FETCH_HEAD -- "$LISTINGS_FILE"; then
+          if git fetch --quiet origin "$BRANCH" && git diff --cached --quiet FETCH_HEAD; then
             echo "Listings already on $BRANCH, nothing to push."
           else
             git config user.name "Cedrik Ferland"
@@ -88,8 +87,8 @@ jobs:
             git commit -m "Listing update"
             git push --force origin "HEAD:refs/heads/$BRANCH"
           fi
-          if [ "$(gh pr list --head "$BRANCH" --state open --json number --jq length)" = "0" ]; then
-            gh pr create --base main --head "$BRANCH" \
+          if [ "$(gh pr list --base "$BASE_BRANCH" --head "$BRANCH" --state open --json number --jq length)" = "0" ]; then
+            gh pr create --base "$BASE_BRANCH" --head "$BRANCH" \
               --title "Listing update" \
               --body-file "$RUNNER_TEMP/body.md"
           else
