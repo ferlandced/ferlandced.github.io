@@ -1,8 +1,8 @@
 // Multi-step forms (estimation, property alert), in the home page dialog and on their own page.
 // Web3Forms is answered locally (support/fixtures.js); nothing is ever sent.
 import { test, expect, fields } from "./support/fixtures.js";
-import { site, t, languages } from "./support/site.js";
-import { FORMS, openForm, steps, visibleStep, stepIndex, next, back, skip, submit, fillStep1, pick } from "./support/forms.js";
+import { site, t, languages, listings, url } from "./support/site.js";
+import { FORMS, openForm, openWriteMe, steps, visibleStep, stepIndex, next, back, skip, submit, fillStep1, pick } from "./support/forms.js";
 
 const isPhone = (testInfo) => testInfo.project.name.endsWith("-phone");
 
@@ -202,6 +202,167 @@ for (const [key, f] of Object.entries(FORMS)) {
       });
     });
   }
+}
+
+for (const lang of languages) {
+  for (const where of ["dialog", "page"]) {
+    test.describe(`writeMe in ${where} (${lang})`, () => {
+      const fill = async (form) => {
+        await form.locator("#ct-first-name").fill("Jeanne");
+        await form.locator("#ct-last-name").fill("Tremblay");
+        await form.locator("#ct-email").fill("test@example.com");
+        await form.locator("#ct-message").fill("Bonjour");
+        await form.locator("#ct-consent").check();
+      };
+      const send = (form) => form.locator('button[type="submit"]').click();
+
+      test("title from i18n, one step, no progress bar", async ({ page }) => {
+        const form = await openWriteMe(page, lang, where);
+        await expect(page.locator(where === "page" ? "h1" : "#dialog-writeMe-title")).toHaveText(t(lang).forms.writeMe.title);
+        await expect(steps(form)).toHaveCount(1);
+        await expect(form.locator("[data-progress]")).toHaveCount(0);
+      });
+
+      test("names, a phone or an email, a message and consent are required", async ({ page, submissions }) => {
+        const form = await openWriteMe(page, lang, where);
+        await send(form);
+        expect(submissions).toHaveLength(0);
+        await fill(form);
+        for (const [id, value] of [["#ct-first-name", "Jeanne"], ["#ct-message", "Bonjour"]]) {
+          await form.locator(id).fill("");
+          await send(form);
+          expect(submissions, id).toHaveLength(0);
+          await form.locator(id).fill(value);
+        }
+        await form.locator("#ct-email").fill("");
+        await send(form);
+        const phone = form.locator("#ct-phone");
+        expect(await phone.evaluate((e) => e.validationMessage)).toBe(await phone.getAttribute("data-one-of-message"));
+        expect(submissions).toHaveLength(0);
+        await phone.fill("450 776 4895");
+        await form.locator("#ct-consent").uncheck();
+        await send(form);
+        expect(submissions).toHaveLength(0);
+      });
+
+      test("sends one POST and shows the success message", async ({ page, submissions }) => {
+        const form = await openWriteMe(page, lang, where);
+        await fill(form);
+        await send(form);
+        await expect(form.locator("[data-success]")).toBeVisible();
+        await expect(form.locator("[data-success]")).toBeFocused();
+        expect(submissions).toHaveLength(1);
+        const sent = fields(submissions[0].body);
+        expect(sent.access_key).toBe(site.web3formsKey);
+        expect(sent.form_type).toBe("contact");
+        expect(sent.first_name).toBe("Jeanne");
+        expect(sent.email).toBe("test@example.com");
+        expect(sent.message).toBe("Bonjour");
+        expect(sent.consent).toBe("yes");
+        expect(sent.botcheck).toBeUndefined();
+      });
+
+      test("server error: error shown, data kept, can resend", async ({ page, web3forms, submissions }) => {
+        const form = await openWriteMe(page, lang, where);
+        await fill(form);
+        web3forms.mode = "error";
+        await send(form);
+        await expect(form.locator("[data-error]")).toBeVisible();
+        await expect(form.locator("#ct-message")).toHaveValue("Bonjour");
+        web3forms.mode = "ok";
+        await send(form);
+        await expect(form.locator("[data-success]")).toBeVisible();
+        await expect(form.locator("[data-error]")).toBeHidden();
+        expect(submissions).toHaveLength(2);
+      });
+
+      test("honeypot checked: success shown, nothing sent", async ({ page, submissions }) => {
+        const form = await openWriteMe(page, lang, where);
+        await fill(form);
+        await form.locator('[name="botcheck"]').evaluate((e) => { e.checked = true; });
+        await send(form);
+        await expect(form.locator("[data-success]")).toBeVisible();
+        expect(submissions).toHaveLength(0);
+      });
+    });
+  }
+}
+
+for (const [lang, path] of [["fr", "fr/"], ["en", "en/"], ["en", "listings/"]]) {
+  test.describe(`property info dialog on ${path}`, () => {
+    const open = async (page) => {
+      const button = page.locator("[data-property-info]").first();
+      await button.click();
+      const dialog = page.locator("#dialog-propertyInfo");
+      await expect(dialog).toHaveJSProperty("open", true);
+      return { button, dialog, form: dialog.locator("form[data-wizard]") };
+    };
+
+    test("one shared dialog, filled from the clicked card; the email carries the property", async ({ page, submissions }) => {
+      await page.goto(path);
+      await expect(page.locator("dialog#dialog-propertyInfo")).toHaveCount(1);
+      await expect(page.locator("html")).toHaveAttribute("lang", lang);
+      const item = listings[0];
+      const { dialog, form } = await open(page);
+      const address = item.flag_show_addresse ? item.address.display[lang] : "";
+      await expect(dialog.locator(".form-panel__title")).toHaveText(t(lang).forms.propertyInfo.title);
+      await expect(dialog.locator("[data-property-label]")).toContainText(item.property_kind[lang]);
+      await expect(dialog.locator('a[href^="tel:"]')).toBeVisible();
+      await form.locator("#pi-name").fill("Jeanne Tremblay");
+      await form.locator("#pi-email").fill("test@example.com");
+      await form.locator("#pi-consent").check();
+      await form.locator('button[type="submit"]').click();
+      await expect(form.locator("[data-success]")).toBeVisible();
+      const sent = fields(submissions[0].body);
+      expect(sent.form_type).toBe("property-info");
+      expect(sent.listing_number).toBe(String(item.no_inscription));
+      expect(sent.property_address).toBe(address);
+      expect(sent.subject).toContain(String(item.no_inscription));
+      expect(sent.subject).toContain(item.property_kind[lang]);
+      expect(sent.name).toBe("Jeanne Tremblay");
+      expect(sent.message, "message is optional").toBe("");
+    });
+
+    test("a phone or an email, a name and consent are required", async ({ page, submissions }) => {
+      await page.goto(path);
+      const { form } = await open(page);
+      const send = form.locator('button[type="submit"]');
+      await send.click();
+      await form.locator("#pi-name").fill("Jeanne");
+      await form.locator("#pi-consent").check();
+      await send.click();
+      const phone = form.locator("#pi-phone");
+      expect(await phone.evaluate((e) => e.validationMessage)).toBe(await phone.getAttribute("data-one-of-message"));
+      expect(submissions).toHaveLength(0);
+    });
+
+    test("the fields follow the clicked button; a sent form starts over", async ({ page, submissions }) => {
+      await page.goto(path);
+      const { button, dialog, form } = await open(page);
+      await dialog.locator(".form-panel__close").click();
+      await expect(dialog).toHaveJSProperty("open", false);
+      await expect(button, "focus returns to the button").toBeFocused();
+      // The data holds one listing today: stand in for a second card, with no address to show.
+      await button.evaluate((el) => { el.dataset.listingNumber = "99999999"; el.dataset.propertyAddress = ""; el.dataset.subject = "S 99999999"; el.dataset.propertyLabel = "Condo"; });
+      await open(page);
+      await expect(form.locator('input[name="listing_number"]')).toHaveValue("99999999");
+      await expect(form.locator('input[name="property_address"]')).toHaveValue("");
+      await expect(dialog.locator("[data-property-label]")).toHaveText("Condo");
+      await form.locator("#pi-name").fill("Jeanne");
+      await form.locator("#pi-email").fill("test@example.com");
+      await form.locator("#pi-consent").check();
+      await form.locator('button[type="submit"]').click();
+      await expect(form.locator("[data-success]")).toBeVisible();
+      expect(fields(submissions[0].body).subject).toBe("S 99999999");
+      await dialog.locator(".form-panel__close").click();
+      await open(page);
+      await expect(form.locator("[data-success]")).toBeHidden();
+      await expect(form.locator("#pi-name")).toHaveValue("");
+      await expect(form.locator('input[name="listing_number"]')).toHaveValue("99999999");
+      await expect(form.locator('input[name="subject"]')).toHaveValue("S 99999999");
+      expect(submissions).toHaveLength(1);
+    });
+  });
 }
 
 test.describe("tabs and choice controls", () => {
@@ -418,4 +579,24 @@ test.describe("without JavaScript", () => {
       expect(sent.get("consent")).toBe("yes");
     });
   }
+
+  test("property cards: a link to the Contact page instead of the button", async ({ page }) => {
+    await page.goto("fr/");
+    const card = page.locator("#properties .card").first();
+    await expect(card.locator("button[data-property-info]")).toBeHidden();
+    await card.locator("a.card__more").click();
+    await expect(page).toHaveURL(new RegExp(`${url(site.pages.contact.fr)}$`));
+  });
+
+  test("writeMe: posts straight to Web3Forms", async ({ page, submissions }) => {
+    await page.goto(site.pages.writeMe.fr.slice(1));
+    const form = page.locator("form[data-wizard]");
+    await form.locator("#ct-first-name").fill("Jeanne");
+    await form.locator("#ct-last-name").fill("Tremblay");
+    await form.locator("#ct-email").fill("test@example.com");
+    await form.locator("#ct-message").fill("Bonjour");
+    await form.locator("#ct-consent").check();
+    await Promise.all([page.waitForURL("https://api.web3forms.com/submit"), form.locator('button[type="submit"]').click()]);
+    expect(new URLSearchParams(submissions[0].body).get("form_type")).toBe("contact");
+  });
 });

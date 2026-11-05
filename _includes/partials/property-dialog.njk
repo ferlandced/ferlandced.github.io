@@ -1,0 +1,11 @@
+<dialog class="form-dialog form-dialog--narrow" id="dialog-propertyInfo" aria-labelledby="dialog-propertyInfo-title">
+  <div class="form-panel">
+    <div class="form-panel__head">
+      <h2 class="form-panel__title" id="dialog-propertyInfo-title">{{ t.forms.propertyInfo.title }}</h2>
+      <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.close }}"><span data-icon="x" aria-hidden="true"></span></a>
+    </div>
+    <p class="form-panel__next" data-property-label></p>
+    {% include "partials/call-option.njk" %}
+    {% include "forms/" + lang + "/property-info.html" %}
+  </div>
+</dialog>

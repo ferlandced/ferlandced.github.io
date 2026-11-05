@@ -42,19 +42,38 @@ test("desktop shows the menu without a burger", async ({ page }, testInfo) => {
   await expect(page.locator(".lang-switch")).toBeVisible();
 });
 
-test("header changes state when the page scrolls past the hero", async ({ page, browserName }) => {
-  test.fixme(browserName === "webkit", "In headless WebKit, data-past-hero (header contact icons) is sometimes never set after "
-    + "scrolling past the hero, about 1 run in 7, even with further scrolling. Check on a real iPhone/Safari.");
+test("desktop logo: 72px, its R on the content's left edge, not clipped", async ({ page }, testInfo) => {
+  test.skip(isPhone(testInfo), "desktop only");
+  for (const width of [992, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("fr/");
+    const logo = await page.locator(".brand__logo:visible").boundingBox();
+    expect(logo.height).toBeCloseTo(72, 0);
+    const content = await page.locator("#services .container").boundingBox();
+    expect(Math.abs(logo.x + logo.height * .24 - content.x), `at ${width}px`).toBeLessThanOrEqual(1);
+    expect(logo.x).toBeGreaterThanOrEqual(0);
+    await expect(page.locator(".brand__office")).toHaveText(site.office.nameSuffix);
+  }
+});
+
+test("header turns white when About reaches it, and keeps its height", async ({ page }) => {
   await page.goto("fr/");
   const header = page.locator(".site-header");
-  await expect(header).not.toHaveAttribute("data-scrolled", "");
-  await expect(header).not.toHaveAttribute("data-past-hero", "");
+  const height = (await header.boundingBox()).height;
+  const aboutTop = await page.locator("#about").evaluate((el) => el.getBoundingClientRect().top + scrollY);
   // Instant scrolls: the site scrolls smoothly when motion is allowed, which is slow on a busy machine.
-  await page.evaluate(() => window.scrollTo({ top: document.querySelector("#services").offsetTop, behavior: "instant" }));
-  await expect(header).toHaveAttribute("data-scrolled", "");
+  const scrollTo = (top) => page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), top);
+
+  await expect(header).not.toHaveAttribute("data-past-hero", "");
+  await scrollTo(aboutTop - height - 40);
+  await expect(header, "still over the hero").not.toHaveAttribute("data-past-hero", "");
+  await scrollTo(aboutTop - height + 1);
   await expect(header).toHaveAttribute("data-past-hero", "");
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await expect(header).not.toHaveAttribute("data-scrolled", "");
+  await expect(header).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await scrollTo(aboutTop + 2000);
+  expect((await header.boundingBox()).height, "the header does not shrink").toBeCloseTo(height, 0);
+  await scrollTo(0);
+  await expect(header).not.toHaveAttribute("data-past-hero", "");
 });
 
 for (const [key, urls] of Object.entries({ home: { fr: "/fr/", en: "/en/" }, ...site.pages })) {

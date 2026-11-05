@@ -1,0 +1,6 @@
+<ul class="contact-options">
+  <li>{% include "partials/call-option.njk" %}</li>
+  {%- for o in site.contactOptions %}
+  <li><a class="contact-option" href="{{ site.pages[o.form][lang] }}{% if o.intent %}?intent={{ o.intent }}{% endif %}" data-dialog="dialog-{{ o.form }}"{% if o.intent %} data-intent="{{ o.intent }}"{% endif %}><span class="contact-option__icon">{% include "icons/" + o.icon + ".svg" %}</span><span>{{ t.contactOptions[o.id] }}</span></a></li>
+  {%- endfor %}
+</ul>

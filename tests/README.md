@@ -23,9 +23,10 @@ locally (`support/fixtures.js`), so nothing is ever emailed.
 |---|---|
 | `pages.spec.js` | Every page: status, `lang`, title, one `h1`, hreflang, language switch, header links, mandatory footer content and legal links. Saves a full-page screenshot per page and device. |
 | `header.spec.js` | Phone menu (open, close, Escape, link), desktop menu, scroll states, language switch on every page. |
-| `home.spec.js` | Hero (tagline, one action), contact links, About, trust strip, service buttons and info links, property cards, reduced motion. |
+| `home.spec.js` | Hero (tagline, one action), contact links, About, service buttons and info links, property cards, reduced motion. |
 | `content.spec.js` | Content pages (About, Buy, Sell, Rent, privacy, terms): title, description, Markdown body, review banner on legal drafts. |
-| `forms.spec.js` | Both multi-step forms, in the dialog and on their page: required step, phone or email, phone format, Enter, Back, one POST, skip and send, server errors, double submit, honeypot, budget rule, tabs, tiles, segments, dialog closing, no-JS pages. |
+| `forms.spec.js` | The "Write me" form, and both multi-step forms, in the dialog and on their page: required step, phone or email, phone format, Enter, Back, one POST, skip and send, server errors, double submit, honeypot, budget rule, tabs, tiles, segments, dialog closing, no-JS pages. |
+| `contact.spec.js` | Contact popup and Contact page: the same options in both languages, each one opens the right form, copy button. |
 | `a11y.spec.js` | axe-core WCAG 2.1 A/AA on every page and every dialog step. |
 | `links.spec.js` | Internal links and anchors resolve, `tel:`/`mailto:` format, outbound links allowed by CLAUDE.md, form actions, every resource loads. |
 | `brand.spec.js` | CLAUDE.md trademark and content rules, office name in the header, FR/EN parity. |

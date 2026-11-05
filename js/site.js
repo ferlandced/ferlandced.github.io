@@ -19,35 +19,83 @@
   });
 })();
 
-// Contact form: an email or a phone number is required, at least one of the two.
+// Home page blocks fade in and rise into place as their section arrives, on a timer like Apple's
+// product pages, and then stay. Blocks side by side (Services columns, a row of cards) appear
+// together, and each row starts a step after the previous one. Without JS or with reduced motion
+// everything just shows (see [data-reveal] in site.css).
 (() => {
-  const form = document.querySelector("[data-contact-form]");
-  if (!form) return;
-  const email = form.elements.email, phone = form.elements.phone;
-  const check = () => email.setCustomValidity(email.value.trim() || phone.value.trim() ? "" : form.dataset.eitherMessage);
-  [email, phone].forEach((el) => el.addEventListener("input", check));
-  check();
+  const STEP_MS = 150;
+  const stacks = ".about__body, .service";
+  const singles = "#services-heading, #properties-heading, .properties .card, .properties .container > p";
+
+  const groups = [...document.querySelectorAll(`${stacks}, ${singles}`)];
+  if (!groups.length) return;
+  if (!("IntersectionObserver" in window)) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const itemsOf = (group) => (group.matches(stacks) ? [...group.children] : [group]);
+
+  for (const group of groups) {
+    for (const item of itemsOf(group)) item.setAttribute("data-reveal", "");
+  }
+
+  const show = (item, delayMs) => {
+    item.style.setProperty("--reveal-delay", `${Math.round(delayMs)}ms`);
+    item.dataset.reveal = "in";
+  };
+
+  const sameRow = (a, b) => Math.abs(a.boundingClientRect.top - b.boundingClientRect.top) < 4;
+
+  // Start time of the last block scheduled, so a row that arrives just after another waits its turn
+  let lastStart = -Infinity;
+
+  const observer = new IntersectionObserver((entries) => {
+    const arriving = [];
+    for (const entry of entries) {
+      const alreadyPassed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      if (alreadyPassed) {
+        itemsOf(entry.target).forEach((item) => show(item, 0));
+        observer.unobserve(entry.target);
+      } else if (entry.isIntersecting) {
+        arriving.push(entry);
+      }
+    }
+    arriving.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+    const rows = [];
+    for (const entry of arriving) {
+      const row = rows.at(-1);
+      if (row && sameRow(row[0], entry)) row.push(entry);
+      else rows.push([entry]);
+    }
+
+    const now = performance.now();
+    for (const row of rows) {
+      const start = Math.max(now, lastStart + STEP_MS);
+      let longest = 1;
+      for (const { target } of row) {
+        const items = itemsOf(target);
+        items.forEach((item, i) => show(item, start - now + i * STEP_MS));
+        longest = Math.max(longest, items.length);
+        observer.unobserve(target);
+      }
+      lastStart = start + (longest - 1) * STEP_MS;
+    }
+  }, { rootMargin: "0px 0px -30% 0px" });
+
+  groups.forEach((group) => observer.observe(group));
 })();
 
-// Header contact icons appear once the hero has scrolled out from under the header.
+// The header is past the hero once About reaches it: from there it is white, with the dark logo and
+// the contact icons. On desktop the hero holds still under About, so this follows About, not the hero.
 (() => {
   const header = document.querySelector(".site-header");
-  const hero = document.querySelector(".hero");
-  if (!header || !hero || !("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver(([entry]) => {
-    header.toggleAttribute("data-past-hero", !entry.isIntersecting && entry.boundingClientRect.top < 0);
-  }, { rootMargin: `-${header.offsetHeight}px 0px 0px 0px` });
-  io.observe(hero);
-})();
-
-// Desktop header: switches from the cream logo over the hero photo to the dark logo on white as
-// soon as the page scrolls, because the photo slides away immediately.
-(() => {
-  const header = document.querySelector(".site-header");
-  if (!header) return;
-  const update = () => header.toggleAttribute("data-scrolled", window.scrollY > 24);
+  const next = document.querySelector(".hero ~ section");
+  if (!header || !next) return;
+  const update = () => header.toggleAttribute("data-past-hero", next.getBoundingClientRect().top <= header.offsetHeight);
   update();
-  window.addEventListener("scroll", update, { passive: true });
+  addEventListener("scroll", update, { passive: true });
+  addEventListener("resize", update);
 })();
 
 // Form dialogs: a link with data-dialog="<id>" opens that <dialog> on the home page. Without JS
@@ -59,6 +107,8 @@
     if (!dialog || typeof dialog.showModal !== "function") return;
     link.addEventListener("click", (e) => {
       e.preventDefault();
+      link.closest("dialog")?.close();
+      link.focus({ preventScroll: true });   // Safari does not focus links on click, and the dialog returns focus here
       dialog.querySelector("form[data-wizard]")?.dispatchEvent(new CustomEvent("wizard:open", { detail: { intent: link.dataset.intent } }));
       dialog.showModal();
     });
@@ -73,6 +123,39 @@
     dialog.addEventListener("click", (e) => {
       if (e.target.closest("[data-close]")) { e.preventDefault(); dialog.close(); }
       else if (e.target === dialog && outside(dialog, e)) dialog.close();
+    });
+  });
+})();
+
+// "More info" on a property card: one shared dialog, filled from the clicked button.
+(() => {
+  const dialog = document.getElementById("dialog-propertyInfo");
+  if (!dialog || typeof dialog.showModal !== "function") return;
+  const form = dialog.querySelector("form[data-wizard]");
+  document.querySelectorAll("[data-property-info]").forEach((button) => {
+    button.addEventListener("click", () => {
+      form.dispatchEvent(new CustomEvent("wizard:open"));
+      form.elements.listing_number.value = button.dataset.listingNumber;
+      form.elements.property_address.value = button.dataset.propertyAddress;
+      form.elements.subject.value = button.dataset.subject;
+      dialog.querySelector("[data-property-label]").textContent = button.dataset.propertyLabel;
+      button.focus({ preventScroll: true });
+      dialog.showModal();
+    });
+  });
+})();
+
+// Copy buttons: shown only where the clipboard is available. CSS hides them on touch screens, which can call.
+(() => {
+  if (!navigator.clipboard) return;
+  document.querySelectorAll("[data-copy]").forEach((button) => {
+    button.hidden = false;
+    const label = button.querySelector("[aria-live]");
+    const original = label.textContent;
+    button.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(button.dataset.copy);
+      label.textContent = button.dataset.copied;
+      setTimeout(() => { label.textContent = original; }, 2500);
     });
   });
 })();

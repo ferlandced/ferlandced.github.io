@@ -1,0 +1,38 @@
+<form class="form form--property-info" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
+  <input type="hidden" name="form_type" value="property-info">
+  <input type="hidden" name="subject" value="Demande d'information sur une propriété">
+  <input type="hidden" name="property_address" value="">
+  <input type="hidden" name="listing_number" value="">
+  <input type="hidden" name="from_name" value="Site web Cedrik Ferland">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <section class="form-step" data-step>
+    <div class="form-field">
+      <label for="pi-name">Nom</label>
+      <input id="pi-name" name="name" type="text" autocomplete="name" required>
+    </div>
+    <p class="form-hint form-hint--group" id="pi-either">Un téléphone ou un courriel suffit.</p>
+    <div class="form-field">
+      <label for="pi-phone">Téléphone</label>
+      <input id="pi-phone" name="phone" type="tel" autocomplete="tel" placeholder="514 555-0123" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="pi-either pi-phone-hint" data-one-of="contact" data-one-of-message="Indiquez un téléphone ou un courriel.">
+      <p class="form-hint" id="pi-phone-hint">Au moins 10 chiffres, indicatif régional compris.</p>
+    </div>
+    <div class="form-field">
+      <label for="pi-email">Courriel</label>
+      <input id="pi-email" name="email" type="email" autocomplete="email" aria-describedby="pi-either" data-one-of="contact">
+    </div>
+    <div class="form-field">
+      <label for="pi-message">Message (facultatif)</label>
+      <textarea id="pi-message" name="message"></textarea>
+    </div>
+    <label class="form-consent" for="pi-consent"><input id="pi-consent" type="checkbox" name="consent" value="yes" required> <span>J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la <a href="{{ site.pages.privacy.fr }}">politique de confidentialité</a>.</span></label>
+    <div class="form-actions">
+      <a class="form-cancel" href="/fr/" data-close>Annuler</a>
+      <button type="submit">Envoyer</button>
+    </div>
+  </section>
+
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> Une erreur est survenue. Veuillez réessayer ou me joindre par téléphone.</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> Merci! Je vous reviens très bientôt.</section>
+</form>

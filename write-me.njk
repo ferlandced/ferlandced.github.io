@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+bodyClass: page
+pagination:
+  data: site.languages
+  size: 1
+  alias: lang
+permalink: "{{ site.pages.writeMe[lang] }}"
+translated: true
+pageKey: writeMe
+eleventyComputed:
+  title: "{{ i18n[lang].forms.writeMe.title }}"
+---
+{%- set t = i18n[lang] -%}
+<main class="container form-page">
+  {% set formKey = "writeMe" %}{% set formFile = "contact" %}{% set titleTag = "h1" %}{% set titleId = "form-title" %}
+  {% include "partials/form-panel.njk" %}
+</main>
+<script src="/js/forms.js" defer></script>

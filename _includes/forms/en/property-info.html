@@ -1,0 +1,38 @@
+<form class="form form--property-info" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
+  <input type="hidden" name="form_type" value="property-info">
+  <input type="hidden" name="subject" value="Information request about a property">
+  <input type="hidden" name="property_address" value="">
+  <input type="hidden" name="listing_number" value="">
+  <input type="hidden" name="from_name" value="Cedrik Ferland website">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <section class="form-step" data-step>
+    <div class="form-field">
+      <label for="pi-name">Name</label>
+      <input id="pi-name" name="name" type="text" autocomplete="name" required>
+    </div>
+    <p class="form-hint form-hint--group" id="pi-either">A phone number or an email is enough.</p>
+    <div class="form-field">
+      <label for="pi-phone">Phone</label>
+      <input id="pi-phone" name="phone" type="tel" autocomplete="tel" placeholder="514 555-0123" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="pi-either pi-phone-hint" data-one-of="contact" data-one-of-message="Enter a phone number or an email.">
+      <p class="form-hint" id="pi-phone-hint">At least 10 digits, including the area code.</p>
+    </div>
+    <div class="form-field">
+      <label for="pi-email">Email</label>
+      <input id="pi-email" name="email" type="email" autocomplete="email" aria-describedby="pi-either" data-one-of="contact">
+    </div>
+    <div class="form-field">
+      <label for="pi-message">Message (optional)</label>
+      <textarea id="pi-message" name="message"></textarea>
+    </div>
+    <label class="form-consent" for="pi-consent"><input id="pi-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the <a href="{{ site.pages.privacy.en }}">privacy policy</a>.</span></label>
+    <div class="form-actions">
+      <a class="form-cancel" href="/en/" data-close>Cancel</a>
+      <button type="submit">Send</button>
+    </div>
+  </section>
+
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> Something went wrong. Please try again or reach me by phone.</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> Thank you! I'll get back to you very soon.</section>
+</form>

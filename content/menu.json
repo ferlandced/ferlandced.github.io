@@ -29,6 +29,16 @@
         "fr": "/listings/",
         "en": "/listings/"
       }
+    },
+    {
+      "label": {
+        "fr": "Contact",
+        "en": "Contact"
+      },
+      "url": {
+        "fr": "/fr/contact/",
+        "en": "/en/contact/"
+      }
     }
   ]
 }

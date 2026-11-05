@@ -28,12 +28,39 @@
 .form-panel__close:hover { background: var(--form-tint); }
 
 /* Dialog: centred card, full screen on phones */
-dialog.form-dialog { width: min(760px, 100% - 32px); max-width: none; max-height: calc(100dvh - 48px); padding: 0; border: 0; border-radius: 16px; box-shadow: 0 24px 64px var(--brand-shadow-strong); overflow: auto; overscroll-behavior: contain; }
+dialog.form-dialog { width: min(760px, 100% - 32px - var(--safe-left) - var(--safe-right)); max-width: none; max-height: calc(100dvh - 48px - var(--safe-top) - var(--safe-bottom)); padding: 0; border: 0; border-radius: 16px; box-shadow: 0 24px 64px var(--brand-shadow-strong); overflow: auto; overscroll-behavior: contain; }
 dialog.form-dialog::backdrop { background: color-mix(in srgb, var(--color-charcoal) 45%, transparent); }
 html:has(dialog.form-dialog[open]) { overflow: hidden; }
 @media (max-width: 767.98px) {
   dialog.form-dialog { width: 100%; height: 100dvh; max-height: none; margin: 0; border-radius: 0; box-shadow: none; }
-  dialog.form-dialog > .form-panel { box-sizing: border-box; min-height: 100%; }
+  dialog.form-dialog > .form-panel { box-sizing: border-box; min-height: 100%;
+    padding: calc(var(--form-pad) + var(--safe-top)) calc(var(--form-pad) + var(--safe-right)) calc(var(--form-pad) + var(--safe-bottom)) calc(var(--form-pad) + var(--safe-left)); }
+}
+
+dialog.form-dialog--narrow { width: min(480px, 100% - 32px - var(--safe-left) - var(--safe-right)); }
+@media (max-width: 767.98px) { dialog.form-dialog--narrow { width: 100%; } }
+
+/* Contact options: the popup and the Contact page */
+.contact-options { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.contact-option { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; border: 1px solid var(--form-line); border-radius: var(--form-radius); color: var(--brand-ink); font-weight: var(--font-medium); line-height: 1.3; text-decoration: none; }
+.contact-option:hover { border-color: var(--color-primary-blue); background: var(--form-tint); color: var(--brand-ink); }
+.contact-option__icon { display: inline-flex; flex: 0 0 auto; }
+.contact-option__number { margin-left: auto; white-space: nowrap; }
+.call-option { display: grid; gap: 4px; }
+.form-panel > .call-option { margin-bottom: 16px; }
+.call-option__copy { display: none; align-items: center; justify-self: end; gap: 8px; min-height: 44px; padding: 4px 8px; border: 0; background: none; color: var(--brand-ink); font: inherit; font-size: .875rem; cursor: pointer; }
+.call-option__copy:hover { color: var(--brand-link-hover); }
+@media (hover: hover) and (pointer: fine) { .call-option__copy:not([hidden]) { display: inline-flex; } }
+
+/* Contact page: the agent's picture beside the options. Plain panel until a picture is set in the CMS. */
+.contact-page { display: grid; gap: 32px; padding-block: clamp(32px, 6vw, 72px); }
+.contact-page h1 { margin: 0 0 24px; font-size: clamp(2rem, 4vw, 2.8rem); }
+.contact-page__photo { order: 1; width: min(100%, 240px); aspect-ratio: 9 / 16; overflow: hidden; background: var(--color-charcoal) var(--grain) 0 0 / 180px; }
+.contact-page__photo img { width: 100%; height: 100%; object-fit: cover; }
+.contact-page__body { max-width: 520px; }
+@media (min-width: 768px) {
+  .contact-page { grid-template-columns: auto minmax(0, 1fr); column-gap: 48px; align-items: start; }
+  .contact-page__photo { order: 0; width: clamp(240px, 26vw, 360px); }
 }
 
 /* Progress: a bar (width from --progress, set by js/forms.js) above "Étape 1 sur 3" */
@@ -96,7 +123,6 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step { margin-top:
 .form-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--form-rule); }
 .form-tabs [role="tab"] { flex: 0 0 auto; padding: 8px 16px; border: 1px solid var(--form-line); border-radius: 999px; background: var(--brand-surface); color: var(--brand-ink); font: inherit; font-size: .875rem; font-weight: var(--font-medium); cursor: pointer; }
 .form-tabs [role="tab"][aria-selected="true"] { border-color: var(--color-primary-blue); background: var(--form-tint); }
-.form-tabs [role="tab"]:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
 [data-tabs-active] > .form-tiles > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Tiles: checkbox groups (cities, property types). The checkbox is hidden; the label is the tile. */
@@ -134,7 +160,6 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step { margin-top:
 .form-actions [type="submit"] { background: var(--color-primary-blue); border-color: var(--color-primary-blue); }
 .form-actions button:hover, .form-cancel:hover { background: var(--color-charcoal); border-color: var(--color-charcoal); color: var(--color-white); }
 .form-actions [type="submit"]:hover { background: var(--color-dark-blue); border-color: var(--color-dark-blue); }
-.form-actions button:focus-visible, .form-cancel:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
 .form-actions button:disabled { opacity: .5; cursor: progress; }
 .form-cancel { margin-right: auto; }   /* step 1: Annuler on the left of Suivant, as in the mockup */
 @media (min-width: 768px) { .form-cancel { margin-right: 0; } }

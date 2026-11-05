@@ -45,8 +45,46 @@
       "en": "South Shore"
     },
     "cta": {
-      "fr": "Évaluation gratuite",
-      "en": "Free valuation"
+      "fr": "Me contacter",
+      "en": "Contact me"
+    }
+  },
+  "contactOptions": {
+    "title": {
+      "fr": "Me contacter",
+      "en": "Contact me"
+    },
+    "call": {
+      "fr": "M'appeler",
+      "en": "Call me"
+    },
+    "copy": {
+      "fr": "Copier le numéro",
+      "en": "Copy the number"
+    },
+    "copied": {
+      "fr": "Numéro copié",
+      "en": "Number copied"
+    },
+    "write": {
+      "fr": "M'écrire",
+      "en": "Write me"
+    },
+    "estimate": {
+      "fr": "Estimer ma propriété",
+      "en": "Estimate my property"
+    },
+    "alert": {
+      "fr": "Créer une alerte immobilière",
+      "en": "Set up a property alert"
+    },
+    "findRental": {
+      "fr": "Trouver un logement à louer",
+      "en": "Find a rental"
+    },
+    "postRental": {
+      "fr": "Mettre ma propriété en location",
+      "en": "Post a rental"
     }
   },
   "contactIcons": {
@@ -79,48 +117,6 @@
     "more": {
       "fr": "Lire mon histoire",
       "en": "Read my story"
-    }
-  },
-  "trust": {
-    "label": {
-      "fr": "En bref",
-      "en": "At a glance"
-    },
-    "licence": {
-      "fr": "Courtier titulaire d'un permis de l'OACIQ",
-      "en": "Broker licensed by the OACIQ"
-    },
-    "licenceNumber": {
-      "fr": "Permis no",
-      "en": "Licence no."
-    },
-    "register": {
-      "fr": "Vérifier au registre de l'OACIQ",
-      "en": "Check the OACIQ register"
-    },
-    "backingTitle": {
-      "fr": "Appuyé par REMAX Privilège",
-      "en": "Backed by REMAX Privilège"
-    },
-    "backingText": {
-      "fr": "Une agence, une équipe et des outils derrière chaque dossier.",
-      "en": "An agency, a team and tools behind every file."
-    },
-    "responseTitle": {
-      "fr": "Réponse sous 24 heures ouvrables",
-      "en": "Reply within one business day"
-    },
-    "responseText": {
-      "fr": "Chaque demande reçoit une réponse, par courriel ou par téléphone.",
-      "en": "Every request gets an answer, by email or by phone."
-    },
-    "languagesTitle": {
-      "fr": "En français et en anglais",
-      "en": "In French and English"
-    },
-    "languagesText": {
-      "fr": "Je vous accompagne dans la langue de votre choix.",
-      "en": "I work with you in the language you prefer."
     }
   },
   "services": {
@@ -249,6 +245,14 @@
         "fr": "Vendu",
         "en": "Sold"
       }
+    },
+    "moreInfo": {
+      "fr": "Plus d'infos",
+      "en": "More info"
+    },
+    "infoSubject": {
+      "fr": "Demande d'information",
+      "en": "Information request"
     }
   },
   "forms": {
@@ -275,56 +279,22 @@
         "fr": "Après l'envoi : je vous réponds sous 24 heures ouvrables pour confirmer vos critères, puis je vous envoie les propriétés qui y correspondent.",
         "en": "After you send it: I reply within one business day to confirm your criteria, then send you the properties that match them."
       }
-    }
-  },
-  "contact": {
-    "heading": {
-      "fr": "Me contacter",
-      "en": "Contact me"
     },
-    "intro": {
-      "fr": "Écrivez-moi. Je vous réponds sous 24 heures ouvrables, par courriel ou par téléphone.",
-      "en": "Write to me. I reply within one business day, by email or by phone."
+    "writeMe": {
+      "title": {
+        "fr": "Écrivez-moi",
+        "en": "Write me"
+      },
+      "next": {
+        "fr": "Je vous réponds sous 24 heures ouvrables, par courriel ou par téléphone.",
+        "en": "I reply within one business day, by email or by phone."
+      }
     },
-    "name": {
-      "fr": "Nom",
-      "en": "Name"
-    },
-    "email": {
-      "fr": "Courriel",
-      "en": "Email"
-    },
-    "phone": {
-      "fr": "Téléphone",
-      "en": "Phone"
-    },
-    "either": {
-      "fr": "Indiquez un courriel ou un numéro de téléphone.",
-      "en": "Enter an email address or a phone number."
-    },
-    "message": {
-      "fr": "Message",
-      "en": "Message"
-    },
-    "consentBefore": {
-      "fr": "J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la ",
-      "en": "I agree that this information is sent to Cedrik Ferland to answer my request, as described in the "
-    },
-    "privacy": {
-      "fr": "politique de confidentialité",
-      "en": "privacy policy"
-    },
-    "consentAfter": {
-      "fr": ".",
-      "en": "."
-    },
-    "submit": {
-      "fr": "Envoyer",
-      "en": "Send"
-    },
-    "subject": {
-      "fr": "Nouveau message du site web",
-      "en": "New message from the website"
+    "propertyInfo": {
+      "title": {
+        "fr": "Plus d'infos sur cette propriété",
+        "en": "More info about this property"
+      }
     }
   },
   "office": {
@@ -347,6 +317,18 @@
     "terms": {
       "fr": "Conditions d'utilisation",
       "en": "Terms of use"
+    },
+    "licence": {
+      "fr": "Courtier titulaire d'un permis de l'OACIQ",
+      "en": "Broker licensed by the OACIQ"
+    },
+    "licenceNumber": {
+      "fr": "Permis no",
+      "en": "Licence no."
+    },
+    "licenceRegister": {
+      "fr": "Vérifier au registre de l'OACIQ",
+      "en": "Check the OACIQ register"
     }
   },
   "legal": {

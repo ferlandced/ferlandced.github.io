@@ -11,6 +11,8 @@
     <div>
       <p class="site-footer__office">{{ agent.name }}</p>
       <p>{{ agent.title[lang] }}</p>
+      {# Wording to be confirmed (CLAUDE.md open item). Shows only once the licence number is filled in. #}
+      {% if agent.licence %}<p class="site-footer__licence">{{ t.office.licence }}, {{ t.office.licenceNumber }} {{ agent.licence }}{% if agent.licenceRegisterUrl %}<br><a href="{{ agent.licenceRegisterUrl }}">{{ t.office.licenceRegister }}</a>{% endif %}</p>{% endif %}
       {% if agent.phone %}<p><a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></p>{% endif %}
       {% if agent.email %}<p><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></p>{% endif %}
       <p class="site-footer__copy">© {{ "" | year }} {{ agent.name }}</p>

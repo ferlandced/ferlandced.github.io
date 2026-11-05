@@ -87,9 +87,15 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Header: REMAX logo with full office name.
 - Photography: professional, clipped agent photos where used. No clip art, cartoons or bitmojis.
 - Contrast: WCAG 2.1 AA minimum.
+  - Exception (Matteo, 2026-11-04): REMAX requires its brand colors, not WCAG AA. Where a brand color pairing fails AA, the brand pairing wins. Currently only white text on Primary Red `#FF1200` (about 3.9:1), used by the hero "Contact me" button.
+  - Scope the exception to that pairing. Everything else stays AA. Keep the label as large as the design allows (bold, 18.66px or more passes AA as large text).
+  - Automated contrast checks (axe) are excluded for the excepted element only, not for the page.
+- Focus visible: WCAG AA (2.4.7) except on buttons.
+  - Exception (Matteo, 2026-11-05): buttons (`.btn`, `<button>`, dialog close) show no focus ring, even from the keyboard. Design choice, not a brand rule.
+  - Links, form fields, radio tiles and listing cards keep their focus ring.
 - Motion: subtle, respect `prefers-reduced-motion`.
 - Mobile-first. Breakpoints TBD.
-- Listing card: image, price, address/neighbourhood, beds/baths/area, one CTA. One real `<a>` on the title, stretched over the card with CSS. Do not wrap the whole card in an anchor. Mark as external, `rel="noopener"`.
+- Listing card: image, price, address/neighbourhood, beds/baths/area, one link and one button. One real `<a>` on the title, stretched over the card with CSS; it is the card's only link. Do not wrap the whole card in an anchor. Mark as external, `rel="noopener"`. A real `<button>` "More info", above the stretched link, opens one shared dialog to call or write the agent about that listing (a link to the Contact page without JS).
 
 ## Bilingual (Eleventy)
 - URL structure: `/fr/` and `/en/` (TBC). Default French. `hreflang` on every page. Language switcher maps to the equivalent page.

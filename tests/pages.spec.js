@@ -1,6 +1,7 @@
 // Every page: loads, language, title, one h1, hreflang, language switch, header links, mandatory footer
 // content, nothing loaded from outside the site. Saves a full-page screenshot per page and device
 // in screenshots/<project>/ for visual review.
+import fs from "node:fs";
 import { test, expect } from "./support/fixtures.js";
 import { pages, site, agent, t, url, menuLinks } from "./support/site.js";
 
@@ -16,6 +17,8 @@ test.describe("every page", () => {
       expect(await page.locator('meta[name="description"]').getAttribute("content")).toBeTruthy();
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("main")).toHaveCount(1);
+      await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /viewport-fit=cover/);
+      await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", p.name.startsWith("home-") ? site.themeColor.home : site.themeColor.page);
 
       // hreflang and language switch point to the same page in the other language
       if (p.alternates) {
@@ -47,6 +50,14 @@ test.describe("every page", () => {
       await expect(notice).toHaveAttribute("lang", site.office.independenceLang[p.lang]);
       await expect(footer).toContainText(agent.name);
       await expect(footer).toContainText(agent.title[p.lang]);
+      // OACIQ identification on every page, only once the licence number is filled in
+      const licence = footer.locator(".site-footer__licence");
+      await expect(licence).toHaveCount(agent.licence ? 1 : 0);
+      if (agent.licence) {
+        await expect(licence).toContainText(tr.office.licence);
+        await expect(licence).toContainText(agent.licence);
+        await expect(licence.locator("a")).toHaveCount(agent.licenceRegisterUrl ? 1 : 0);
+      }
       // Legal links on every page
       await expect(footer.locator(`a[href="${url(site.pages.privacy[p.lang])}"]`)).toHaveText(tr.office.privacy);
       await expect(footer.locator(`a[href="${url(site.pages.terms[p.lang])}"]`)).toHaveText(tr.office.terms);
@@ -57,6 +68,19 @@ test.describe("every page", () => {
       await page.screenshot({ path: `screenshots/${testInfo.project.name}/${p.name}.png`, fullPage: true });
     });
   }
+});
+
+test("theme colours come from the brand tokens", () => {
+  const tokens = fs.readFileSync("css/tokens.css", "utf8");
+  for (const colour of Object.values(site.themeColor)) expect(tokens).toContain(colour);
+});
+
+// Playwright cannot emulate iOS insets: this checks they are wired in. The visual check needs a real iPhone.
+test("safe-area insets reach the header, the phone menu, the footer and the dialogs", () => {
+  const css = fs.readFileSync("css/site.css", "utf8");
+  for (const side of ["top", "right", "bottom", "left"]) expect(css).toContain(`--safe-${side}: env(safe-area-inset-${side}, 0px)`);
+  for (const rule of [/\.site-header \{[^}]*padding-top: var\(--safe-top\)/, /\.nav-toggle \{ position: fixed; right: calc\(12px \+ var\(--safe-right\)\); bottom: calc\(12px \+ var\(--safe-bottom\)\)/, /\.site-footer \{ padding-bottom: var\(--safe-bottom\)/]) expect(css).toMatch(rule);
+  expect(fs.readFileSync("css/forms.css", "utf8")).toMatch(/\.form-panel \{[^}]*calc\(var\(--form-pad\) \+ var\(--safe-bottom\)\)/);
 });
 
 test("site root redirects to the French home page", async ({ page }) => {

@@ -20,6 +20,28 @@ export async function openForm(page, key, lang, where) {
   return dialog.locator("form[data-wizard]");
 }
 
+/** Opens the one-step "Write me" form and returns a locator scoped to it. */
+export async function openWriteMe(page, lang, where) {
+  if (where === "page") {
+    await page.goto(site.pages.writeMe[lang].slice(1));
+    return page.locator("form[data-wizard]");
+  }
+  const popup = await openContactPopup(page, lang);
+  await popup.locator('a[data-dialog="dialog-writeMe"]').click();
+  const dialog = page.locator("#dialog-writeMe");
+  await expect(dialog).toHaveJSProperty("open", true);
+  return dialog.locator("form[data-wizard]");
+}
+
+/** Opens the contact popup on the home page and returns its locator. */
+export async function openContactPopup(page, lang) {
+  await page.goto(`${lang}/`);
+  await page.locator(".hero__cta a").click();
+  const popup = page.locator("#dialog-contact");
+  await expect(popup).toHaveJSProperty("open", true);
+  return popup;
+}
+
 export const steps = (form) => form.locator("[data-step]");
 export const visibleStep = (form) => form.locator("[data-step]:not([hidden])");
 

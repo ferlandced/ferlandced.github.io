@@ -30,9 +30,11 @@ collections:
           - { name: signature, label: "Signature", widget: image, hint: "Agent mark (house + signature). SVG preferred, trimmed tight to the drawing." }
           - { name: hero_photo, label: "Agent photo", widget: image, hint: "Clipped photo with a transparent background, portrait, at least 1200 px tall. Also used in the About section." }
           - { name: hero_photo_alt, label: "Agent photo description", widget: string, required: false }
-          - { name: side_image, label: "Side image", widget: image, required: false, hint: "Shown right of the red band on desktop only. Portrait, at least 1600 px tall, usage rights confirmed." }
-          - { name: side_image_alt, label: "Side image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
-          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Desktop only: the scene behind the agent photo in the About section. Portrait, same proportions as the agent photo. Empty shows a plain gray panel." }
+          - { name: side_image, label: "Hero image", widget: image, required: false, hint: "Full-screen background of the hero on every device. Landscape, at least 1920 px wide, usage rights confirmed." }
+          - { name: side_image_alt, label: "Hero image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
+          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Phones only: the scene behind the agent photo in the About section. Portrait, 9:16. Empty shows a plain gray panel." }
+          - { name: contact_photo, label: "Contact page photo", widget: image, required: false, hint: "Agent picture on the Contact page. Portrait, 9:16. Empty shows a plain gray panel." }
+          - { name: contact_photo_alt, label: "Contact page photo description", widget: string, required: false }
 
   # Header menu (read by header.njk as `menu`). Each item: a French and English label and URL.
   - name: menu
@@ -164,7 +166,75 @@ collections:
                   - { name: fr, label: "Français", widget: string, required: false }
                   - { name: en, label: "English", widget: string, required: false }
               - name: cta
-                label: "Bouton du bandeau : mène au formulaire d'estimation"
+                label: "Bouton du bandeau : ouvre les options de contact"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+          - name: contactOptions
+            label: "Options de contact (fenêtre et page Contact)"
+            widget: object
+            collapsed: true
+            fields:
+              - name: title
+                label: "Titre de la fenêtre et de la page Contact"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: call
+                label: "Option : appeler"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: copy
+                label: "Bouton qui copie le numéro (ordinateur)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: copied
+                label: "Message une fois le numéro copié"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: write
+                label: "Option : écrire"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: estimate
+                label: "Option : estimation"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: alert
+                label: "Option : alerte immobilière"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: findRental
+                label: "Option : trouver un logement"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: postRental
+                label: "Option : mettre en location"
                 widget: object
                 collapsed: false
                 fields:
@@ -229,81 +299,6 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
-          - name: trust
-            label: "Bandeau de confiance (sous À propos)"
-            widget: object
-            collapsed: true
-            fields:
-              - name: label
-                label: "Nom du bandeau, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: licence
-                label: "Permis : titre (affiché seulement si le numéro de permis est rempli dans le profil)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: licenceNumber
-                label: "Permis : texte devant le numéro"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: register
-                label: "Permis : lien vers le registre de l'OACIQ"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: backingTitle
-                label: "Agence : titre"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: backingText
-                label: "Agence : texte"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: responseTitle
-                label: "Délai de réponse : titre (engagement réel à confirmer)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: responseText
-                label: "Délai de réponse : texte"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: languagesTitle
-                label: "Langues : titre"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: languagesText
-                label: "Langues : texte"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
           - name: services
             label: "Services"
             widget: object
@@ -475,6 +470,20 @@ collections:
             widget: object
             collapsed: true
             fields:
+              - name: moreInfo
+                label: "Bouton sur chaque propriété : demander plus d'infos"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: infoSubject
+                label: "Début de l'objet du courriel reçu pour une propriété"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
               - name: heading
                 label: "Titre de la section des propriétés"
                 widget: object
@@ -593,100 +602,63 @@ collections:
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
-          - name: contact
-            label: "Formulaire de contact"
-            widget: object
-            collapsed: true
-            fields:
-              - name: heading
-                label: "Titre de la section Contact"
+              - name: writeMe
+                label: "Formulaire Écrivez-moi"
                 widget: object
-                collapsed: false
+                collapsed: true
                 fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: intro
-                label: "Phrase sous le titre"
+                  - name: title
+                    label: "Titre"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: next
+                    label: "Texte sous le titre"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: text }
+                      - { name: en, label: "English", widget: text }
+              - name: propertyInfo
+                label: "Fenêtre Plus d'infos sur une propriété"
                 widget: object
-                collapsed: false
+                collapsed: true
                 fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: name
-                label: "Étiquette du champ Nom"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: email
-                label: "Étiquette du champ Courriel"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: phone
-                label: "Étiquette du champ Téléphone"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: either
-                label: "Aide sous les champs : courriel ou téléphone obligatoire"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: message
-                label: "Étiquette du champ Message"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: consentBefore
-                label: "Case de consentement : texte avant le lien vers la politique"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: privacy
-                label: "Case de consentement : texte du lien vers la politique de confidentialité"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: consentAfter
-                label: "Case de consentement : texte après le lien (souvent un point)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: submit
-                label: "Bouton d'envoi du formulaire"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: subject
-                label: "Objet du courriel reçu par le courtier"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+                  - name: title
+                    label: "Titre"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
           - name: office
             label: "Pied de page"
             widget: object
             collapsed: true
             fields:
+              - name: licence
+                label: "Permis : texte d'identification (affiché seulement si le numéro de permis est rempli dans le profil)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: licenceNumber
+                label: "Permis : texte devant le numéro"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
+              - name: licenceRegister
+                label: "Permis : lien vers le registre de l'OACIQ"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: fr, label: "Français", widget: string }
+                  - { name: en, label: "English", widget: string }
               - name: type
                 label: "Type d'entreprise sous le nom du bureau"
                 widget: object
@@ -944,7 +916,7 @@ collections:
             fields:
               - { name: fr, label: "Titre (français)", widget: string }
               - { name: en, label: "Title (English)", widget: string }
-          # OACIQ licence: the trust strip on the home page shows it only once the number is filled in.
+          # OACIQ licence: the footer shows it on every page once the number is filled in.
           - { name: licence, label: "OACIQ licence number", widget: string, required: false }
           - { name: licenceRegisterUrl, label: "OACIQ register link", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Must be an oaciq.com link'] }
           - name: bio

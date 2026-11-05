@@ -11,15 +11,15 @@ translated: true
 {%- set t = i18n[lang] -%}
 {%- set photo = home.hero_photo or agent.photo -%}
 <main>
-  {# The stage holds the hero and About. With motion allowed, the agent photo in .stage__track
-     stays pinned while it travels from the hero into the About card, then scrolls up with About. #}
+  {# The stage holds the hero and About. On desktop, with motion allowed, the agent photo in
+     .stage__track stays still while the hero fades and About rises under him. #}
   <div class="stage">
     <section class="hero" aria-labelledby="hero-name">
-      {# Stripes are decorative. The side image uses the CMS description; empty keeps it silent. #}
+      {# The image uses the CMS description; empty keeps it silent. Stripes are decorative. #}
+      <span class="hero__side">{% if home.side_image %}<img src="{{ home.side_image }}" alt="{{ home.side_image_alt }}" fetchpriority="high">{% endif %}</span>
       <div class="hero__band">
         <span class="hero__stripe hero__stripe--red" aria-hidden="true"></span>
         <span class="hero__stripe hero__stripe--dark" aria-hidden="true"></span>
-        {% if home.side_image %}<span class="hero__side"><img src="{{ home.side_image }}" alt="{{ home.side_image_alt }}"></span>{% endif %}
       </div>
       <div class="hero__inner">
         <div class="hero__id">
@@ -28,8 +28,8 @@ translated: true
           <p class="hero__tagline">{{ t.hero.tagline }}</p>
           <p class="hero__role">{{ agent.title[lang] }}</p>
           <p class="hero__agency">{{ t.hero.agency }}{% if t.hero.area %}, {{ t.hero.area }}{% endif %}</p>
-          {# One action: the estimation form, in a dialog with JS, on its own page without #}
-          <p class="hero__cta"><a class="btn btn--solid" href="{{ site.pages.estimation[lang] }}" data-dialog="dialog-estimation">{{ t.hero.cta }}</a></p>
+          {# One action: the contact options, in a dialog with JS, on the Contact page without #}
+          <p class="hero__cta"><a class="btn btn--cta" href="{{ site.pages.contact[lang] }}" data-dialog="dialog-contact">{% include "icons/square-pen.svg" %}{{ t.hero.cta }}</a></p>
         </div>
       </div>
       {# Own layer so it can be cut along the slash on phones and tablets #}
@@ -39,8 +39,6 @@ translated: true
     {% if photo %}
     <div class="stage__track" aria-hidden="true">
       <div class="stage__pin">
-        {# Backdrop behind the agent once he reaches About: CMS image, or a plain gray placeholder #}
-        <div class="stage__backdrop"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}></div>
         <div class="stage__agent"><img src="{{ photo }}" alt=""></div>
       </div>
     </div>
@@ -48,9 +46,9 @@ translated: true
 
     <section id="about" class="about">
       <div class="container about__inner">
-        {# The agent's picture in About. When the travelling copy is active it stays invisible and
-           only holds the space where the copy lands; otherwise (reduced motion) it shows as is. #}
-        {% if photo %}<div class="about__card" aria-hidden="true"{% if home.about_backdrop %} style="background-image: url('{{ home.about_backdrop | url }}')"{% endif %}><img src="{{ photo }}" alt="" loading="lazy"></div>{% endif %}
+        {# The agent's picture in About: on the right where he stood in the hero (desktop), in a card
+           with the CMS backdrop (phones). Invisible while the pinned copy stands in for it. #}
+        {% if photo %}<div class="about__card" aria-hidden="true"{% if home.about_backdrop %} style="--backdrop: url('{{ home.about_backdrop | url }}'); --backdrop-size: cover"{% endif %}><img src="{{ photo }}" alt="" loading="lazy"></div>{% endif %}
         <div class="about__body">
           <h2>{{ t.about.heading }}</h2>
           {{ agent.bio[lang] | renderContent("md") | safe }}
@@ -63,23 +61,6 @@ translated: true
       </div>
     </section>
   </div>
-
-  {# Trust strip: what is true today (OACIQ: advertising must be accurate and provable).
-     The licence item shows only once the licence number is filled in (Agent profile in the CMS).
-     Placed after About, not directly under the hero: the photo travels from the hero into About. #}
-  <section class="trust" aria-label="{{ t.trust.label }}">
-    <ul class="container trust__list">
-      {% if agent.licence %}
-      <li class="trust__item trust__item--licence">
-        <p class="trust__title">{{ t.trust.licence }}</p>
-        <p>{{ t.trust.licenceNumber }} {{ agent.licence }}{% if agent.licenceRegisterUrl %}<br><a href="{{ agent.licenceRegisterUrl }}">{{ t.trust.register }}</a>{% endif %}</p>
-      </li>
-      {% endif %}
-      <li class="trust__item"><p class="trust__title">{{ t.trust.backingTitle }}</p><p>{{ t.trust.backingText }}</p></li>
-      <li class="trust__item"><p class="trust__title">{{ t.trust.responseTitle }}</p><p>{{ t.trust.responseText }}</p></li>
-      <li class="trust__item"><p class="trust__title">{{ t.trust.languagesTitle }}</p><p>{{ t.trust.languagesText }}</p></li>
-    </ul>
-  </section>
 
   <section id="services" class="services" aria-labelledby="services-heading">
     <div class="container">
@@ -117,11 +98,21 @@ translated: true
   {% endif %}
 
   {# Form dialogs, opened by the service buttons (see js/site.js). Full screen on phones. #}
-  {% for formKey, formFile in { propertyAlert: "property-alert", estimation: "estimation" } %}
+  {% for formKey, formFile in { propertyAlert: "property-alert", estimation: "estimation", writeMe: "contact" } %}
   <dialog class="form-dialog" id="dialog-{{ formKey }}" aria-labelledby="dialog-{{ formKey }}-title">
     {% set titleTag = "h2" %}{% set titleId = "dialog-" ~ formKey ~ "-title" %}
     {% include "partials/form-panel.njk" %}
   </dialog>
   {% endfor %}
+  {% if listings.length %}{% include "partials/property-dialog.njk" %}{% endif %}
+  <dialog class="form-dialog form-dialog--narrow" id="dialog-contact" aria-labelledby="dialog-contact-title">
+    <div class="form-panel">
+      <div class="form-panel__head">
+        <h2 class="form-panel__title" id="dialog-contact-title">{{ t.contactOptions.title }}</h2>
+        <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.close }}"><span data-icon="x" aria-hidden="true"></span></a>
+      </div>
+      {% include "partials/contact-options.njk" %}
+    </div>
+  </dialog>
 </main>
 <script src="/js/forms.js" defer></script>

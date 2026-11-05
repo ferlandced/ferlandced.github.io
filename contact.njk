@@ -1,0 +1,21 @@
+---
+layout: layouts/base.njk
+bodyClass: page
+pagination:
+  data: site.languages
+  size: 1
+  alias: lang
+permalink: "{{ site.pages.contact[lang] }}"
+translated: true
+pageKey: contact
+eleventyComputed:
+  title: "{{ i18n[lang].contactOptions.title }}"
+---
+{%- set t = i18n[lang] -%}
+<main class="container contact-page">
+  <div class="contact-page__photo">{% if home.contact_photo %}<img src="{{ home.contact_photo }}" alt="{{ home.contact_photo_alt }}">{% endif %}</div>
+  <div class="contact-page__body">
+    <h1>{{ t.contactOptions.title }}</h1>
+    {% include "partials/contact-options.njk" %}
+  </div>
+</main>

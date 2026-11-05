@@ -18,5 +18,8 @@
       {% if item.superficie_habitable %}<li><span class="card__icon" aria-hidden="true">{% include "icons/ruler.svg" %}</span><span class="visually-hidden">{{ t.properties.area }}</span> {{ item.superficie_habitable[lang] }}</li>{% endif %}
     </ul>
     {% endif %}
+    {%- set propertyLabel = item.property_kind[lang] ~ (", " ~ address if address else "") %}
+    <button class="card__more" type="button" data-property-info data-listing-number="{{ item.no_inscription }}" data-property-address="{{ address }}" data-property-label="{{ propertyLabel }}" data-subject="{{ t.properties.infoSubject }} · {{ t.properties.number }} {{ item.no_inscription }} · {{ item.property_kind[lang] }}" aria-label="{{ t.properties.moreInfo }}, {{ propertyLabel }}, {{ t.properties.number }} {{ item.no_inscription }}">{{ t.properties.moreInfo }}</button>
+    <noscript><a class="card__more" href="{{ site.pages.contact[lang] }}">{{ t.properties.moreInfo }}</a></noscript>
   </div>
 </article>

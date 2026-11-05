@@ -45,9 +45,9 @@
   --brand-accent: var(--color-bridge-red);      /* pills, eyebrows, button hover: white text 7.5:1 */
   --brand-button: var(--color-dark-red);        /* ghost button text and hover fill: 13.4:1 on white, 12.3:1 on cream */
   --brand-button-border: var(--color-primary-red);
+  --brand-cta: var(--color-primary-red);        /* white text 3.9:1: large bold text only (18.66px and up) */
   --brand-highlight: var(--color-primary-red);  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
   --brand-focus: var(--color-primary-blue);
-  --brand-hero-tone: color-mix(in srgb, var(--color-charcoal) 50%, var(--color-white));  /* half-strength charcoal: hero background right of the band, and the end of its fade */
   --brand-shadow: color-mix(in srgb, var(--color-black) 8%, transparent);
   --brand-shadow-strong: color-mix(in srgb, var(--color-black) 14%, transparent);
   --brand-placeholder: color-mix(in srgb, var(--color-charcoal) 12%, var(--color-cream));
