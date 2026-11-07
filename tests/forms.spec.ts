@@ -14,7 +14,6 @@ import {
   FORMS,
   FORM_ENTRIES,
   FORM_PLACES,
-  type FormKey,
   openForm,
   openWriteMe,
   steps,
@@ -25,10 +24,15 @@ import {
   skip,
   submit,
   fillStep1,
+  toContactStep,
   pick,
 } from "./support/forms.ts";
 
 const isPhone = (testInfo: TestInfo) => testInfo.project.name.endsWith("-phone");
+
+/** The computed display of each element, whether or not its step is the one shown. */
+const displays = (locator: Locator) =>
+  locator.evaluateAll((elements) => elements.map((element) => getComputedStyle(element).display));
 
 for (const [key, formConfig] of FORM_ENTRIES) {
   for (const where of FORM_PLACES) {
@@ -47,15 +51,16 @@ for (const [key, formConfig] of FORM_ENTRIES) {
         await next(form);
         expect(await stepIndex(form)).toBe(0);
 
+        const contact = formConfig.contactStep;
         await fillStep1(form, key, { phone: null, email: null });
         await form.locator(`#${formConfig.prefix}-consent`).uncheck();
         await form.locator(`#${formConfig.prefix}-email`).fill("test@example.com");
         await next(form);
-        expect(await stepIndex(form), "consent unchecked").toBe(0);
+        expect(await stepIndex(form), "consent unchecked").toBe(contact);
         await form.locator(`#${formConfig.prefix}-consent`).check();
         await form.locator(`#${formConfig.prefix}-email`).fill("");
         await next(form);
-        expect(await stepIndex(form)).toBe(0);
+        expect(await stepIndex(form)).toBe(contact);
         const phone = form.locator(`#${formConfig.prefix}-phone`);
         expect(await phone.evaluate((element: HTMLInputElement) => element.validationMessage)).toBe(
           await phone.getAttribute("data-one-of-message"),
@@ -63,12 +68,12 @@ for (const [key, formConfig] of FORM_ENTRIES) {
 
         await form.locator(`#${formConfig.prefix}-email`).fill("test@example.com");
         await next(form);
-        expect(await stepIndex(form), "email alone is enough").toBe(1);
+        expect(await stepIndex(form), "email alone is enough").toBe(contact + 1);
         await back(form);
         await form.locator(`#${formConfig.prefix}-email`).fill("");
         await phone.fill("450 776 4895");
         await next(form);
-        expect(await stepIndex(form), "phone alone is enough").toBe(1);
+        expect(await stepIndex(form), "phone alone is enough").toBe(contact + 1);
         expect(submissions).toHaveLength(0);
       });
 
@@ -76,6 +81,7 @@ for (const [key, formConfig] of FORM_ENTRIES) {
         page,
       }) => {
         const form = await openForm(page, key, "fr", where);
+        await toContactStep(form, key);
         const phone = form.locator(`#${formConfig.prefix}-phone`);
         await phone.pressSequentially("+1 (450) abc 776;4895x");
         await expect(phone).toHaveValue("+1 (450)  7764895");
@@ -103,7 +109,7 @@ for (const [key, formConfig] of FORM_ENTRIES) {
         const form = await openForm(page, key, "fr", where);
         await fillStep1(form, key);
         await form.locator(`#${formConfig.prefix}-email`).press("Enter");
-        expect(await stepIndex(form)).toBe(1);
+        expect(await stepIndex(form)).toBe(formConfig.contactStep + 1);
         await expect(visibleStep(form).locator("h2")).toBeFocused();
         await back(form);
         await expect(form.locator(`#${formConfig.prefix}-first-name`)).toHaveValue("Jeanne");
@@ -163,7 +169,9 @@ for (const [key, formConfig] of FORM_ENTRIES) {
         expect(sent.phone).toBe("450 776 4895");
         expect(sent.botcheck, "unchecked honeypot is not sent").toBeUndefined();
         expect(sent.consent).toBe("yes");
-        expect(sent.intent, "no intent from a plain link").toBe("");
+        expect(sent.intent, "buy, picked on the first step; no intent on the estimation").toBe(
+          key === "propertyAlert" ? "achat" : "",
+        );
         if (key === "estimation") {
           expect(sent.address).toBe("123 rue Principale");
           expect(sent.property_type).toBe(formConfig.typeValue);
@@ -204,7 +212,7 @@ for (const [key, formConfig] of FORM_ENTRIES) {
           web3forms.mode = mode;
           await skip(form);
           await expect(form.locator("[data-error]")).toBeVisible();
-          expect(await stepIndex(form)).toBe(1);
+          expect(await stepIndex(form)).toBe(formConfig.contactStep + 1);
           await expect(visibleStep(form).locator("button").first()).toBeEnabled();
           await back(form);
           await expect(form.locator(`#${formConfig.prefix}-first-name`)).toHaveValue("Jeanne");
@@ -268,7 +276,7 @@ for (const [key, formConfig] of FORM_ENTRIES) {
           );
           await back(form);
           await skip(form);
-          expect(await stepIndex(form), "jumps to the step with the invalid field").toBe(3);
+          expect(await stepIndex(form), "jumps to the step with the invalid field").toBe(4);
           await form.locator("#pa-budget-min").fill("300000");
           expect(await max.evaluate((element: HTMLInputElement) => element.validity.valid)).toBe(
             true,
@@ -512,7 +520,7 @@ test.describe("tabs and choice controls", () => {
     await tabs.nth(2).focus();
     await page.keyboard.press("Enter");
     await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-    expect(await stepIndex(form)).toBe(1);
+    expect(await stepIndex(form)).toBe(2);
     await page.keyboard.press("Home");
     await page.keyboard.press("a");
     await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
@@ -603,28 +611,37 @@ test.describe("dialog", () => {
     await expect(form.locator("[data-success]")).toBeHidden();
     await expect(form.locator("[data-error]")).toBeHidden();
     expect(await stepIndex(form)).toBe(0);
-    await expect(form.locator("[data-progress]")).toHaveText("Étape 1 sur 4");
+    await expect(form.locator("[data-progress]")).toHaveText(
+      `Étape 1 sur ${FORMS.propertyAlert.steps}`,
+    );
     await expect(form.locator("#pa-first-name")).toHaveValue("");
     await expect(form.locator("#pa-consent")).not.toBeChecked();
   });
 
-  for (const [key, lang] of [
-    ["propertyAlert", "fr"],
-    ["estimation", "en"],
-  ] satisfies [FormKey, Lang][]) {
-    test(`rental button opens ${key} (${lang}) with the rental intent and subject; buy/sell does not`, async ({
+  for (const lang of languages) {
+    test(`(${lang}) the search button opens the alert; buy or rent sets the intent, the subject and the texts`, async ({
       page,
       submissions,
     }) => {
       await page.goto(`${lang}/`);
-      const dialog = page.locator(`#dialog-${key}`);
+      const dialog = page.locator("#dialog-propertyAlert");
       const form = dialog.locator("form[data-wizard]");
       const subject = form.locator('input[name="subject"]');
       const rental = await subject.getAttribute("data-subject-location");
       const plain = await subject.getAttribute("value");
+      const rentTexts = form.locator('[data-when-intent="location"]');
+      const buyTexts = form.locator('[data-when-intent="achat"]');
 
-      await page.locator(`.service--rent a[data-dialog="dialog-${key}"]`).click();
-      await fillStep1(form, key);
+      await page.locator('.service--search a[data-dialog="dialog-propertyAlert"]').click();
+      await expect(dialog).toHaveJSProperty("open", true);
+      await expect(form.locator('input[name="intent"]:checked'), "nothing chosen yet").toHaveCount(
+        0,
+      );
+      await fillStep1(form, "propertyAlert", { intent: "location" });
+      expect(await displays(rentTexts), "rent wording shown").not.toContain("none");
+      expect(await displays(buyTexts), "buy wording hidden").toEqual(
+        Array.from({ length: await buyTexts.count() }, () => "none"),
+      );
       await next(form);
       await skip(form);
       await expect(form.locator("[data-success]")).toBeVisible();
@@ -633,20 +650,34 @@ test.describe("dialog", () => {
       expect(sent.subject).toBe(rental);
 
       await dialog.locator(".form-panel__close").click();
-      await page
-        .locator(
-          `.service--${key === "estimation" ? "sell" : "buy"} a[data-dialog="dialog-${key}"]`,
-        )
-        .click();
-      await fillStep1(form, key);
+      await page.locator('.service--search a[data-dialog="dialog-propertyAlert"]').click();
+      await expect(
+        form.locator('input[name="intent"]:checked'),
+        "a sent form starts over",
+      ).toHaveCount(0);
+      expect(await displays(buyTexts), "back to the buy wording").not.toContain("none");
+      await fillStep1(form, "propertyAlert", { intent: "achat" });
       await next(form);
       await skip(form);
       await expect(form.locator("[data-success]")).toBeVisible();
       sent = fields(submissionAt(submissions, 1).body);
-      expect(sent.intent).toBe("");
+      expect(sent.intent).toBe("achat");
       expect(sent.subject).toBe(plain);
     });
   }
+
+  test("the sell button opens the estimation without an intent", async ({ page, submissions }) => {
+    await page.goto("en/");
+    const form = page.locator("#dialog-estimation form[data-wizard]");
+    await page.locator('.service--sell a[data-dialog="dialog-estimation"]').click();
+    await fillStep1(form, "estimation");
+    await next(form);
+    await skip(form);
+    await expect(form.locator("[data-success]")).toBeVisible();
+    const sent = fields(submissionAt(submissions, 0).body);
+    expect(sent.intent).toBe("");
+    expect(sent.subject).toBe(await form.locator('input[name="subject"]').getAttribute("value"));
+  });
 
   test("backdrop click closes on desktop; a tap below the form on a phone does not", async ({
     page,
@@ -678,16 +709,19 @@ test.describe("form pages", () => {
     await expect(page).toHaveURL(/\/ced\/en\/$/);
   });
 
-  test("?intent=location sets the rental intent; an unknown intent is ignored", async ({
+  test("?intent=location picks Rent; an unknown intent leaves the choice to the visitor", async ({
     page,
     submissions,
   }) => {
     for (const [query, intent] of [
       ["?intent=location", "location"],
-      ["?intent=hack", ""],
+      ["?intent=hack", "achat"],
     ] satisfies [string, string][]) {
       await page.goto(site.pages.propertyAlert.fr.slice(1) + query);
       const form = page.locator("form[data-wizard]");
+      await expect(form.locator('input[name="intent"]:checked')).toHaveCount(
+        query === "?intent=location" ? 1 : 0,
+      );
       await fillStep1(form, "propertyAlert");
       await next(form);
       await skip(form);
@@ -696,7 +730,7 @@ test.describe("form pages", () => {
       expect(sent.intent, query).toBe(intent);
       const subject = form.locator('input[name="subject"]');
       expect(sent.subject).toBe(
-        await subject.getAttribute(intent ? "data-subject-location" : "value"),
+        await subject.getAttribute(intent === "location" ? "data-subject-location" : "value"),
       );
     }
   });
@@ -739,6 +773,18 @@ test.describe("without JavaScript", () => {
       expect(sent.get("consent")).toBe("yes");
     });
   }
+
+  test("property alert: choosing Rent switches the wording without JS", async ({ page }) => {
+    await page.goto(site.pages.propertyAlert.fr.slice(1));
+    const form = page.locator("form[data-wizard]");
+    const rentTexts = form.locator('[data-when-intent="location"]');
+    const buyTexts = form.locator('[data-when-intent="achat"]');
+    await expect(buyTexts.first()).toBeVisible();
+    await expect(rentTexts.first()).toBeHidden();
+    await pick(form, "pa-intent-location");
+    await expect(rentTexts.first()).toBeVisible();
+    await expect(buyTexts.first()).toBeHidden();
+  });
 
   test("property cards: a link to the Contact page instead of the button", async ({ page }) => {
     await page.goto("fr/");

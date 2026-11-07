@@ -4,11 +4,23 @@
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="property_alert">
   <input type="hidden" name="subject" value="Property alert sign-up" data-subject-location="Looking for a rental">
-  <input type="hidden" name="intent" value="">
   <input type="hidden" name="from_name" value="Cedrik Ferland website">
   <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 
   <p class="form-progress" data-progress hidden>Step <span data-current></span> of <span data-total></span></p>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">Are you looking to buy or to rent?</h2>
+    <fieldset class="form-tiles form-tiles--intent">
+      <legend class="visually-hidden">Buy or rent</legend>
+      <label for="pa-intent-achat"><input id="pa-intent-achat" type="radio" name="intent" value="achat" required> <span data-icon="house" aria-hidden="true"></span> Buy</label>
+      <label for="pa-intent-location"><input id="pa-intent-location" type="radio" name="intent" value="location" required> <span data-icon="key-round" aria-hidden="true"></span> Rent</label>
+    </fieldset>
+    <div class="form-actions">
+      <a class="form-cancel" href="/en/" data-close>Cancel</a>
+      <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
 
   <section class="form-step" data-step>
     <h2 tabindex="-1">Your contact information</h2>
@@ -40,13 +52,13 @@
     </div>
     <label class="form-consent" for="pa-consent"><input id="pa-consent" type="checkbox" name="consent" value="yes" required> <span>I agree that this information is sent to Cedrik Ferland to answer my request, as described in the <a href="{{ site.pages.privacy.en }}">privacy policy</a>.</span></label>
     <div class="form-actions">
-      <a class="form-cancel" href="/en/" data-close>Cancel</a>
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Back</button>
       <button type="button" data-next>Next <span data-icon="arrow-right" aria-hidden="true"></span></button>
     </div>
   </section>
 
   <section class="form-step" data-step>
-    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Where do you want to buy?</h2>
+    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Where do you want to <span data-when-intent="achat">buy</span><span data-when-intent="location">rent</span>?</h2>
     <p class="form-hint">Choose one or more regions and cities.</p>
     <div class="form-tabs" role="tablist" aria-label="Regions" data-tabs hidden>
       <button type="button" role="tab" id="pa-tab-montreal-ile" aria-controls="pa-region-montreal-ile">Montreal (Island)</button>
@@ -176,11 +188,11 @@
       <legend class="visually-hidden"><span data-icon="wallet" aria-hidden="true"></span> Budget</legend>
       <div class="form-row">
         <div class="form-field">
-          <label for="pa-budget-min">Minimum ($)</label>
+          <label for="pa-budget-min"><span data-when-intent="achat">Minimum ($)</span><span data-when-intent="location">Minimum rent ($ per month)</span></label>
           <div class="form-affix"><span class="form-affix__unit" aria-hidden="true">$</span><input id="pa-budget-min" name="budget_min" type="number" inputmode="numeric" min="0" step="1"></div>
         </div>
         <div class="form-field">
-          <label for="pa-budget-max">Maximum ($)</label>
+          <label for="pa-budget-max"><span data-when-intent="achat">Maximum ($)</span><span data-when-intent="location">Maximum rent ($ per month)</span></label>
           <div class="form-affix"><span class="form-affix__unit" aria-hidden="true">$</span><input id="pa-budget-max" name="budget_max" type="number" inputmode="numeric" min="0" step="1" data-gte="budget_min" data-gte-message="The maximum budget must be equal to or higher than the minimum budget."></div>
         </div>
       </div>

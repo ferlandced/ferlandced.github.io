@@ -76,9 +76,20 @@ body {
   overflow-x: clip;
 }
 
-/* Home page content runs under the transparent header */
+/* Home page content runs under the transparent header. iOS Safari tints its status bar and toolbar
+   from the body's background: dark over the hero, white once the page is past it (the header marks
+   that, see js/site.ts). The content itself is white. */
 body.home {
   padding-top: 0;
+  background: var(--color-charcoal);
+}
+
+body.home:has(.site-header[data-past-hero]) {
+  background: var(--brand-surface);
+}
+
+body.home > main {
+  background: var(--brand-surface);
 }
 
 strong,
@@ -109,13 +120,15 @@ h1,
 h2,
 h3 {
   color: var(--brand-primary);
+  font-family: var(--font-heading);
   line-height: 1.15;
-  font-weight: var(--font-bold);
-  letter-spacing: -0.01em;
+  font-weight: var(--font-semibold);
 }
 
+/* Section headings: Figtree SemiBold 29/33 */
 h2 {
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-size: 1.8125rem;
+  line-height: 1.14;
   margin: 0 0 24px;
 }
 
@@ -178,22 +191,64 @@ a:hover {
   text-underline-offset: 0.3em;
 }
 
-/* The page's main action. White on Primary Red passes AA only as large text, so keep the label at 19px bold. Dark Red on hover (13.4:1). */
-.btn--cta {
+/* Pill buttons: Figtree Medium 14, sentence case */
+.btn--cta,
+.btn--outline {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 24px;
-  background: var(--brand-cta);
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 14px 22px;
+  border-radius: 1000px;
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: var(--font-medium);
+  line-height: 1.43;
+  text-transform: none;
+  text-align: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* The page's main action: white on Dark Red (13.4:1), Bridge Red on hover (7.5:1) */
+.btn--cta {
+  min-width: 224px;
+  min-height: 56px;
+  padding-inline: 24px;
+  background: var(--brand-button);
   color: var(--brand-on-dark);
-  font-size: 1.1875rem;
-  transition: background-color 0.2s;
+}
+
+.btn--cta svg {
+  width: 24px;
+  height: 24px;
 }
 
 .btn--cta:hover {
+  background: var(--brand-accent);
+  color: var(--brand-on-dark);
+  text-decoration: none;
+}
+
+/* Outlined: 2px Dark Red border and label; fills Dark Red with white text on hover */
+.btn--outline {
+  border: 2px solid var(--brand-button);
+  color: var(--brand-button);
+}
+
+.btn--outline:hover {
   background: var(--brand-button);
   color: var(--brand-on-dark);
   text-decoration: none;
+}
+
+/* Underlined Dark Red text link (Inter Regular 17/24) */
+.link-accent {
+  color: var(--brand-button);
+  font-weight: var(--font-regular);
+  line-height: 1.41;
 }
 
 /* ==========================================================================
@@ -478,7 +533,7 @@ body:not(.home) .contact-icons--header {
 @property --corner-x {
   syntax: "<length-percentage>";
   inherits: true;
-  initial-value: 50vw;
+  initial-value: 82vw;
 }
 
 .menu-corner,
@@ -488,8 +543,9 @@ body:not(.home) .contact-icons--header {
 }
 
 @media (width <= 767.98px) {
+  /* Same small corner everywhere, over the hero too; only opening the menu moves it */
   .site-header {
-    --corner-x: 50vw;
+    --corner-x: 82vw;
     --corner-stripe-width: 14px;
 
     transition:
@@ -497,10 +553,6 @@ body:not(.home) .contact-icons--header {
       background-color 0.3s;
   }
 
-  .site-header[data-past-hero],
-  body:not(.home) .site-header {
-    --corner-x: 82vw;
-  } /* small corner after the hero */
   .site-header[data-open] {
     --corner-x: -45vw;
   }
@@ -554,37 +606,10 @@ body:not(.home) .contact-icons--header {
     color: var(--brand-on-dark);
   }
 
-  /* Language and contact icons move into the menu */
-
-  /* Language lives in the menu. The contact icons stack above the burger on the hero only,
-     and fade out once the visitor scrolls past it (or opens the menu, which has its own). */
-  .site-header__tools .lang-switch {
-    display: none;
-  }
-
+  /* Language and contact icons live in the menu only; nothing sits above the burger */
+  .site-header__tools .lang-switch,
   .site-header__tools .contact-icons--header {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    right: calc(12px + var(--safe-right));
-    bottom: calc(64px + var(--safe-bottom));
-    z-index: 1;
-    gap: 0;
-    padding: 0;
-    background: none;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .site-header__tools .contact-icons--header a {
-    color: var(--brand-on-dark);
-  }
-
-  .site-header[data-past-hero] .contact-icons--header,
-  .site-header[data-open] .contact-icons--header,
-  body:not(.home) .contact-icons--header {
-    opacity: 0 !important;
-    visibility: hidden !important;
+    display: none;
   }
 
   /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
@@ -689,7 +714,7 @@ body:not(.home) .contact-icons--header {
   --photo-width: calc(var(--photo-height) * 0.5623);
 
   /* agent's left edge */
-  --photo-x: calc(50vw - var(--photo-width) - clamp(24px, 6vw, 120px));
+  --photo-x: calc(50vw - var(--photo-width) - clamp(24px, 6vw, 120px) - var(--safe-right));
 
   /* Slash: placed from the agent so it always passes just right of his hands. Hands reach about 88% of
      the photo's width, about 12% of its height above the bottom; the line leans right as it rises.
@@ -698,8 +723,8 @@ body:not(.home) .contact-icons--header {
     var(--photo-x) + var(--photo-width) * 0.8 - var(--photo-height) * 0.12 * tan(var(--slash-angle))
   );
   --red-width: 10px; /* Primary Red line: fixed on every screen */
-  --name-size: clamp(1.25rem, 1.8vw, 2rem);
-  --signature-width: clamp(88px, 8vw, 140px); /* kept smaller than the header logo */
+  --name-size: clamp(2rem, 3.7vw, 3.3rem);
+  --signature-width: clamp(88px, min(10vw, 16svh), 142px);
   --motion-end: calc(var(--hero-height) * 0.9); /* the hero has faded out by 90% of its scroll */
 
   /* hero photo top: cropped at the bottom when taller */
@@ -735,12 +760,20 @@ body:not(.home) .contact-icons--header {
   object-fit: cover;
 }
 
-/* Scrim between the image and the text */
+/* Scrim between the image and the text, after Figma's hero__before (62% black at the top), kept at
+   44% or more through the text so the white text passes AA (measured: 5:1 or better, see home tests),
+   then fading out at the bottom. One vertical gradient on every screen. */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in sRGB, var(--color-black) 62%, transparent) 10%,
+    color-mix(in sRGB, var(--color-black) 44%, transparent) 75%,
+    transparent 100%
+  );
 }
 
 .hero__inner {
@@ -768,36 +801,40 @@ body:not(.home) .contact-icons--header {
   margin-bottom: 12px;
 }
 
+/* Figtree throughout: name Medium, role Light, quote Regular with Bold words */
 .hero__name {
   margin: 0;
   font-size: var(--name-size);
+  font-weight: var(--font-medium);
+  line-height: 1.1;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .hero__role {
-  margin: 6px 0 0;
-  font-weight: var(--font-medium);
-  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-light);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.33;
   color: var(--brand-ink);
-}
-
-.hero__agency {
-  margin: 2px 0 0;
-  font-size: 0.95rem;
-  color: var(--brand-muted);
 }
 
 .hero__tagline {
-  margin: 8px 0 12px;
-  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
-  font-weight: var(--font-medium);
-  line-height: 1.35;
+  margin: clamp(24px, 6svh, 56px) 0 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 1.8vw, 1.62rem);
+  font-weight: var(--font-regular);
+  line-height: 1.2;
+  text-wrap: balance;
   color: var(--brand-ink);
 }
 
+.hero__tagline strong {
+  font-weight: var(--font-bold);
+}
+
 .hero__cta {
-  margin: 20px 0 0;
+  margin: clamp(20px, 4svh, 32px) 0 0;
 }
 
 .hero__photo,
@@ -874,7 +911,7 @@ body:not(.home) .contact-icons--header {
     --photo-height: min(var(--hero-height) * 0.62, var(--wrap) * 1.25);
     --photo-x: calc(var(--photo-width) * -0.62);
     --agent-top: calc(var(--header-height) + 8px);
-    --name-size: 1.25rem;
+    --name-size: 1.75rem;
     --signature-width: 80px;
 
     /* Band: vertical span and position. Its centre sits on the page centre. */
@@ -886,9 +923,14 @@ body:not(.home) .contact-icons--header {
     /* red stripe's right edge */
     --band-roff: calc(var(--band-off) + 40px * var(--slash-red-ratio));
 
-    /* About card: centred above the text, below the header, 9:16 */
+    /* About card: centred above the text, below the header and notch, 9:16. Sized to the small
+       viewport (Safari's toolbars shown) and kept above the home indicator, so it fits while held. */
     --about-top: calc(var(--header-height) + var(--safe-top));
-    --frame-width: min(var(--wrap), 360px, (var(--hero-height) - var(--frame-top) - 24px) * 9 / 16);
+    --frame-width: min(
+      var(--wrap),
+      360px,
+      (100svh - var(--frame-top) - 24px - var(--safe-bottom)) * 9 / 16
+    );
     --frame-height: calc(var(--frame-width) * 16 / 9);
   }
 
@@ -917,7 +959,7 @@ body:not(.home) .contact-icons--header {
 }
 
 /* Phones only: no agent in the hero (he appears directly in About). The side image fills the
-   hero, the name block sits mid-screen on the left in white over a dark scrim, and a short slash
+   hero, the name block is centred like on desktop, in white over a dark scrim, and a short slash
    rises from the bottom centre at the fixed 27.5° with solid Dark Red to its right. */
 @media (width <= 767.98px) {
   .stage {
@@ -935,34 +977,25 @@ body:not(.home) .contact-icons--header {
     --slash-right: calc(var(--slash-left) + 14px);
   }
 
-  /* Scrim: darkens the left of the photo so white text passes contrast on any image */
-  .hero::before {
-    background: linear-gradient(
-      to right,
-      color-mix(in sRGB, var(--color-black) 70%, transparent),
-      color-mix(in sRGB, var(--color-black) 35%, transparent) 60%,
-      transparent
-    );
-  }
-
   .hero__id {
-    inset: 50% auto auto 0;
-    translate: 0 -50%;
-    max-width: 100%;
-    text-align: left;
+    inset: 50% 0 auto;
+    transform: translateY(-50%);
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     color: var(--brand-on-dark);
   }
 
   .hero__name,
   .hero__tagline,
-  .hero__role,
-  .hero__agency {
+  .hero__role {
     color: var(--brand-on-dark);
   }
 
   .hero__signature {
-    margin-left: 0;
-    filter: invert(1);
+    margin: 0 0 12px;
   }
 }
 
@@ -984,47 +1017,39 @@ body:not(.home) .contact-icons--header {
     --band-height: calc(var(--hero-height) - var(--header-height) - var(--safe-top));
   }
 
-  /* At least 55% black under the text, whatever the image: white text then passes AA on it. Stops at the agent. */
-  .hero::before {
-    --text-end: calc(50% + var(--photo-x));
-
-    background:
-      linear-gradient(
-        to bottom,
-        color-mix(in sRGB, var(--color-black) 62%, transparent),
-        color-mix(in sRGB, var(--color-black) 55%, transparent) var(--header-height),
-        transparent calc(var(--header-height) + 120px)
-      ),
-      linear-gradient(
-        to right,
-        color-mix(in sRGB, var(--color-black) 72%, transparent),
-        color-mix(in sRGB, var(--color-black) 55%, transparent) var(--text-end),
-        transparent calc(var(--text-end) + var(--photo-width) * 0.4)
-      );
-  }
-
+  /* The text block is centred on the page (Figma: 14px left of centre). On narrower screens it moves
+     left so it never runs past the agent's left side (his photo has a transparent margin of about 12%). */
   .hero__inner {
     z-index: 6;
+    position: absolute;
+    inset: 0;
+    width: auto;
+    margin: 0;
+
+    --text-right: calc(50% + var(--photo-x) + var(--photo-width) * 0.12);
+    --text-width: min(32rem, var(--text-right) - var(--wrap-left));
+    --text-centre: min(50% - 14px, var(--text-right) - var(--text-width) / 2);
   }
 
   .hero__id {
-    left: 0;
-    right: auto;
-    bottom: clamp(48px, 14%, 160px);
-    max-width: min(34rem, 50vw + var(--photo-x) - var(--wrap-left) - 24px);
-    text-align: left;
+    inset: 46% auto auto var(--text-centre);
+    transform: translate(-50%, -50%); /* not translate: the scroll fade below animates that */
+    width: var(--text-width);
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .hero__signature {
-    margin-left: 0;
-    filter: invert(1);
+    margin: 0 0 clamp(8px, 3svh, 24px);
   }
 
   .hero__id,
   .hero__name,
   .hero__tagline,
-  .hero__role,
-  .hero__agency {
+  .hero__role {
     color: var(--brand-on-dark);
   }
 
@@ -1090,18 +1115,8 @@ body:not(.home) .contact-icons--header {
   }
 }
 
-@media (width >= 768px) and (width <= 1199.98px) {
-  .hero__id {
-    bottom: 40px;
-  }
-
-  .hero__name {
-    font-size: 1.125rem;
-  }
-}
-
 /* ==========================================================================
-   About: white. Desktop: the agent stays where he stood in the hero, text on his left.
+   About: white. Desktop: the agent stays where he stood in the hero, text on his left, right-aligned.
    Phones: his picture in a card above the text.
    ========================================================================== */
 .about,
@@ -1122,16 +1137,17 @@ body:not(.home) .contact-icons--header {
   row-gap: 32px;
 }
 
+/* Outside the text container: on desktop the card is placed against About itself */
 .about__card {
-  justify-self: center;
+  position: relative;
+  margin-inline: auto;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   overflow: hidden;
   width: var(--frame-width);
   height: var(--frame-height);
-  background: var(--color-charcoal) var(--backdrop, var(--grain)) center /
-    var(--backdrop-size, 180px);
+  background: var(--backdrop, none) center / cover; /* no panel unless the CMS sets a backdrop */
 }
 
 .about__card img {
@@ -1140,8 +1156,26 @@ body:not(.home) .contact-icons--header {
   max-width: none;
 }
 
-.about__body {
-  max-width: 68ch;
+.about__body h2 {
+  margin-bottom: clamp(24px, 6svh, 56px);
+}
+
+.about__line {
+  margin: 0 0 clamp(16px, 3svh, 32px);
+}
+
+.about__actions {
+  margin: 0;
+}
+
+.about__contact {
+  list-style: none;
+  padding: 0;
+  margin: clamp(32px, 10svh, 140px) 0 0;
+  display: grid;
+  gap: 4px;
+  color: var(--brand-muted);
+  text-align: left;
 }
 
 @media (width >= 768px) {
@@ -1171,113 +1205,200 @@ body:not(.home) .contact-icons--header {
   }
 
   .about__body {
-    max-width: min(68ch, 50vw + var(--photo-x) - var(--wrap-left) - 48px);
+    width: min(43rem, 50vw + var(--photo-x) - var(--wrap-left) - 64px);
+    text-align: right;
   }
-}
-
-.about__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 32px;
-}
-
-.about__contact {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
-  display: grid;
-  gap: 4px;
-  color: var(--brand-muted);
 }
 
 .stage__track {
   display: none;
 }
 
+/* The agent's photo, with the paramedic photo and the agent again stacked on it. The extra layers
+   only show with scroll-driven motion (Motion, below). Each layer clips its photo, so
+   moving the layer one way and its photo the other way sweeps a straight edge across a still picture. */
+.agent-photos__layer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.agent-photos__layer--paramedic,
+.agent-photos__layer--return {
+  display: none;
+  position: absolute;
+  inset: 0;
+}
+
 /* ==========================================================================
-   Services: white. Three columns split by slashes; stacked with plain lines on phones.
+   Services: white. Desktop: two rows; one continuous slash at the fixed 27.5° runs through both,
+   crossing the row boundary at the page centre. The looking row has its photo right of the slash,
+   the selling row left of it. A solid Dark Blue band covers the cut. Phones: image, then text.
    ========================================================================== */
 .services {
   background: var(--brand-surface);
 }
 
-/* Subgrid keeps titles, texts and buttons aligned across the three columns */
 .services__list {
-  --svc-gap: clamp(64px, 7vw, 104px);
-
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: auto auto auto auto;
-  column-gap: var(--svc-gap);
 }
 
-.service {
-  position: relative;
-  display: grid;
-  grid-row: span 4;
-  grid-template-rows: subgrid;
+.service__media img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
 }
 
 .service__title {
-  margin: 0 0 12px;
-  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  margin: 0 0 16px;
+  font-size: clamp(1.5rem, 2.45vw, 2.1875rem);
+  font-weight: var(--font-regular);
+  line-height: 1.15;
 }
 
 .service__text {
-  margin: 0 0 24px;
+  margin: 0 0 clamp(24px, 4vw, 56px);
 }
 
-.service__actions {
+.service__links {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  margin: 0 0 clamp(24px, 4vw, 64px);
+  line-height: 1.3;
 }
 
-.service__more {
-  justify-self: start;
-  margin-top: 16px;
-  font-weight: var(--font-medium);
+.service__links a {
+  font-weight: var(--font-regular);
 }
 
-/* Slash between titles: 20px, Primary Red 1/4 + Dark Red 3/4, fixed angle (skew keeps vertical lines at the slash angle) */
-.service + .service::before {
-  content: "";
-  position: absolute;
-  top: -14px;
-  left: calc(var(--svc-gap) / -2 - 10px);
-  width: 20px;
-  height: 64px;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-red) calc(var(--slash-red-ratio) * 100%),
-    var(--color-dark-red) 0
-  );
-  transform: skewX(calc(var(--slash-angle) * -1));
+.service__action {
+  margin: 0;
 }
 
 @media (width <= 767.98px) {
   .services__list {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    row-gap: 72px;
+    display: grid;
+    gap: 56px;
+  }
+
+  .service__media {
+    margin-bottom: 24px;
+    aspect-ratio: 16 / 9;
+    background: var(--brand-placeholder);
+  }
+
+  .service__media:empty {
+    display: none;
+  }
+
+  .service__content {
+    width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
+    margin-left: var(--wrap-left);
+  }
+}
+
+@media (width >= 768px) {
+  .services {
+    position: relative;
+  }
+
+  /* The heading sits in the white top-left corner of the first row */
+  .services__head {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    margin-top: 0;
+    pointer-events: none;
+  }
+
+  .services__list {
+    --row-height: clamp(440px, 42vw, 640px);
+    --lean: calc(var(--row-height) * tan(var(--slash-angle)));
+    --band: 14px;
   }
 
   .service {
-    grid-row: auto;
-    grid-template-rows: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: var(--row-height);
   }
 
-  /* Plain horizontal divider, not a rotated slash */
-  .service + .service::before {
-    top: -38px;
-    left: 0;
-    width: 64px;
-    height: 4px;
-    transform: none;
+  .service__media {
+    position: absolute;
+    inset: 0;
+    background: var(--brand-placeholder);
+  }
+
+  .service::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--color-dark-blue);
+    pointer-events: none;
+  }
+
+  .service__content {
+    position: relative;
+    z-index: 2;
+    padding-block: 48px;
+  }
+
+  /* Looking: text left, photo right of the slash. The slash runs from 50% + lean at the top to 50% at the bottom.
+     Each photo box covers its side of the slash only, so the picture is not over-cropped. */
+  .service--search .service__media {
+    left: 50%;
+    clip-path: polygon(var(--lean) 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .service--search::after {
+    clip-path: polygon(
+      calc(50% + var(--lean) - var(--band) / 2) 0,
+      calc(50% + var(--lean) + var(--band) / 2) 0,
+      calc(50% + var(--band) / 2) 100%,
+      calc(50% - var(--band) / 2) 100%
+    );
+  }
+
+  .service--search .service__content {
+    width: min(33.25rem, 50% - var(--wrap-left) - 48px);
+    margin-left: var(--wrap-left);
+  }
+
+  /* Selling: photo left of the slash (50% at the top to 50% - lean at the bottom), text right-aligned on the right */
+  .service--sell .service__media {
+    right: 50%;
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--lean)) 100%, 0 100%);
+  }
+
+  .service--sell::after {
+    clip-path: polygon(
+      calc(50% - var(--band) / 2) 0,
+      calc(50% + var(--band) / 2) 0,
+      calc(50% - var(--lean) + var(--band) / 2) 100%,
+      calc(50% - var(--lean) - var(--band) / 2) 100%
+    );
+  }
+
+  .service--sell .service__content {
+    align-self: end;
+    width: min(33.25rem, 50% - var(--gutter) - 48px);
+    margin-right: var(--wrap-left); /* mirrors the first row's left margin */
+    text-align: right;
+  }
+
+  .service--sell .service__links {
+    align-items: flex-end;
   }
 }
 
@@ -1338,35 +1459,37 @@ body:not(.home) .contact-icons--header {
    ========================================================================== */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 40px clamp(24px, 3vw, 46px);
+  margin-bottom: 40px;
 }
 
+/* The photo and a Dark Charcoal panel with white text (15.9:1); the "more info" link sits under the panel */
 .card {
   position: relative;
-  background: var(--brand-surface);
-  border-radius: var(--brand-radius);
-  overflow: hidden;
-  box-shadow: 0 1px 3px var(--brand-shadow);
-  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.card:hover {
-  box-shadow: 0 8px 24px var(--brand-shadow-strong);
-}
-
-/* After the button and card rules so it wins at equal specificity */
-@media (prefers-reduced-motion: reduce) {
-  .btn,
-  .btn--cta,
-  .card {
-    transition: none;
-  }
+.card__media,
+.card__body {
+  align-self: stretch;
 }
 
 .card__media {
   position: relative;
+  background: var(--color-charcoal);
+}
+
+/* The photo fades into the panel over its lower 70px */
+.card__media::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 70px;
+  background: linear-gradient(to bottom, transparent, var(--color-charcoal));
+  pointer-events: none;
 }
 
 .card__img {
@@ -1377,8 +1500,11 @@ body:not(.home) .contact-icons--header {
   background: var(--brand-placeholder);
 }
 
+/* Above the photo's fade, but clicks go through to the card's link */
 .card__status {
   position: absolute;
+  z-index: 1;
+  pointer-events: none;
   top: 12px;
   left: 12px;
   padding: 2px 12px;
@@ -1389,19 +1515,23 @@ body:not(.home) .contact-icons--header {
 }
 
 .card__body {
-  padding: 16px;
+  padding: 24px 21px;
+  background: var(--color-charcoal);
+  color: var(--brand-on-dark);
 }
 
 .card__number {
   margin: 0;
-  color: var(--brand-muted);
   font-size: 0.875rem;
+  line-height: 1.2;
 }
 
 .card__title {
-  margin: 8px 0 2px;
+  margin: 36px 0 6px;
+  color: inherit;
   font-size: 1rem;
-  line-height: 1.5;
+  font-weight: var(--font-bold);
+  line-height: 1.25;
 }
 
 .card__title a,
@@ -1427,27 +1557,26 @@ body:not(.home) .contact-icons--header {
 
 .card__meta {
   margin: 0;
-  color: var(--brand-muted);
   font-size: 0.75rem;
+  line-height: 1.3;
 }
 
 .card__price {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
+  font-family: var(--font-heading);
   font-size: 1.1875rem;
-  line-height: 1.3;
+  line-height: 1.25;
   font-weight: var(--font-bold);
-  color: var(--brand-price);
 }
 
 .card__facts {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 14px;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   list-style: none;
   font-size: 0.75rem;
-  font-weight: var(--font-medium);
 }
 
 .card__facts li {
@@ -1458,7 +1587,6 @@ body:not(.home) .contact-icons--header {
 
 .card__icon {
   display: inline-flex;
-  color: var(--brand-muted);
 }
 
 .card__icon svg {
@@ -1466,63 +1594,57 @@ body:not(.home) .contact-icons--header {
   height: 18px;
 }
 
-/* Above the title link stretched over the card. The button needs JS; without it, the noscript link shows. */
+/* Above the title link stretched over the card. The button needs JS; without it, the noscript link shows.
+   Looks like a link: phone icon and underlined Dark Red text. */
 .card__more {
   position: relative;
   z-index: 1;
   display: inline-flex;
   align-items: center;
+  gap: 12px;
   min-height: 44px;
-  margin-top: 12px;
-  padding: 8px 16px;
-  border: 1px solid var(--brand-button);
-  border-radius: var(--brand-radius);
-  background: var(--brand-surface);
+  margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--brand-button);
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: var(--font-bold);
-  text-decoration: none;
+  font-weight: var(--font-regular);
+  line-height: 1.41;
+  text-align: left;
   cursor: pointer;
 }
 
+.card__more svg {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: var(--brand-ink);
+}
+
+.card__more span {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .card__more:hover {
-  background: var(--brand-button);
-  color: var(--brand-on-dark);
+  color: var(--brand-link-hover);
 }
 
 html:not(.js) button.card__more {
   display: none;
 }
 
-@media (width <= 767.98px) {
-  .cards {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+.properties__all {
+  margin: 0;
+}
 
-  .card {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-  }
-
-  .card__img {
-    height: 100%;
-    aspect-ratio: auto;
-    min-height: 104px;
-  }
-
-  .card__status {
-    top: 8px;
-    left: 8px;
-  }
-
-  .card__body {
-    padding: 12px;
-  }
-
-  .card__title {
-    margin-top: 4px;
+/* After the button and card rules so it wins at equal specificity */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn--cta,
+  .btn--outline {
+    transition: none;
   }
 }
 
@@ -1653,7 +1775,7 @@ html:not(.js) button.card__more {
   [data-reveal="in"],
   [data-reveal]:focus-within {
     opacity: 1;
-    translate: none;
+    translate: 0 0;
   }
 
   [data-reveal="in"] {
@@ -1662,11 +1784,63 @@ html:not(.js) button.card__more {
 }
 
 /* ==========================================================================
-   Motion. Scroll-driven animations (Chrome, Edge, Safari 26+); other browsers and
-   reduced-motion users get the static layout above.
+   Motion. Scroll-driven animations (Chrome, Edge, Safari 26+), CSS only. Browsers without every
+   feature used here (scroll timelines and timeline-scope), and reduced-motion users, get the static
+   layout above: all text shown, agent photo only. Only opacity and translate animate.
+
+   About tells the story in three parts while the agent photo stays put:
+     part 1  agent photo
+     part 2  the paramedic photo wipes in from the right and covers him
+     part 3  the agent photo wipes back in from the left
+   Desktop: About is three screens tall with its text held on screen; each part fades in with its photo.
+   Phones: the photo card holds under the header during the swaps, then the whole text appears at once.
    ========================================================================== */
-@supports (animation-timeline: view()) {
+@supports (animation-timeline: view()) and (timeline-scope: --about) {
   @media (prefers-reduced-motion: no-preference) {
+    .stage {
+      timeline-scope: --about;
+    }
+
+    /* One range for the whole swap (--range-story): the paramedic wipes in over its first 40%,
+       holds, and the agent wipes back over its last 40%. Each wipe also hides the outgoing photo
+       behind the edge, so neither silhouette shows around the other. */
+    .agent-photos:has(.agent-photos__layer--paramedic)
+      :is(.agent-photos__layer, .agent-photos__layer > img) {
+      animation-timeline: --about;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-range: var(--range-story);
+    }
+
+    .agent-photos__layer--paramedic,
+    .agent-photos__layer--return {
+      display: flex;
+    }
+
+    .agent-photos__layer--agent {
+      animation-name: agent-frame;
+    }
+
+    .agent-photos__layer--agent > img {
+      animation-name: agent-image;
+    }
+
+    .agent-photos__layer--paramedic {
+      animation-name: paramedic-frame;
+    }
+
+    .agent-photos__layer--paramedic > img {
+      animation-name: paramedic-image;
+    }
+
+    .agent-photos__layer--return {
+      animation-name: return-frame;
+    }
+
+    .agent-photos__layer--return > img {
+      animation-name: return-image;
+    }
+
     @media (width >= 768px) {
       /* The slashes, the image and its scrim fade in place to the page's white */
       .hero__band,
@@ -1688,6 +1862,8 @@ html:not(.js) button.card__more {
          scrolls up with it. The hero photo and the About card stay invisible and only hold his place. */
       .stage {
         position: relative;
+
+        --range-story: contain 15% contain 85%;
       }
 
       /* The hero holds still and fades in place while About scrolls over it (About is see-through,
@@ -1700,6 +1876,51 @@ html:not(.js) button.card__more {
 
       .about {
         background: none;
+        view-timeline: --about;
+      }
+
+      /* Three screens: one to arrive, two for the story. The text holds on screen meanwhile.
+         Only where the text fits on screen: on short screens (phones in landscape) it scrolls
+         normally, all shown, while the photos still swap. */
+      @media (height >= 600px) {
+        .about {
+          display: block;
+          align-content: normal; /* block containers honour align-content too: keep the text at the top */
+          height: calc(var(--hero-height) * 3);
+          padding: 0;
+        }
+
+        .about__inner {
+          position: sticky;
+          top: 0;
+          height: var(--hero-height);
+          align-content: center;
+          padding-block: calc(var(--header-height) + var(--safe-top))
+            calc(24px + var(--safe-bottom));
+        }
+
+        [data-story-step] {
+          animation: story-in linear both;
+          animation-timeline: --about;
+        }
+
+        /* A link reached with the keyboard shows at once, even before its part of the story */
+        [data-story-step]:focus-within {
+          animation: none;
+        }
+
+        [data-story-step="1"] {
+          animation-range: entry 50% entry 100%;
+        }
+
+        /* Each part fades in as its photo starts to sweep in */
+        [data-story-step="2"] {
+          animation-range: contain 15% contain 28%;
+        }
+
+        [data-story-step="3"] {
+          animation-range: contain 57% contain 70%;
+        }
       }
 
       .stage__track {
@@ -1721,11 +1942,36 @@ html:not(.js) button.card__more {
         position: absolute;
         top: var(--agent-top);
         left: calc(50% + var(--photo-x));
+        width: var(--photo-width);
+        height: var(--photo-height);
       }
 
       .hero__photo,
       .about__card {
         visibility: hidden;
+      }
+    }
+
+    @media (width <= 767.98px) {
+      .stage {
+        --range-story: contain 5% contain 95%;
+      }
+
+      /* Taller than the card by a little more than a screen: the card holds under the header meanwhile */
+      .about__media {
+        height: calc(var(--frame-height) + 120svh);
+        view-timeline: --about;
+      }
+
+      .about__card {
+        position: sticky;
+        top: calc(var(--header-height) + var(--safe-top) + 16px);
+      }
+
+      .about__body {
+        animation: story-in linear both;
+        animation-timeline: view();
+        animation-range: entry 40px entry 240px;
       }
     }
   }
@@ -1739,9 +1985,99 @@ html:not(.js) button.card__more {
 
 /* visibility: hidden at the end takes the invisible links out of the tab order */
 @keyframes id-out {
+  from {
+    translate: 0 0;
+  }
+
   to {
     opacity: 0;
     translate: 0 -80px;
     visibility: hidden;
+  }
+}
+
+@keyframes story-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Every keyframe states its translate as a value, never "none" or left implicit: iOS 26 Safari runs
+   scroll-driven animations off the main thread and crashes blending "none" with a value. */
+
+/* Story swap (see Motion). Percentages of --range-story: paramedic in from the right over 0-40%, hold,
+   agent back from the left over 60-100%. A layer moving one way while its photo moves the other keeps the
+   photo still and sweeps one straight edge across it. */
+@keyframes agent-frame {
+  0% {
+    translate: 0 0;
+  }
+
+  40%,
+  100% {
+    translate: -100% 0;
+  }
+}
+
+@keyframes agent-image {
+  0% {
+    translate: 0 0;
+  }
+
+  40%,
+  100% {
+    translate: 100% 0;
+  }
+}
+
+@keyframes paramedic-frame {
+  0%,
+  100% {
+    translate: 100% 0;
+  }
+
+  40%,
+  60% {
+    translate: 0 0;
+  }
+}
+
+@keyframes paramedic-image {
+  0%,
+  100% {
+    translate: -100% 0;
+  }
+
+  40%,
+  60% {
+    translate: 0 0;
+  }
+}
+
+@keyframes return-frame {
+  0%,
+  60% {
+    translate: -100% 0;
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes return-image {
+  0%,
+  60% {
+    translate: 100% 0;
+  }
+
+  100% {
+    translate: 0 0;
   }
 }

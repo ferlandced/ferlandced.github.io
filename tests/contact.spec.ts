@@ -63,9 +63,18 @@ for (const lang of languages) {
       await expect(popup).toHaveJSProperty("open", false);
       const dialog = page.locator(`#dialog-${option.form}`);
       await expect(dialog).toHaveJSProperty("open", true);
-      const intent = dialog.locator('input[name="intent"]');
-      if (await intent.count()) {
-        await expect(intent).toHaveValue(option.intent || "");
+      // A hidden intent field (estimation) holds the intent; radios (property alert) have it picked
+      const hidden = dialog.locator('input[type="hidden"][name="intent"]');
+      const radios = dialog.locator('input[type="radio"][name="intent"]');
+      if (await hidden.count()) {
+        await expect(hidden).toHaveValue(option.intent || "");
+      } else if (await radios.count()) {
+        const picked = dialog.locator('input[name="intent"]:checked');
+        if (option.intent) {
+          await expect(picked).toHaveValue(option.intent);
+        } else {
+          await expect(picked).toHaveCount(0);
+        }
       }
     });
 

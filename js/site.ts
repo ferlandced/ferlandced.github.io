@@ -31,12 +31,12 @@
 })();
 
 // Home page blocks fade in and rise into place as their section arrives, on a timer like Apple's
-// product pages, and then stay. Blocks side by side (Services columns, a row of cards) appear
-// together, and each row starts a step after the previous one. Without JS or with reduced motion
-// everything just shows (see [data-reveal] in site.css).
+// product pages, and then stay. Blocks side by side (a row of cards) appear together, and each row
+// starts a step after the previous one. About is driven by the scroll instead (css/site.css, Motion).
+// Without JS or with reduced motion everything just shows (see [data-reveal] in site.css).
 (() => {
   const STEP_MS = 150;
-  const stacks = ".about__body, .service";
+  const stacks = ".service__content";
   const singles =
     "#services-heading, #properties-heading, .properties .card, .properties .container > p";
 

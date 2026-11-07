@@ -4,11 +4,23 @@
   <input type="hidden" name="access_key" value="ff2d76e3-ab1e-4f77-9bc7-df314f30fe08">
   <input type="hidden" name="form_type" value="property_alert">
   <input type="hidden" name="subject" value="Inscription à l'alerte immobilière" data-subject-location="Recherche de logement à louer">
-  <input type="hidden" name="intent" value="">
   <input type="hidden" name="from_name" value="Site web Cedrik Ferland">
   <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 
   <p class="form-progress" data-progress hidden>Étape <span data-current></span> sur <span data-total></span></p>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">Vous cherchez à acheter ou à louer?</h2>
+    <fieldset class="form-tiles form-tiles--intent">
+      <legend class="visually-hidden">Achat ou location</legend>
+      <label for="pa-intent-achat"><input id="pa-intent-achat" type="radio" name="intent" value="achat" required> <span data-icon="house" aria-hidden="true"></span> Acheter</label>
+      <label for="pa-intent-location"><input id="pa-intent-location" type="radio" name="intent" value="location" required> <span data-icon="key-round" aria-hidden="true"></span> Louer</label>
+    </fieldset>
+    <div class="form-actions">
+      <a class="form-cancel" href="/fr/" data-close>Annuler</a>
+      <button type="button" data-next>Suivant <span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </div>
+  </section>
 
   <section class="form-step" data-step>
     <h2 tabindex="-1">Vos coordonnées</h2>
@@ -40,13 +52,13 @@
     </div>
     <label class="form-consent" for="pa-consent"><input id="pa-consent" type="checkbox" name="consent" value="yes" required> <span>J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la <a href="{{ site.pages.privacy.fr }}">politique de confidentialité</a>.</span></label>
     <div class="form-actions">
-      <a class="form-cancel" href="/fr/" data-close>Annuler</a>
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> Précédent</button>
       <button type="button" data-next>Suivant <span data-icon="arrow-right" aria-hidden="true"></span></button>
     </div>
   </section>
 
   <section class="form-step" data-step>
-    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Où désirez-vous acheter?</h2>
+    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> Où désirez-vous <span data-when-intent="achat">acheter</span><span data-when-intent="location">louer</span>?</h2>
     <p class="form-hint">Choisissez une ou plusieurs régions et villes.</p>
     <div class="form-tabs" role="tablist" aria-label="Régions" data-tabs hidden>
       <button type="button" role="tab" id="pa-tab-montreal-ile" aria-controls="pa-region-montreal-ile">Montréal (île)</button>
@@ -176,11 +188,11 @@
       <legend class="visually-hidden"><span data-icon="wallet" aria-hidden="true"></span> Budget</legend>
       <div class="form-row">
         <div class="form-field">
-          <label for="pa-budget-min">Minimum ($)</label>
+          <label for="pa-budget-min"><span data-when-intent="achat">Minimum ($)</span><span data-when-intent="location">Loyer minimum ($ par mois)</span></label>
           <div class="form-affix"><input id="pa-budget-min" name="budget_min" type="number" inputmode="numeric" min="0" step="1"><span class="form-affix__unit" aria-hidden="true">$</span></div>
         </div>
         <div class="form-field">
-          <label for="pa-budget-max">Maximum ($)</label>
+          <label for="pa-budget-max"><span data-when-intent="achat">Maximum ($)</span><span data-when-intent="location">Loyer maximum ($ par mois)</span></label>
           <div class="form-affix"><input id="pa-budget-max" name="budget_max" type="number" inputmode="numeric" min="0" step="1" data-gte="budget_min" data-gte-message="Le budget maximum doit être égal ou supérieur au budget minimum."><span class="form-affix__unit" aria-hidden="true">$</span></div>
         </div>
       </div>

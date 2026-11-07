@@ -595,6 +595,32 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   }
 }
 
+/* Wording that depends on buy or rent: the buy text by default, the rent text once Rent is
+   checked. Pure CSS, so it works without JS too. */
+[data-when-intent="location"] {
+  display: none;
+}
+
+.form--property-alert:has(input[name="intent"][value="location"]:checked) {
+  [data-when-intent="achat"] {
+    display: none;
+  }
+
+  [data-when-intent="location"] {
+    display: inline;
+  }
+}
+
+/* Buy or rent: two large tiles side by side on every screen */
+.form-tiles.form-tiles--intent {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-tiles.form-tiles--intent > label {
+  min-height: 72px;
+  font-size: 1rem;
+}
+
 /* Segmented control: one choice among a few short values (rooms, parking, pool). The radio is hidden; the label is the segment. */
 .form-segments {
   display: flex;
@@ -826,4 +852,8 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
 
 [data-icon="trees"] {
   --icon: url("../images/icons/trees.svg");
+}
+
+[data-icon="key-round"] {
+  --icon: url("../images/icons/key-round.svg");
 }

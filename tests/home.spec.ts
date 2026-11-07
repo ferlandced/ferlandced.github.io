@@ -1,4 +1,4 @@
-// Home page content: hero, contact links, About, service buttons and info links,
+// Home page content: hero, contact links, About and its story, service buttons and info links,
 // the property cards, and the reduced-motion layout.
 import type { Locator, Page } from "@playwright/test";
 import { test, expect, present } from "./support/fixtures.ts";
@@ -27,16 +27,20 @@ for (const lang of languages) {
       await page.goto(`${lang}/`);
     });
 
-    test("hero shows the agent, the agency and the tagline", async ({ page }) => {
+    test("hero shows the agent, his title and the tagline with its bold words", async ({
+      page,
+    }) => {
+      const tagline = copyFor(lang).hero.tagline;
       await expect(page.locator("h1")).toHaveText(agent.name);
-      await expect(page.locator(".hero__tagline")).toHaveText(copyFor(lang).hero.tagline);
+      await expect(page.locator(".hero__tagline")).toHaveText(tagline.replaceAll("**", ""));
+      const bold = [...tagline.matchAll(/\*\*(.+?)\*\*/g)].map((match) => match[1]);
+      expect(bold.length, "the tagline has bold words").toBeGreaterThan(0);
+      await expect(page.locator(".hero__tagline strong")).toHaveText(bold as string[]);
       await expect(page.locator(".hero__role")).toHaveText(agent.title[lang]);
-      await expect(page.locator(".hero__agency")).toHaveText(
-        [copyFor(lang).hero.agency, copyFor(lang).hero.area].filter(Boolean).join(", "),
-      );
+      await expect(page.locator(".hero__agency")).toHaveCount(0);
     });
 
-    test("hero has one action: the contact popup, from a red button with an icon", async ({
+    test("hero has one action: the contact popup, from a Dark Red pill with an icon", async ({
       page,
     }) => {
       const action = page.locator(".hero a");
@@ -44,16 +48,11 @@ for (const lang of languages) {
       await expect(action).toHaveText(copyFor(lang).hero.cta);
       await expect(action).toHaveAttribute("href", url(site.pages.contact[lang]));
       await expect(action.locator("svg")).toBeVisible();
-      await expect(action).toHaveCSS("background-color", "rgb(255, 18, 0)");
-      await expect(action).toHaveCSS("color", "rgb(255, 255, 255)");
-      const size = await action.evaluate((element) =>
-        parseFloat(getComputedStyle(element).fontSize),
+      await expect(action, "Dark Red: white text passes AA at any size").toHaveCSS(
+        "background-color",
+        "rgb(102, 0, 0)",
       );
-      expect(
-        size,
-        "large text: white on Primary Red passes AA only from 18.66px bold",
-      ).toBeGreaterThanOrEqual(18.66);
-      await expect(action).toHaveCSS("font-weight", "700");
+      await expect(action).toHaveCSS("color", "rgb(255, 255, 255)");
 
       await action.click();
       const popup = page.locator("#dialog-contact");
@@ -90,45 +89,53 @@ for (const lang of languages) {
       expect(follows).toBe("services");
     });
 
-    test("each service links to its information page", async ({ page }) => {
-      for (const id of ["buy", "sell", "rent"] as const) {
-        const more = page.locator(`.service--${id} .service__more`);
-        await expect(more).toHaveAttribute("href", url(site.pages[id][lang]));
-        await expect(more).toHaveText(copyFor(lang).services[id].more);
+    test("two services: looking (buy or rent) and selling, each linking to its information pages", async ({
+      page,
+    }) => {
+      const services = copyFor(lang).services;
+      await expect(page.locator(".service")).toHaveCount(2);
+      const expected = {
+        search: [
+          ["buy", services.search.moreBuy],
+          ["rent", services.search.moreRent],
+        ],
+        sell: [["sell", services.sell.more]],
+      } as const;
+      for (const [id, links] of Object.entries(expected)) {
+        await expect(page.locator(`.service--${id} .service__title`)).toHaveText(
+          textAt(services, `${id}.title`),
+        );
+        const anchors = page.locator(`.service--${id} .service__links a`);
+        await expect(anchors).toHaveCount(links.length);
+        for (const [index, [pageKey, label]] of links.entries()) {
+          await expect(anchors.nth(index)).toHaveAttribute("href", url(site.pages[pageKey][lang]));
+          await expect(anchors.nth(index)).toHaveText(label);
+        }
       }
     });
 
-    test("service buttons point to the form pages and open the matching dialog", async ({
+    test("service buttons point to the form pages and open the matching dialog, no intent", async ({
       page,
     }) => {
-      // Per service: each button's form and, for rentals, its intent
-      const expected: Record<string, [form: string, intent?: string][]> = {
-        buy: [["propertyAlert"]],
-        sell: [["estimation"]],
-        rent: [
-          ["propertyAlert", "location"],
-          ["estimation", "location"],
-        ],
-      };
-      for (const [id, actions] of Object.entries(expected)) {
-        const links = page.locator(`.service--${id} .service__actions a`);
-        await expect(links).toHaveCount(actions.length);
-        for (const [index, [key, intent]] of actions.entries()) {
-          await expect(links.nth(index)).toHaveAttribute(
-            "href",
-            url(pageUrl(key, lang)) + (intent ? `?intent=${intent}` : ""),
-          );
-          await expect(links.nth(index)).toHaveAttribute("data-dialog", `dialog-${key}`);
-          if (intent) {
-            await expect(links.nth(index)).toHaveAttribute("data-intent", intent);
-          } else {
-            await expect(links.nth(index)).not.toHaveAttribute("data-intent", /.*/);
-          }
-          await expect(links.nth(index)).toHaveText(
-            textAt(copyFor(lang).services, `${id}.action${index + 1}.label`),
-          );
-        }
+      for (const [id, key] of [
+        ["search", "propertyAlert"],
+        ["sell", "estimation"],
+      ] as const) {
+        const button = page.locator(`.service--${id} .service__action a`);
+        await expect(button).toHaveCount(1);
+        await expect(button).toHaveAttribute("href", url(pageUrl(key, lang)));
+        await expect(button).toHaveAttribute("data-dialog", `dialog-${key}`);
+        await expect(button).not.toHaveAttribute("data-intent", /.*/);
+        await expect(button).toHaveText(textAt(copyFor(lang).services, `${id}.action`));
       }
+    });
+
+    test("About tells the story in three parts, in reading order", async ({ page }) => {
+      await expect(page.locator(".about__line")).toHaveText([
+        agent.story_introduction[lang],
+        agent.story_paramedic[lang],
+        agent.story_today[lang],
+      ]);
     });
   });
 }
@@ -167,6 +174,7 @@ for (const lang of languages) {
       }
       const more = card.locator("button[data-property-info]");
       await expect(more).toHaveText(copyFor(lang).properties.moreInfo);
+      await expect(more.locator("svg"), "phone icon").toHaveCount(1);
       await expect(more).toHaveAttribute(
         "aria-label",
         new RegExp(
@@ -176,9 +184,8 @@ for (const lang of languages) {
       await card.scrollIntoViewIfNeeded();
       const onButton = await more.evaluate((element) => {
         const rect = element.getBoundingClientRect();
-        return (
-          document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2) === element
-        );
+        const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        return hit !== null && element.contains(hit);
       });
       expect(onButton, "the button sits above the stretched link").toBe(true);
       const hit = await card.locator(".card__media").evaluate((element) => {
@@ -190,6 +197,13 @@ for (const lang of languages) {
     }
   });
 }
+
+test("the link to all properties shows only with more than the 6 cards on the home page", async ({
+  page,
+}) => {
+  await page.goto("fr/");
+  await expect(page.locator(".properties__all")).toHaveCount(listings.length > 6 ? 1 : 0);
+});
 
 test.describe("desktop hero", () => {
   test.skip(({ isMobile }) => isMobile, "desktop only");
@@ -216,8 +230,16 @@ test.describe("desktop hero", () => {
 
       const text = await box(".hero__id");
       const agent = await box(".hero__photo");
-      expect(text.x + text.width, "text ends before the agent").toBeLessThanOrEqual(agent.x);
+      // The photo has a transparent margin of about 12% of its width on the left
+      expect(text.x + text.width, "text ends before the agent").toBeLessThanOrEqual(
+        agent.x + agent.width * 0.12 + 1,
+      );
+      expect(text.x, "text stays inside the content area").toBeGreaterThanOrEqual(0);
       expect(agent.x + agent.width).toBeLessThanOrEqual(width);
+      const textCentre = text.x + text.width / 2;
+      if (width >= 1440) {
+        expect(Math.abs(textCentre - (width / 2 - 14)), "centred on the page").toBeLessThan(2);
+      }
 
       const zIndexOf = (selector: string) =>
         page.locator(selector).evaluate((element) => Number(getComputedStyle(element).zIndex));
@@ -289,7 +311,7 @@ test.describe("desktop hero", () => {
     const at = async (y: number) => {
       await scrollToY(page, y);
       return Promise.all([
-        boxOf(".stage__agent img"),
+        boxOf(".stage__agent .agent-photos__layer--agent img"),
         boxOf(".about__card"),
         boxOf(".about__body"),
       ]);
@@ -332,13 +354,139 @@ test.describe("desktop hero", () => {
 
 test("every section after the hero is on white, none on cream", async ({ page }) => {
   await page.goto("fr/");
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator("body > main")).toHaveCSS("background-color", "rgb(255, 255, 255)");
   for (const id of ["#about", "#services", "#properties"]) {
     const color = await page
       .locator(id)
       .evaluate((element) => getComputedStyle(element).backgroundColor);
     expect(["rgb(255, 255, 255)", "rgba(0, 0, 0, 0)"], id).toContain(color);
   }
+});
+
+test("the body is dark over the hero and white past it, for the iOS Safari bars", async ({
+  page,
+}) => {
+  await page.goto("fr/");
+  const body = page.locator("body");
+  await expect(body).toHaveCSS("background-color", "rgb(35, 35, 35)");
+  await page.evaluate(() => {
+    window.scrollTo({ top: innerHeight * 3, behavior: "instant" });
+  });
+  await expect(page.locator(".site-header")).toHaveAttribute("data-past-hero", "");
+  await expect(body).toHaveCSS("background-color", "rgb(255, 255, 255)");
+});
+
+test("hero text passes AA against the photo and its scrim, measured on the pixels behind it", async ({
+  page,
+}) => {
+  await page.goto("fr/");
+  await page.evaluate(() => document.fonts.ready);
+  const parts = [".hero__name", ".hero__role", ".hero__tagline"];
+  const boxes = await page.evaluate(
+    (selectors) =>
+      selectors.map((selector) => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          throw new Error(`Missing ${selector}`);
+        }
+        const rect = element.getBoundingClientRect();
+        const size = parseFloat(getComputedStyle(element).fontSize);
+        const bold = Number(getComputedStyle(element).fontWeight) >= 700;
+        // WCAG large text: 24px, or 18.66px bold
+        const needed = size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
+        return { selector, x: rect.x, y: rect.y, width: rect.width, height: rect.height, needed };
+      }),
+    parts,
+  );
+  await page.addStyleTag({ content: ".hero__id, .site-header { visibility: hidden !important; }" });
+  const shot = (await page.screenshot({ scale: "css" })).toString("base64");
+  const worst = await page.evaluate(
+    async ([shot, boxes]) => {
+      const img = new Image();
+      img.src = `data:image/png;base64,${shot}`;
+      await img.decode();
+      const canvas = new OffscreenCanvas(img.width, img.height);
+      const context = canvas.getContext("2d");
+      if (!context) {
+        throw new Error("No 2D canvas context");
+      }
+      context.drawImage(img, 0, 0);
+      const linear = (channel: number) => {
+        const value = channel / 255;
+        return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+      };
+      return boxes.map((box) => {
+        const { data } = context.getImageData(
+          Math.max(0, Math.round(box.x)),
+          Math.round(box.y),
+          Math.max(1, Math.round(box.width)),
+          Math.max(1, Math.round(box.height)),
+        );
+        const luminances: number[] = [];
+        for (let index = 0; index < data.length; index += 4) {
+          luminances.push(
+            0.2126 * linear(data[index] ?? 0) +
+              0.7152 * linear(data[index + 1] ?? 0) +
+              0.0722 * linear(data[index + 2] ?? 0),
+          );
+        }
+        luminances.sort((first, second) => first - second);
+        // The lightest 5% of the background, against white text
+        const light = luminances[Math.floor(0.95 * (luminances.length - 1))] ?? 1;
+        return { selector: box.selector, needed: box.needed, ratio: 1.05 / (light + 0.05) };
+      });
+    },
+    [shot, boxes] as const,
+  );
+  for (const { selector, needed, ratio } of worst) {
+    expect(ratio, `${selector} contrast`).toBeGreaterThanOrEqual(needed);
+  }
+});
+
+test("a status badge on a card lets clicks through to the listing link", async ({ page }) => {
+  await page.goto("fr/");
+  const badge = page.locator("#properties .card__status").first();
+  test.skip((await badge.count()) === 0, "no listing with a status");
+  await badge.scrollIntoViewIfNeeded();
+  const hit = await badge.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)?.tagName;
+  });
+  expect(hit).toBe("A");
+});
+
+test("About: a link reached with the keyboard shows even before its part of the story", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the held story text is desktop only");
+  await page.goto("fr/");
+  test.skip(
+    !(await page.evaluate(
+      () => CSS.supports("animation-timeline: view()") && CSS.supports("timeline-scope: --about"),
+    )),
+    "needs scroll-driven animations",
+  );
+  const step = page.locator('.about__actions[data-story-step="3"]');
+  await expect(step, "part 3 waits at the top of the page").toHaveCSS("opacity", "0");
+  await step.locator("a").focus();
+  await expect(step).toHaveCSS("opacity", "1");
+});
+
+test("short landscape screens: the About text scrolls normally, all three parts shown", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "landscape phone size on the desktop layout");
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto("fr/#about");
+  for (const line of await page.locator(".about__line").all()) {
+    await expect(line).toHaveCSS("opacity", "1");
+  }
+  await expect(page.locator(".about__inner")).toHaveCSS("position", "static");
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+  ).toBeLessThanOrEqual(0);
 });
 
 test.describe("without JavaScript", () => {
@@ -363,7 +511,7 @@ test("buttons show no focus ring, links keep theirs (exception in CLAUDE.md)", a
   await expect(action).toBeFocused();
   await expect(action).toHaveCSS("outline-style", "none");
 
-  const more = page.locator(".service__more").first();
+  const more = page.locator(".service__links a").first();
   await page.keyboard.press("Tab");
   await more.focus();
   await expect(more).toHaveCSS("outline-style", "solid");
@@ -374,57 +522,36 @@ const delayOf = (locator: Locator) =>
     elements.map((element) => parseFloat(element.style.getPropertyValue("--reveal-delay"))),
   );
 
-test("desktop: Services fades in row by row as it arrives, columns side by side together, and stays", async ({
+test("Services: each block's title, text, links and button fade in one after the other, and stay", async ({
   page,
-  isMobile,
 }) => {
-  test.skip(isMobile, "desktop only: on phones the columns are stacked");
   await page.goto("fr/");
-  const section = page.locator("#services");
-  const heading = page.locator("#services-heading");
-  const { top, vh } = await section.evaluate((element) => ({
-    top: element.getBoundingClientRect().top + scrollY,
-    vh: innerHeight,
-  }));
-
-  await scrollToY(page, top - vh);
-  await expect(heading, "nothing shows before the section arrives").toHaveAttribute(
-    "data-reveal",
-    "",
-  );
-
-  await scrollToY(page, top - vh * 0.2);
-  await expect(page.locator(".service__more").last()).toHaveAttribute("data-reveal", "in");
-  const [headingDelay] = await delayOf(heading);
-  let previous = present(headingDelay, "the Services heading delay");
-  for (const part of [".service__title", ".service__text", ".service__actions", ".service__more"]) {
-    const delays = await delayOf(page.locator(part));
-    expect(new Set(delays).size, `every ${part} appears at the same time`).toBe(1);
-    const delay = present(delays[0], `a delay on ${part}`);
-    expect(delay, `${part} comes after the row above`).toBeGreaterThan(previous);
-    previous = delay;
+  const blocks = page.locator(".service__content");
+  for (const index of [0, 1]) {
+    const block = blocks.nth(index);
+    const title = block.locator(".service__title");
+    const { top, vh } = await block.evaluate((element) => ({
+      top: element.getBoundingClientRect().top + scrollY,
+      vh: innerHeight,
+    }));
+    await scrollToY(page, top - vh * 1.5);
+    await expect(title, "nothing shows before the block arrives").toHaveAttribute(
+      "data-reveal",
+      "",
+    );
+    await scrollToY(page, top - vh * 0.3);
+    await expect(block.locator(".service__action")).toHaveAttribute("data-reveal", "in");
+    const delays = await delayOf(block.locator(":scope > *"));
+    for (const [position, delay] of delays.entries()) {
+      if (position > 0) {
+        expect(delay, `part ${position + 1} comes after part ${position}`).toBeGreaterThan(
+          present(delays[position - 1], "the previous delay"),
+        );
+      }
+    }
+    await scrollToY(page, top + vh * 2);
+    await expect(title, "blocks stay once shown").toHaveAttribute("data-reveal", "in");
   }
-  await expect(heading).toHaveCSS("opacity", "1");
-  await expect(heading).toHaveCSS("translate", "none");
-
-  await scrollToY(page, top + vh * 2);
-  await expect(heading, "blocks stay once shown").toHaveAttribute("data-reveal", "in");
-});
-
-test("phones: each Services column fades in as it arrives", async ({ page, isMobile }) => {
-  test.skip(!isMobile, "phones only");
-  await page.goto("fr/");
-  const columns = page.locator(".service");
-  const first = await columns
-    .first()
-    .evaluate((element) => element.getBoundingClientRect().top + scrollY);
-  await scrollToY(page, first - (await page.evaluate(() => innerHeight)) / 2);
-  await expect(columns.first().locator(".service__title")).toHaveAttribute("data-reveal", "in");
-  const lastTop = await columns
-    .last()
-    .evaluate((element) => element.getBoundingClientRect().top / innerHeight);
-  expect(lastTop, "the last column is still below the trigger line").toBeGreaterThan(0.7);
-  await expect(columns.last().locator(".service__title")).toHaveAttribute("data-reveal", "");
 });
 
 test("a link to a section lands with its blocks shown, and the sections above it too", async ({
@@ -432,7 +559,7 @@ test("a link to a section lands with its blocks shown, and the sections above it
 }) => {
   await page.goto("fr/#properties");
   await expect(page.locator("#properties-heading")).toHaveAttribute("data-reveal", "in");
-  await expect(page.locator("#services .service__more").last()).toHaveAttribute(
+  await expect(page.locator("#services .service__action").last()).toHaveAttribute(
     "data-reveal",
     "in",
   );
@@ -457,5 +584,97 @@ test("reduced motion: the agent photo shows in About without the travelling copy
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("fr/#about");
-  await expect(page.locator(".about__card img")).toBeVisible();
+  await expect(page.locator(".about__card .agent-photos__layer--agent img")).toBeVisible();
+});
+
+test.describe("About story: the paramedic photo replaces the agent, then the agent comes back", () => {
+  /** Where each photo layer of the visible picture stands, in widths of the picture from its place. */
+  const layerOffsets = (page: Page, container: string) =>
+    page.locator(container).evaluate((element) => {
+      const base = element.getBoundingClientRect();
+      const offset = (selector: string) => {
+        const layer = element.querySelector(selector);
+        return layer
+          ? Math.round(((layer.getBoundingClientRect().x - base.x) / base.width) * 10) / 10
+          : null;
+      };
+      return {
+        agent: offset(".agent-photos__layer--agent"),
+        paramedic: offset(".agent-photos__layer--paramedic"),
+        back: offset(".agent-photos__layer--return"),
+      };
+    });
+
+  /** Scroll position at a fraction of the story's scroll range (the timeline's "contain" range).
+      View timelines leave out the page's scroll-padding-top (the header), like the browser does. */
+  const storyAt = (page: Page, subject: string, fraction: number) =>
+    page.locator(subject).evaluate((element: HTMLElement, fraction: number) => {
+      const inset = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const start = element.getBoundingClientRect().top + scrollY - inset;
+      return start + (element.offsetHeight - (innerHeight - inset)) * fraction;
+    }, fraction);
+
+  const noSideScroll = async (page: Page) => {
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+      "no sideways scroll",
+    ).toBeLessThanOrEqual(0);
+  };
+
+  test("in step with the scroll, never showing two photos side by side at rest", async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto("fr/");
+    test.skip(
+      !(await page.evaluate(
+        () => CSS.supports("animation-timeline: view()") && CSS.supports("timeline-scope: --about"),
+      )),
+      "needs scroll-driven animations",
+    );
+    // Desktop: the pinned copy over About; phones: the card in About
+    const container = isMobile ? ".about__card" : ".stage__agent";
+    const subject = isMobile ? ".about__media" : ".about";
+    const lines = page.locator(".about__line");
+
+    await scrollToY(page, await storyAt(page, subject, 0));
+    expect(await layerOffsets(page, container)).toEqual({ agent: 0, paramedic: 1, back: -1 });
+    await noSideScroll(page);
+
+    await scrollToY(page, await storyAt(page, subject, 0.5));
+    expect(await layerOffsets(page, container), "paramedic only").toEqual({
+      agent: -1,
+      paramedic: 0,
+      back: -1,
+    });
+    if (!isMobile) {
+      await expect(lines.nth(1)).toHaveCSS("opacity", "1");
+      await expect(lines.nth(2), "part 3 waits for the agent").toHaveCSS("opacity", "0");
+    }
+    await noSideScroll(page);
+
+    await scrollToY(page, await storyAt(page, subject, 1));
+    expect(await layerOffsets(page, container), "the agent again only").toEqual({
+      agent: -1,
+      paramedic: 1,
+      back: 0,
+    });
+    await page.locator(".about__contact").scrollIntoViewIfNeeded();
+    for (const line of await lines.all()) {
+      await expect(line).toHaveCSS("opacity", "1");
+    }
+    await noSideScroll(page);
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("all three parts show at once, with the agent photo only", async ({ page }) => {
+      await page.goto("fr/#about");
+      for (const line of await page.locator(".about__line").all()) {
+        await expect(line).toHaveCSS("opacity", "1");
+      }
+      await expect(page.locator(".agent-photos__layer--paramedic").first()).toBeHidden();
+    });
+  });
 });
