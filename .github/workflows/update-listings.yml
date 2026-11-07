@@ -1,5 +1,7 @@
 # Fetches the agent's listings from the REMAX Québec API and, when they change, opens a PR
-# against the branch the workflow runs on. Scheduled runs use main, where merging deploys the site.
+# against the branch the workflow runs on and squash-merges it right away (main requires PRs,
+# with no approvals or checks). Commits made with GITHUB_TOKEN don't trigger other workflows,
+# so on main it starts the deploy itself.
 # Requires: repo secret REMAX_API_KEY, and repo Settings → Actions → General →
 # "Allow GitHub Actions to create and approve pull requests".
 name: Update listings
@@ -13,6 +15,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: update-listings
@@ -62,7 +65,7 @@ jobs:
             curl --fail --silent --show-error -o "$PHOTOS_DIR/$id.jpg" "https://media.remax-quebec.com/img/www_small/$photo"
           done
 
-      - name: Open or update the PR
+      - name: Open and merge the PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -101,4 +104,8 @@ jobs:
               --body-file "$RUNNER_TEMP/body.md"
           else
             gh pr edit "$BRANCH" --body-file "$RUNNER_TEMP/body.md"
+          fi
+          gh pr merge "$BRANCH" --squash --delete-branch --body-file "$RUNNER_TEMP/body.md"
+          if [ "$BASE_BRANCH" = "main" ]; then
+            gh workflow run deploy.yml --ref main
           fi
