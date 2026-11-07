@@ -254,30 +254,60 @@
     };
 
     // Intent (e.g. rental): ?intent=<name> on the page URL, or "wizard:open" with { intent } from the home page
-    // dialog (js/site.ts). Applied only when the subject field has data-subject-<name>: the intent field is
-    // set and that subject is used. Anything else falls back to the default subject and an empty intent.
+    // dialog (js/site.ts). The intent is either a hidden field or a visible choice (radio buttons, e.g. buy or
+    // rent in the property alert). A hidden field is set only when the subject has data-subject-<name>; a radio
+    // is checked only when one has that value, and keeps the visitor's choice otherwise.
+    // The subject becomes data-subject-<intent> when there is one, the default subject otherwise.
+    // The wording that depends on the intent follows the checked radio in CSS (css/forms.css), JS or not.
     // The original subject is kept here: on a hidden input, setting .value also changes its default value.
     const subject = fieldNamed("subject");
     const baseSubject = subject?.value ?? "";
-    const setIntent = (intent: string | null | undefined) => {
-      const intentField = fieldNamed("intent");
-      const key = intent ? `subject${intent.charAt(0).toUpperCase()}${intent.slice(1)}` : "";
-      const intentSubject = key ? subject?.dataset[key] : undefined;
-      if (intentField) {
-        intentField.value = intentSubject && intent ? intent : "";
+    const subjectFor = (intent: string) =>
+      intent
+        ? subject?.dataset[`subject${intent.charAt(0).toUpperCase()}${intent.slice(1)}`]
+        : undefined;
+    const intentControl = () => form.elements.namedItem("intent");
+    const currentIntent = () => {
+      const control = intentControl();
+      return control instanceof RadioNodeList || isField(control) ? control.value : "";
+    };
+    const applyIntent = () => {
+      if (!intentControl()) {
+        return; // e.g. the property info form, whose subject is set from the clicked card
       }
       if (subject) {
-        subject.value = intentSubject || baseSubject;
+        subject.value = subjectFor(currentIntent()) || baseSubject;
       }
     };
+    const setIntent = (intent: string | null | undefined) => {
+      const control = intentControl();
+      if (control instanceof RadioNodeList) {
+        const radios = [...control].filter((radio) => radio instanceof HTMLInputElement);
+        const match = radios.find((radio) => radio.value === intent);
+        if (match) {
+          match.checked = true;
+        }
+      } else if (isField(control)) {
+        control.value = intent && subjectFor(intent) ? intent : "";
+      }
+      applyIntent();
+    };
+
+    form.addEventListener("change", (event) => {
+      if (event.target instanceof HTMLInputElement && event.target.name === "intent") {
+        applyIntent();
+      }
+    });
 
     // Reset (e.g. reopening a dialog after a sent request): back to step 1, messages hidden.
+    // The fields are reset after this event, so the intent texts follow once that is done.
     form.addEventListener("reset", () => {
       if (error) {
         error.hidden = true;
       }
       success.hidden = true;
       show(0, false);
+      queueMicrotask(applyIntent);
     });
 
     // Opened from a link. A sent form starts over; one being filled in, sending or failed is kept as is.

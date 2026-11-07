@@ -129,6 +129,15 @@ export default function (eleventyConfig: UserConfig) {
     count < 0 ? array.slice(count) : array.slice(0, count),
   );
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
+  // CMS one-liners: escapes the text, then turns **words** into <strong>words</strong>
+  eleventyConfig.addFilter("inlineBold", (text: string | null | undefined) =>
+    (text ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll(/\*\*(.+?)\*\*/g, "<strong>$1</strong>"),
+  );
 
   return {
     templateFormats: ["njk", "md"],

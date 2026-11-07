@@ -30,9 +30,14 @@ collections:
           - { name: signature, label: "Signature", widget: image, hint: "Agent mark (house + signature). SVG preferred, trimmed tight to the drawing." }
           - { name: hero_photo, label: "Agent photo", widget: image, hint: "Clipped photo with a transparent background, portrait, at least 1200 px tall. Also used in the About section." }
           - { name: hero_photo_alt, label: "Agent photo description", widget: string, required: false }
+          - { name: paramedic_photo, label: "Paramedic photo", widget: image, required: false, hint: "About section: replaces the agent photo while the story talks about his paramedic years. Same size and framing as the agent photo (transparent background, same crop), so the two line up." }
           - { name: side_image, label: "Hero image", widget: image, required: false, hint: "Full-screen background of the hero on every device. Landscape, at least 1920 px wide, usage rights confirmed." }
           - { name: side_image_alt, label: "Hero image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
-          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Phones only: the scene behind the agent photo in the About section. Portrait, 9:16. Empty shows a plain gray panel." }
+          - { name: service_search_image, label: "Services: looking for a property image", widget: image, required: false, hint: "Landscape, about 1600 px wide, cut along the slash on the site. Usage rights confirmed." }
+          - { name: service_search_image_alt, label: "Services: looking image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
+          - { name: service_sell_image, label: "Services: selling image", widget: image, required: false, hint: "Landscape, about 1600 px wide, cut along the slash on the site. Usage rights confirmed." }
+          - { name: service_sell_image_alt, label: "Services: selling image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
+          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Phones only: the scene behind the agent photo in the About section. Portrait, 9:16. Empty shows no background." }
           - { name: contact_photo, label: "Contact page photo", widget: image, required: false, hint: "Agent picture on the Contact page. Portrait, 9:16. Empty shows a plain gray panel." }
           - { name: contact_photo_alt, label: "Contact page photo description", widget: string, required: false }
 
@@ -144,27 +149,13 @@ collections:
             widget: object
             collapsed: true
             fields:
-              - name: agency
-                label: "Ligne sous le titre du courtier : nom de l'agence"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
               - name: tagline
-                label: "Slogan sous le nom du courtier"
+                label: "Slogan au centre du bandeau (entourer de ** ** les mots en gras)"
                 widget: object
                 collapsed: false
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
-              - name: area
-                label: "Secteur, ajouté après le nom de l'agence (laisser vide pour ne rien afficher)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string, required: false }
-                  - { name: en, label: "English", widget: string, required: false }
               - name: cta
                 label: "Bouton du bandeau : ouvre les options de contact"
                 widget: object
@@ -311,167 +302,86 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
-              - name: buy
-                label: "Acheter"
+              - name: search
+                label: "Chercher une propriété (achat ou location)"
                 widget: object
                 collapsed: false
                 fields:
                   - name: title
-                    label: "Acheter : titre de la colonne"
+                    label: "Titre"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
                   - name: text
-                    label: "Acheter : texte de la colonne"
+                    label: "Texte"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
-                  - name: more
-                    label: "Acheter : lien vers la page d'information"
+                  - name: moreBuy
+                    label: "Lien vers la page Acheter"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
-                  - name: action1
-                    label: "Bouton"
+                  - name: moreRent
+                    label: "Lien vers la page Louer"
                     widget: object
                     collapsed: false
                     fields:
-                      - name: label
-                        label: "Acheter : texte du bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-                      - name: subject
-                        label: "Acheter : objet du courriel envoyé par le bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - name: action
+                    label: "Bouton : ouvre l'alerte immobilière (le formulaire demande achat ou location)"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
               - name: sell
                 label: "Vendre"
                 widget: object
                 collapsed: false
                 fields:
                   - name: title
-                    label: "Vendre : titre de la colonne"
+                    label: "Titre"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
                   - name: text
-                    label: "Vendre : texte de la colonne"
+                    label: "Texte"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: text }
                       - { name: en, label: "English", widget: text }
                   - name: more
-                    label: "Vendre : lien vers la page d'information"
+                    label: "Lien vers la page Vendre"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
-                  - name: action1
-                    label: "Bouton"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - name: label
-                        label: "Vendre : texte du bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-                      - name: subject
-                        label: "Vendre : objet du courriel envoyé par le bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-              - name: rent
-                label: "Louer"
-                widget: object
-                collapsed: false
-                fields:
-                  - name: title
-                    label: "Louer : titre de la colonne"
+                  - name: action
+                    label: "Bouton : ouvre le formulaire d'évaluation"
                     widget: object
                     collapsed: false
                     fields:
                       - { name: fr, label: "Français", widget: string }
                       - { name: en, label: "English", widget: string }
-                  - name: text
-                    label: "Louer : texte de la colonne"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-                  - name: more
-                    label: "Louer : lien vers la page d'information"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: action1
-                    label: "Premier bouton"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - name: label
-                        label: "Louer : texte du premier bouton (trouver un logement)"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-                      - name: subject
-                        label: "Louer : objet du courriel du premier bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-                  - name: action2
-                    label: "Deuxième bouton"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - name: label
-                        label: "Louer : texte du deuxième bouton (louer sa propriété)"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
-                      - name: subject
-                        label: "Louer : objet du courriel du deuxième bouton"
-                        widget: object
-                        collapsed: false
-                        fields:
-                          - { name: fr, label: "Français", widget: string }
-                          - { name: en, label: "English", widget: string }
           - name: properties
             label: "Propriétés"
             widget: object
             collapsed: true
             fields:
               - name: moreInfo
-                label: "Bouton sur chaque propriété : demander plus d'infos"
+                label: "Lien sous chaque propriété : demander plus d'infos"
                 widget: object
                 collapsed: false
                 fields:
@@ -492,7 +402,7 @@ collections:
                   - { name: fr, label: "Français", widget: string }
                   - { name: en, label: "English", widget: string }
               - name: all
-                label: "Bouton vers la page de toutes les propriétés"
+                label: "Bouton vers la page de toutes les propriétés (affiché à partir de 7 propriétés)"
                 widget: object
                 collapsed: false
                 fields:
@@ -919,12 +829,25 @@ collections:
           # OACIQ licence: the footer shows it on every page once the number is filled in.
           - { name: licence, label: "OACIQ licence number", widget: string, required: false }
           - { name: licenceRegisterUrl, label: "OACIQ register link", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Must be an oaciq.com link'] }
-          - name: bio
-            label: Bio
+          # About section on the home page: three parts, shown one after the other while scrolling.
+          - name: story_introduction
+            label: "Story, part 1 (agent photo)"
             widget: object
             fields:
-              - { name: fr, label: "Bio (français)", widget: markdown }
-              - { name: en, label: "Bio (English)", widget: markdown }
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: story_paramedic
+            label: "Story, part 2 (the paramedic photo appears)"
+            widget: object
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
+          - name: story_today
+            label: "Story, part 3 (the agent photo comes back)"
+            widget: object
+            fields:
+              - { name: fr, label: "Français", widget: text }
+              - { name: en, label: "English", widget: text }
           - { name: phone, label: Phone, widget: string, required: false }
           - { name: email, label: Email, widget: string, required: false, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Must be an email address'] }
           # Social profiles: an icon shows on the site only when the link is filled in.

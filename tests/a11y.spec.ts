@@ -68,8 +68,11 @@ test("dialog writeMe", async ({ page }) => {
 for (const [key, formConfig] of FORM_ENTRIES) {
   test(`dialog ${key}: every step`, async ({ page }) => {
     const form = await openForm(page, key, "fr", "dialog");
+    for (let index = 0; index < formConfig.contactStep; index++) {
+      await check(page, `#dialog-${key}`);
+    }
     await fillStep1(form, key);
-    for (let index = 0; index < formConfig.steps; index++) {
+    for (let index = formConfig.contactStep; index < formConfig.steps; index++) {
       await check(page, `#dialog-${key}`);
       if (index < formConfig.steps - 1) {
         await next(form);

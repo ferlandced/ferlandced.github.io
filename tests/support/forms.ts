@@ -3,9 +3,22 @@ import type { Locator, Page } from "@playwright/test";
 import { expect } from "./fixtures.ts";
 import { site, type Lang } from "./site.ts";
 
+// contactStep: index of the contact details step (the property alert first asks buy or rent)
 export const FORMS = {
-  estimation: { prefix: "est", steps: 5, typeTile: "est-type-duplex", typeValue: "Duplex" },
-  propertyAlert: { prefix: "pa", steps: 4, typeTile: "pa-type-condo", typeValue: "Condo" },
+  estimation: {
+    prefix: "est",
+    steps: 5,
+    contactStep: 0,
+    typeTile: "est-type-duplex",
+    typeValue: "Duplex",
+  },
+  propertyAlert: {
+    prefix: "pa",
+    steps: 5,
+    contactStep: 1,
+    typeTile: "pa-type-condo",
+    typeValue: "Condo",
+  },
 } as const;
 
 /** The multi-step forms: estimation and property alert. */
@@ -73,13 +86,33 @@ interface ContactDetails {
   email?: string | null;
 }
 
-/** Fills the required first step (contact details, plus the address for the estimation). */
+/** The property alert's buy-or-rent radio values. */
+export type AlertIntent = "achat" | "location";
+
+/**
+ * Fills the required steps up to the contact details and stays on that step: for the property alert,
+ * buy or rent first (keeps a choice already made, e.g. from ?intent=, otherwise picks `intent`);
+ * for the estimation, the address.
+ */
 export async function fillStep1(
   form: Locator,
   key: FormKey,
-  { phone = "450 776 4895", email = "test@example.com" }: ContactDetails = {},
+  {
+    phone = "450 776 4895",
+    email = "test@example.com",
+    intent = "achat",
+  }: ContactDetails & { intent?: AlertIntent } = {},
 ) {
   const prefix = FORMS[key].prefix;
+  if (key === "propertyAlert") {
+    if ((await form.locator('input[name="intent"]:checked').count()) === 0) {
+      await pick(form, `pa-intent-${intent}`);
+    }
+    // Without JS the form is one long page: no step to move to
+    if (await form.evaluate((element) => element.hasAttribute("data-wizard-ready"))) {
+      await next(form);
+    }
+  }
   if (key === "estimation") {
     await form.locator("#est-address").fill("123 rue Principale");
   }
@@ -92,6 +125,14 @@ export async function fillStep1(
     await form.locator(`#${prefix}-email`).fill(email);
   }
   await form.locator(`#${prefix}-consent`).check();
+}
+
+/** Moves to the contact details step: the property alert asks buy or rent first. */
+export async function toContactStep(form: Locator, key: FormKey) {
+  if (key === "propertyAlert") {
+    await pick(form, "pa-intent-achat");
+    await next(form);
+  }
 }
 
 /** Clicks the tile/segment label for an input id (the input itself is visually hidden). */

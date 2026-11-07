@@ -4,29 +4,32 @@
    Do not hardcode colours or fonts anywhere else; reference these variables.
    ========================================================================== */
 
-/* Montserrat, self-hosted (SIL OFL, see /fonts/OFL.txt). Latin subset covers French. */
+/* Figtree (headings, buttons) and Inter (body), self-hosted variable fonts (SIL OFL, see
+   /fonts/OFL-figtree.txt and /fonts/OFL-inter.txt). Latin subset covers French. */
 @font-face {
-  font-family: Montserrat;
+  font-family: Figtree;
   font-style: normal;
-  font-weight: 300;
+  font-weight: 300 700;
   font-display: swap;
-  src: url("../fonts/montserrat-latin-300-normal.woff2") format("woff2");
+  src: url("../fonts/figtree-latin-wght-normal.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: Montserrat;
+  font-family: Inter;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 300 700;
   font-display: swap;
-  src: url("../fonts/montserrat-latin-500-normal.woff2") format("woff2");
+  src: url("../fonts/inter-latin-wght-normal.woff2") format("woff2");
 }
 
+/* Arial scaled to Inter's metrics, so the swap to Inter barely moves the text */
 @font-face {
-  font-family: Montserrat;
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("../fonts/montserrat-latin-700-normal.woff2") format("woff2");
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90.5%;
+  descent-override: 22.5%;
+  line-gap-override: 0%;
 }
 
 :root {
@@ -43,10 +46,15 @@
   --color-white: #ffffff;
   --color-sky-blue: #a3d4f2;
 
-  /* Typography: Montserrat, Arial fallback. Weights: Light, Medium, Bold only. */
-  --font-family: "Montserrat", Arial, sans-serif;
+  /* Typography: Figtree for headings and buttons, Inter for text, Arial fallback.
+     Exception to the manual's Montserrat (Matteo, 2026-11-07, see CLAUDE.md). */
+  --font-heading: "Figtree", Arial, sans-serif;
+  --font-body: "Inter", "Inter Fallback", Arial, sans-serif;
+  --font-family: var(--font-body);
   --font-light: 300;
+  --font-regular: 400;
   --font-medium: 500;
+  --font-semibold: 600;
   --font-bold: 700;
 
   /* Semantic roles. WCAG 2.1 AA contrast checked for each text pairing. */
@@ -71,9 +79,6 @@
   /* ghost button text and hover fill: 13.4:1 on white, 12.3:1 on cream */
   --brand-button: var(--color-dark-red);
   --brand-button-border: var(--color-primary-red);
-
-  /* white text 3.9:1: large bold text only (18.66px and up) */
-  --brand-cta: var(--color-primary-red);
 
   /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
   --brand-highlight: var(--color-primary-red);

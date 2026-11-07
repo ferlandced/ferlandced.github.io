@@ -42,7 +42,8 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - White `#FFFFFF`
 - Sky Blue `#A3D4F2`
 - Gradients: Primary Red and Primary Blue only.
-- Typography: Montserrat (self-hosted), Arial fallback. Weights: Light, Medium, Bold.
+- Typography: Figtree (headings, buttons) and Inter (text), self-hosted variable fonts, Arial fallback. Weights 300-700.
+  - Exception (Matteo, 2026-11-07): the manual specifies Montserrat (Light, Medium, Bold). The site uses Figtree + Inter by design choice.
 
 ## Logo rules
 
@@ -97,10 +98,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Palette: Cream, White, Black, Dark Blue/Bridge Blue as base. Red and blue as accents.
 - Header: REMAX logo with full office name.
 - Photography: professional, clipped agent photos where used. No clip art, cartoons or bitmojis.
-- Contrast: WCAG 2.1 AA minimum.
-  - Exception (Matteo, 2026-11-04): REMAX requires its brand colors, not WCAG AA. Where a brand color pairing fails AA, the brand pairing wins. Currently only white text on Primary Red `#FF1200` (about 3.9:1), used by the hero "Contact me" button.
-  - Scope the exception to that pairing. Everything else stays AA. Keep the label as large as the design allows (bold, 18.66px or more passes AA as large text).
-  - Automated contrast checks (axe) are excluded for the excepted element only, not for the page.
+- Contrast: WCAG 2.1 AA minimum. No exceptions: the hero "Contact me" button is now Dark Red (white text passes AA).
 - Focus visible: WCAG AA (2.4.7) except on buttons.
   - Exception (Matteo, 2026-11-05): buttons (`.btn`, `<button>`, dialog close) show no focus ring, even from the keyboard. Design choice, not a brand rule.
   - Links, form fields, radio tiles and listing cards keep their focus ring.
@@ -147,3 +145,5 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Privacy policy FR/EN
 - Photo reuse rights
 - Whether the agent photo / Dynamic logo is used
+- Service photos (images/services/): usage rights, and the sell photo's sign is in English
+- Final wording for the About story (three parts) and the two service texts, FR and EN

@@ -128,6 +128,12 @@ test("safe-area insets reach the header, the phone menu, the footer and the dial
     /\.site-header \{[^}]*padding-top: var\(--safe-top\)/,
     /\.nav-toggle \{[^}]*position: fixed;[^}]*right: calc\(12px \+ var\(--safe-right\)\);[^}]*bottom: calc\(12px \+ var\(--safe-bottom\)\)/,
     /\.site-footer \{[^}]*padding-bottom: var\(--safe-bottom\)/,
+    // Home: the agent clear of a landscape notch, the phone About card under the header and above
+    // the home indicator, the held About text clear of both
+    /--photo-x: calc\([^;]*var\(--safe-right\)\)/,
+    /--frame-width: min\([^;]*var\(--safe-bottom\)/,
+    /\.about__card \{[^}]*top: calc\(var\(--header-height\) \+ var\(--safe-top\) \+ 16px\)/,
+    /\.about__inner \{[^}]*padding-block: calc\(var\(--header-height\) \+ var\(--safe-top\)\)\s+calc\(24px \+ var\(--safe-bottom\)\)/,
   ]) {
     expect(css).toMatch(rule);
   }

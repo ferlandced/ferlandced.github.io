@@ -111,3 +111,29 @@ for (const [key, urls] of Object.entries({ home: { fr: "/fr/", en: "/en/" }, ...
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 }
+
+test("phones: no contact icons above the burger; they are in the menu", async ({
+  page,
+}, testInfo) => {
+  test.skip(!isPhone(testInfo), "phones only");
+  await page.goto("fr/");
+  await expect(page.locator(".site-header__tools .contact-icons--header")).toBeHidden();
+  await page.locator(".nav-toggle").click();
+  await expect(page.locator(".contact-icons--menu")).toBeVisible();
+});
+
+test("phones: the corner keeps its small size over the hero and past it", async ({
+  page,
+}, testInfo) => {
+  test.skip(!isPhone(testInfo), "phones only");
+  await page.goto("fr/");
+  const header = page.locator(".site-header");
+  const cornerX = () =>
+    header.evaluate((element) => getComputedStyle(element).getPropertyValue("--corner-x").trim());
+  const overHero = await cornerX();
+  await page.evaluate(() => {
+    window.scrollTo({ top: innerHeight * 2, behavior: "instant" });
+  });
+  await expect(header).toHaveAttribute("data-past-hero", "");
+  expect(await cornerX()).toBe(overHero);
+});

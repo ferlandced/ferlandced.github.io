@@ -32,17 +32,9 @@
     }
   },
   "hero": {
-    "agency": {
-      "fr": "REMAX Privilège, agence immobilière",
-      "en": "REMAX Privilège, real estate agency"
-    },
     "tagline": {
-      "fr": "C'est l'humain derrière chaque transaction qui compte.",
-      "en": "It's the person behind every transaction that matters."
-    },
-    "area": {
-      "fr": "Rive-Sud",
-      "en": "South Shore"
+      "fr": "« **C'est l'humain** derrière chaque transaction **qui compte.** »",
+      "en": "“**It's the person** behind every transaction **that matters.**”"
     },
     "cta": {
       "fr": "Me contacter",
@@ -107,8 +99,8 @@
   },
   "about": {
     "heading": {
-      "fr": "À propos",
-      "en": "About"
+      "fr": "À propos de moi",
+      "en": "About me"
     },
     "cellLabel": {
       "fr": "Cellulaire",
@@ -124,86 +116,44 @@
       "fr": "Services",
       "en": "Services"
     },
-    "buy": {
+    "search": {
       "title": {
-        "fr": "Acheter",
-        "en": "Buy"
+        "fr": "Cherchez-vous une nouvelle propriété?",
+        "en": "Looking for a new home?"
       },
       "text": {
-        "fr": "Dites-moi ce que vous cherchez. Je vous envoie les nouvelles propriétés qui correspondent à vos critères dès leur arrivée sur le marché.",
-        "en": "Tell me what you are looking for. I send you new properties that match your criteria as soon as they come on the market."
+        "fr": "Que vous vouliez acheter ou louer, dites-moi ce que vous cherchez. Je vous envoie les nouvelles propriétés qui correspondent à vos critères dès leur arrivée sur le marché.",
+        "en": "Whether you want to buy or rent, tell me what you are looking for. I send you new properties that match your criteria as soon as they come on the market."
       },
-      "action1": {
-        "label": {
-          "fr": "Créer ma recherche personnalisée",
-          "en": "Set up my property search"
-        },
-        "subject": {
-          "fr": "Recherche personnalisée",
-          "en": "Property search"
-        }
-      },
-      "more": {
+      "moreBuy": {
         "fr": "En savoir plus sur l'achat",
         "en": "More about buying"
+      },
+      "moreRent": {
+        "fr": "En savoir plus sur la location",
+        "en": "More about renting"
+      },
+      "action": {
+        "fr": "Créer ma recherche personnalisée",
+        "en": "Set up my property search"
       }
     },
     "sell": {
       "title": {
-        "fr": "Vendre",
-        "en": "Sell"
+        "fr": "Voulez-vous vendre?",
+        "en": "Thinking of selling?"
       },
       "text": {
         "fr": "Je vous aide à fixer le bon prix et je vous accompagne jusqu'à la signature chez le notaire.",
         "en": "I help you set the right price and guide you all the way to the notary signing."
       },
-      "action1": {
-        "label": {
-          "fr": "Combien vaut ma propriété ?",
-          "en": "What is my property worth?"
-        },
-        "subject": {
-          "fr": "Évaluation de ma propriété",
-          "en": "Property valuation"
-        }
-      },
       "more": {
         "fr": "En savoir plus sur la vente",
         "en": "More about selling"
-      }
-    },
-    "rent": {
-      "title": {
-        "fr": "Louer",
-        "en": "Rent"
       },
-      "text": {
-        "fr": "Vous cherchez un logement ou vous voulez louer votre propriété ? Je vous aide à trouver le bon endroit ou le bon locataire.",
-        "en": "Looking for a place, or want to rent out your property? I help you find the right place or the right tenant."
-      },
-      "action1": {
-        "label": {
-          "fr": "Trouver un logement à louer",
-          "en": "Find a place to rent"
-        },
-        "subject": {
-          "fr": "Recherche de logement à louer",
-          "en": "Looking for a rental"
-        }
-      },
-      "action2": {
-        "label": {
-          "fr": "Mettre ma propriété en location",
-          "en": "Rent out my property"
-        },
-        "subject": {
-          "fr": "Mise en location de ma propriété",
-          "en": "Renting out my property"
-        }
-      },
-      "more": {
-        "fr": "En savoir plus sur la location",
-        "en": "More about renting"
+      "action": {
+        "fr": "Combien vaut ma propriété ?",
+        "en": "What is my property worth?"
       }
     }
   },
@@ -247,8 +197,8 @@
       }
     },
     "moreInfo": {
-      "fr": "Plus d'infos",
-      "en": "More info"
+      "fr": "Plus d'infos sur la propriété",
+      "en": "More about this property"
     },
     "infoSubject": {
       "fr": "Demande d'information",
