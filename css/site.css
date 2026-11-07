@@ -8,7 +8,6 @@
      very large     >= 1400px         (xxl): content capped at --wrap-max, colour bleeds to the edge
    ========================================================================== */
 
-
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
@@ -16,174 +15,663 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --gutter: calc(16px + max(var(--safe-left), var(--safe-right)));
   --wrap-max: 1320px;
+
   /* Content is aligned left: it starts at --wrap-left from the screen edge (gutter, plus the logo shift
      on desktop) and is at most --wrap-max wide. Extra space on wide screens goes to the right. */
   --wrap-left: calc(var(--gutter) + var(--brand-shift, 0px));
-  --wrap: min(var(--wrap-max), 100vw - var(--wrap-left) - var(--gutter));  /* viewport-based twin of .container width, for transforms */
 
-  --header-h: 64px;
-  --logo-h: 60px;            /* rendered height of the logo file (its canvas has built-in clear space) */
+  /* viewport-based twin of .container width, for transforms */
+  --wrap: min(var(--wrap-max), 100vw - var(--wrap-left) - var(--gutter));
+  --header-height: 64px;
+  --logo-height: 60px; /* rendered height of the logo file (its canvas has built-in clear space) */
 
   /* Slash Design: fixed angle, Primary Red 1/4 next to the photo, Dark Red 3/4 */
   --slash-angle: 27.5deg;
-  --slash-red-ratio: .25;
+  --slash-red-ratio: 0.25;
+
   /* Fine grain (SVG noise, light speckle) laid over a solid colour for a textured surface */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (min-width: 768px) { :root { --gutter: calc(24px + max(var(--safe-left), var(--safe-right))); --header-h: 80px; --logo-h: 72px; --brand-shift: clamp(24px, 6vw, 120px); } }   /* content sits a bit right of the gutter */
 
-* { box-sizing: border-box; }
-html { scroll-padding-top: calc(var(--header-h) + var(--safe-top) + 8px); }
+@media (width >= 768px) {
+  :root {
+    --gutter: calc(24px + max(var(--safe-left), var(--safe-right)));
+    --header-height: 80px;
+    --logo-height: 72px;
+    --brand-shift: clamp(24px, 6vw, 120px);
+  }
+} /* content sits a bit right of the gutter */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: calc(var(--header-height) + var(--safe-top) + 8px);
+}
+
 /* Overscroll and any gap around the hero match the surface under the status bar */
-html:has(body.home) { background: var(--color-charcoal); }
-@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
-body { margin: 0; padding-top: calc(var(--header-h) + var(--safe-top)); min-height: 100lvh; display: flex; flex-direction: column; font-family: var(--font-family); font-weight: var(--font-light); font-size: 1.0625rem; color: var(--brand-ink); background: var(--brand-surface); line-height: 1.65; overflow-x: clip; }
+html:has(body.home) {
+  background: var(--color-charcoal);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  padding-top: calc(var(--header-height) + var(--safe-top));
+  min-height: 100lvh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family);
+  font-weight: var(--font-light);
+  font-size: 1.0625rem;
+  color: var(--brand-ink);
+  background: var(--brand-surface);
+  line-height: 1.65;
+  overflow-x: clip;
+}
+
 /* Home page content runs under the transparent header */
-body.home { padding-top: 0; }
-strong, b { font-weight: var(--font-bold); }
-:focus-visible { outline: 3px solid var(--brand-focus); outline-offset: 2px; }
+body.home {
+  padding-top: 0;
+}
+
+strong,
+b {
+  font-weight: var(--font-bold);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand-focus);
+  outline-offset: 2px;
+}
+
 /* No focus ring on buttons, even from the keyboard: see the exception in CLAUDE.md */
-:is(.btn, button, .form-panel__close):focus-visible { outline: none; }
-img { max-width: 100%; display: block; }
-body > main { flex: 1 0 auto; }
-h1, h2, h3 { color: var(--brand-primary); line-height: 1.15; font-weight: var(--font-bold); letter-spacing: -.01em; }
-h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 24px; }
-a { color: var(--brand-link); text-underline-offset: .15em; }
-a:hover { color: var(--brand-link-hover); }
-.container { width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); margin-right: auto; padding-block: 24px; }
-.muted { color: var(--brand-muted); }
-.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:is(.btn, button, .form-panel__close):focus-visible {
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+body > main {
+  flex: 1 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--brand-primary);
+  line-height: 1.15;
+  font-weight: var(--font-bold);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  margin: 0 0 24px;
+}
+
+a {
+  color: var(--brand-link);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--brand-link-hover);
+}
+
+.container {
+  width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
+  margin-left: var(--wrap-left);
+  margin-right: auto;
+  padding-block: 24px;
+}
+
+.muted {
+  color: var(--brand-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* Ghost button: Primary Red border, Dark Red text, no fill. Fills Dark Red with white text on hover. */
-.btn { display: inline-block; padding: 9px 0; border: 0; border-radius: 0; background: none; color: var(--brand-button); font: inherit; font-size: .875rem; font-weight: var(--font-bold); line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; text-align: left; text-decoration: none; cursor: pointer; transition: color .2s; }
+.btn {
+  display: inline-block;
+  padding: 9px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--brand-button);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--font-bold);
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
 /* No border or fill: text aligns with the content's left edge; hover underlines in Bridge Red */
-.btn:hover { color: var(--brand-link-hover); text-decoration: underline; text-underline-offset: .3em; }
+.btn:hover {
+  color: var(--brand-link-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
 /* The page's main action. White on Primary Red passes AA only as large text, so keep the label at 19px bold. Dark Red on hover (13.4:1). */
-.btn--cta { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; background: var(--brand-cta); color: var(--brand-on-dark); font-size: 1.1875rem; transition: background-color .2s; }
-.btn--cta:hover { background: var(--brand-button); color: var(--brand-on-dark); text-decoration: none; }
+.btn--cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--brand-cta);
+  color: var(--brand-on-dark);
+  font-size: 1.1875rem;
+  transition: background-color 0.2s;
+}
+
+.btn--cta:hover {
+  background: var(--brand-button);
+  color: var(--brand-on-dark);
+  text-decoration: none;
+}
 
 /* ==========================================================================
    Header: fixed, white. On desktop the logo shrinks as the page scrolls.
    ========================================================================== */
 .site-header {
-  position: fixed; inset: 0 0 auto 0; z-index: 100;
-  height: calc(var(--header-h) + var(--safe-top));
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  height: calc(var(--header-height) + var(--safe-top));
   padding-top: var(--safe-top);
-  display: flex; align-items: center; gap: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
   padding-inline: var(--wrap-left) var(--gutter);
   background: transparent;
 }
+
 /* Inner pages have no hero behind the header, so it stays white there */
-body:not(.home) .site-header { background: var(--brand-surface); }
+body:not(.home) .site-header {
+  background: var(--brand-surface);
+}
+
 /* Office logo, stacked: REMAX logo with the office name underneath, left-aligned with the R.
-   Measurements are fractions of --logo-h, the rendered height of the 2:1 logo canvas:
+   Measurements are fractions of --logo-height, the rendered height of the 2:1 logo canvas:
    the R starts at .24, the REMAX capitals are .40 tall.
    The gap under REMAX keeps the manual's clear space (half the X height, .20). */
-.brand { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; text-decoration: none; color: var(--color-black); translate: 0 calc(var(--logo-h) * -.1); }
-.brand__logo { height: var(--logo-h); width: auto; max-width: none; }
-/* Cap height about 60% of the REMAX capitals (manual: 50-100%) */
-.brand__office { margin: calc(var(--logo-h) * -.12) 0 0 calc(var(--logo-h) * .24); font-weight: var(--font-medium); font-size: calc(var(--logo-h) * .34); line-height: 1; white-space: nowrap; }
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+  text-decoration: none;
+  color: var(--color-black);
+  translate: 0 calc(var(--logo-height) * -0.1);
+}
 
-.site-nav { display: flex; align-items: center; gap: 28px; margin-left: clamp(16px, 3vw, 48px); }
-.site-nav a:not(.btn) { color: var(--brand-ink); text-decoration: none; font-size: .875rem; font-weight: var(--font-medium); letter-spacing: .06em; text-transform: uppercase; }
-.site-nav a:not(.btn):hover { color: var(--brand-link-hover); }
+.brand__logo {
+  height: var(--logo-height);
+  width: auto;
+  max-width: none;
+}
+
+/* Cap height about 60% of the REMAX capitals (manual: 50-100%) */
+.brand__office {
+  margin: calc(var(--logo-height) * -0.12) 0 0 calc(var(--logo-height) * 0.24);
+  font-weight: var(--font-medium);
+  font-size: calc(var(--logo-height) * 0.34);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-left: clamp(16px, 3vw, 48px);
+}
+
+.site-nav a:not(.btn) {
+  color: var(--brand-ink);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: var(--font-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-nav a:not(.btn):hover {
+  color: var(--brand-link-hover);
+}
 
 /* Top-right tools: contact icons (after the hero) and the language switch.
    White chips keep them readable over the hero picture and scrolled content. */
-.site-header__tools { order: 2; margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.lang-switch { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-ink); font-size: .875rem; font-weight: var(--font-bold); letter-spacing: .06em; text-decoration: none; }
-.lang-switch:hover { color: var(--brand-link-hover); }
+.site-header__tools {
+  order: 2;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--brand-radius);
+  background: var(--brand-surface);
+  color: var(--brand-ink);
+  font-size: 0.875rem;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.lang-switch:hover {
+  color: var(--brand-link-hover);
+}
 
 /* Contact icons: phone, email, social. 44px targets, 20px glyphs. */
-.contact-icons { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.contact-icons a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--brand-radius); color: var(--brand-ink); }
-.contact-icons a:hover { color: var(--brand-link-hover); }
-.icon { width: 20px; height: 20px; }
-.contact-icons--header { padding: 0 4px; border-radius: var(--brand-radius); background: var(--brand-surface); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
-[data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { opacity: 1; visibility: visible; }
-.contact-icons--menu { display: none; }
-@media (max-width: 767.98px) {
-  .contact-icons--header { display: none; }
-  .js-nav [data-open] .contact-icons--menu { display: flex; margin-top: 12px; }
+.contact-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-@media (prefers-reduced-motion: reduce) { .contact-icons--header { transition: none; } }
+
+.contact-icons a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--brand-radius);
+  color: var(--brand-ink);
+}
+
+.contact-icons a:hover {
+  color: var(--brand-link-hover);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-icons--header {
+  padding: 0 4px;
+  border-radius: var(--brand-radius);
+  background: var(--brand-surface);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
+}
+
+[data-past-hero] .contact-icons--header,
+body:not(.home) .contact-icons--header {
+  opacity: 1;
+  visibility: visible;
+}
+
+.contact-icons--menu {
+  display: none;
+}
+
+@media (width <= 767.98px) {
+  .contact-icons--header {
+    display: none;
+  }
+
+  .js-nav [data-open] .contact-icons--menu {
+    display: flex;
+    margin-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-icons--header {
+    transition: none;
+  }
+}
 
 /* White chip, like the language switch, so the icon stays visible over the hero's blue */
-.nav-toggle { order: 3; display: none; margin-left: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-ink); cursor: pointer; }
-.nav-toggle__bars, .nav-toggle__bars::before, .nav-toggle__bars::after { display: block; width: 24px; height: 2px; margin-inline: auto; background: currentColor; transition: transform .2s, opacity .2s; }
-.nav-toggle__bars { position: relative; }
-.nav-toggle__bars::before, .nav-toggle__bars::after { content: ""; position: absolute; left: 0; }
-.nav-toggle__bars::before { top: -7px; }
-.nav-toggle__bars::after { top: 7px; }
-[data-open] .nav-toggle__bars { background: transparent; }
-[data-open] .nav-toggle__bars::before { transform: translateY(7px) rotate(45deg); }
-[data-open] .nav-toggle__bars::after { transform: translateY(-7px) rotate(-45deg); }
+.nav-toggle {
+  order: 3;
+  display: none;
+  margin-left: 8px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--brand-radius);
+  background: var(--brand-surface);
+  color: var(--brand-ink);
+  cursor: pointer;
+}
 
-@media (max-width: 767.98px) {
-  .js-nav .nav-toggle { display: block; }
+.nav-toggle__bars,
+.nav-toggle__bars::before,
+.nav-toggle__bars::after {
+  display: block;
+  width: 24px;
+  height: 2px;
+  margin-inline: auto;
+  background: currentColor;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+
+.nav-toggle__bars {
+  position: relative;
+}
+
+.nav-toggle__bars::before,
+.nav-toggle__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.nav-toggle__bars::before {
+  top: -7px;
+}
+
+.nav-toggle__bars::after {
+  top: 7px;
+}
+
+[data-open] .nav-toggle__bars {
+  background: transparent;
+}
+
+[data-open] .nav-toggle__bars::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+[data-open] .nav-toggle__bars::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (width <= 767.98px) {
+  .js-nav .nav-toggle {
+    display: block;
+  }
+
   .js-nav .site-nav {
-    display: none; position: absolute; inset: 100% 0 auto 0;
-    flex-direction: column; align-items: stretch; gap: 0;
-    padding: 8px var(--gutter) 24px; background: var(--brand-surface);
+    display: none;
+    position: absolute;
+    inset: 100% 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px var(--gutter) 24px;
+    background: var(--brand-surface);
     box-shadow: 0 12px 24px var(--brand-shadow);
   }
-  .js-nav [data-open] .site-nav { display: flex; }
-  .js-nav .site-nav a:not(.btn) { padding: 12px 0; border-bottom: 1px solid var(--brand-placeholder); }
+
+  .js-nav [data-open] .site-nav {
+    display: flex;
+  }
+
+  .js-nav .site-nav a:not(.btn) {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--brand-placeholder);
+  }
+
   /* Without JS the links stay inline, smaller */
-  html:not(.js-nav) .site-header { height: auto; min-height: calc(var(--header-h) + var(--safe-top)); flex-wrap: wrap; row-gap: 0; padding-block: calc(8px + var(--safe-top)) 8px; }
-  html:not(.js-nav) .site-nav { order: 4; flex-basis: 100%; flex-wrap: wrap; gap: 4px 16px; margin-left: 0; }
-  html:not(.js-nav) .site-nav a:not(.btn) { font-size: .8rem; padding-block: 6px; }
+  html:not(.js-nav) .site-header {
+    height: auto;
+    min-height: calc(var(--header-height) + var(--safe-top));
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-block: calc(8px + var(--safe-top)) 8px;
+  }
+
+  html:not(.js-nav) .site-nav {
+    order: 4;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-left: 0;
+  }
+
+  html:not(.js-nav) .site-nav a:not(.btn) {
+    font-size: 0.8rem;
+    padding-block: 6px;
+  }
 }
 
 /* ==========================================================================
    Phone menu: the hero's slash lives here as a fixed bottom-right corner (red stripe, solid
    Dark Red to its right). The white burger sits in it. Tapping it slides the slash line up and
    left, so the Dark Red grows into the menu panel with the links, contact icons and language.
-   --cx is where the red stripe meets the bottom of the screen.
+   --corner-x is where the red stripe meets the bottom of the screen.
    ========================================================================== */
-@property --cx { syntax: "<length-percentage>"; inherits: true; initial-value: 50vw; }
-.menu-corner, .site-nav__lang, .brand__logo--light { display: none; }
-@media (max-width: 767.98px) {
-  .site-header { --cx: 50vw; --cx-stripe: 14px; transition: --cx .45s cubic-bezier(.22, 1, .36, 1), background-color .3s; }
-  .site-header[data-past-hero], body:not(.home) .site-header { --cx: 82vw; }   /* small corner after the hero */
-  .site-header[data-open] { --cx: -45vw; }
-  .menu-corner { display: block; position: fixed; inset: 0; pointer-events: none; }
-  .menu-corner > span { position: absolute; inset: 0; }
-  .menu-corner__red  { background: var(--color-primary-red); clip-path: polygon(calc(var(--cx) + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 1px + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 1px) 100%, var(--cx) 100%); }
-  .menu-corner__dark { background: var(--color-dark-red); clip-path: polygon(calc(var(--cx) + var(--cx-stripe) + 100lvh * tan(var(--slash-angle))) 0, calc(var(--cx) + var(--cx-stripe) + 100lvh * tan(var(--slash-angle)) + 200vw) 0, calc(var(--cx) + var(--cx-stripe) + 200vw) 100%, calc(var(--cx) + var(--cx-stripe)) 100%); }
+@property --corner-x {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 50vw;
+}
+
+.menu-corner,
+.site-nav__lang,
+.brand__logo--light {
+  display: none;
+}
+
+@media (width <= 767.98px) {
+  .site-header {
+    --corner-x: 50vw;
+    --corner-stripe-width: 14px;
+
+    transition:
+      --corner-x 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.3s;
+  }
+
+  .site-header[data-past-hero],
+  body:not(.home) .site-header {
+    --corner-x: 82vw;
+  } /* small corner after the hero */
+  .site-header[data-open] {
+    --corner-x: -45vw;
+  }
+
+  .menu-corner {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .menu-corner > span {
+    position: absolute;
+    inset: 0;
+  }
+
+  .menu-corner__red {
+    background: var(--color-primary-red);
+    clip-path: polygon(
+      calc(var(--corner-x) + 100lvh * tan(var(--slash-angle))) 0,
+      calc(var(--corner-x) + var(--corner-stripe-width) + 1px + 100lvh * tan(var(--slash-angle))) 0,
+      calc(var(--corner-x) + var(--corner-stripe-width) + 1px) 100%,
+      var(--corner-x) 100%
+    );
+  }
+
+  .menu-corner__dark {
+    background: var(--color-dark-red);
+    clip-path: polygon(
+      calc(var(--corner-x) + var(--corner-stripe-width) + 100lvh * tan(var(--slash-angle))) 0,
+      calc(var(--corner-x) + var(--corner-stripe-width) + 100lvh * tan(var(--slash-angle)) + 200vw)
+        0,
+      calc(var(--corner-x) + var(--corner-stripe-width) + 200vw) 100%,
+      calc(var(--corner-x) + var(--corner-stripe-width)) 100%
+    );
+  }
+
   /* The hero's own stripes are replaced by the corner */
-  .hero__stripe { display: none; }
+  .hero__stripe {
+    display: none;
+  }
 
   /* Burger: white, bottom right, on the Dark Red */
-  .js-nav .nav-toggle { position: fixed; right: calc(12px + var(--safe-right)); bottom: calc(12px + var(--safe-bottom)); z-index: 1; margin: 0; background: none; color: var(--brand-on-dark); }
+  .js-nav .nav-toggle {
+    position: fixed;
+    right: calc(12px + var(--safe-right));
+    bottom: calc(12px + var(--safe-bottom));
+    z-index: 1;
+    margin: 0;
+    background: none;
+    color: var(--brand-on-dark);
+  }
+
   /* Language and contact icons move into the menu */
+
   /* Language lives in the menu. The contact icons stack above the burger on the hero only,
      and fade out once the visitor scrolls past it (or opens the menu, which has its own). */
-  .site-header__tools .lang-switch { display: none; }
-  .site-header__tools .contact-icons--header { display: flex; flex-direction: column; position: fixed; right: calc(12px + var(--safe-right)); bottom: calc(64px + var(--safe-bottom)); z-index: 1;
-    gap: 0; padding: 0; background: none; opacity: 1; visibility: visible; }
-  .site-header__tools .contact-icons--header a { color: var(--brand-on-dark); }
-  .site-header[data-past-hero] .contact-icons--header, .site-header[data-open] .contact-icons--header,
-  body:not(.home) .contact-icons--header { opacity: 0 !important; visibility: hidden !important; }
+  .site-header__tools .lang-switch {
+    display: none;
+  }
+
+  .site-header__tools .contact-icons--header {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: calc(12px + var(--safe-right));
+    bottom: calc(64px + var(--safe-bottom));
+    z-index: 1;
+    gap: 0;
+    padding: 0;
+    background: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .site-header__tools .contact-icons--header a {
+    color: var(--brand-on-dark);
+  }
+
+  .site-header[data-past-hero] .contact-icons--header,
+  .site-header[data-open] .contact-icons--header,
+  body:not(.home) .contact-icons--header {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
 
   /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
+
   /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
-  .js-nav .site-nav { display: flex; position: fixed; inset: auto calc(16px + var(--safe-right)) calc(72px + var(--safe-bottom)) auto; z-index: 1; flex-direction: column; align-items: flex-end; gap: 4px;
-    max-height: calc(100dvh - 72px - 16px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto; padding: 0 12px 0 0; margin-right: -12px; background: none; box-shadow: none; opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
-  .js-nav [data-open] .site-nav { opacity: 1; visibility: visible; transition-delay: .2s; }
-  .js-nav .site-nav a:not(.btn) { padding: 10px 0; border: 0; color: var(--brand-on-dark); font-size: 1.125rem; }
-  .js-nav [data-open] .contact-icons--menu { display: flex; margin: 8px -12px 0 0; }
-  .contact-icons--menu a { color: var(--brand-on-dark); }
-  .site-nav__lang { display: block; margin-top: 8px; color: var(--brand-on-dark); font-size: .875rem; font-weight: var(--font-bold); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; padding: 10px 0; }
+  .js-nav .site-nav {
+    display: flex;
+    position: fixed;
+    inset: auto calc(16px + var(--safe-right)) calc(72px + var(--safe-bottom)) auto;
+    z-index: 1;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    max-height: calc(100dvh - 72px - 16px - var(--safe-top) - var(--safe-bottom));
+    overflow-y: auto;
+    padding: 0 12px 0 0;
+    margin-right: -12px;
+    background: none;
+    box-shadow: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s,
+      visibility 0.2s;
+  }
+
+  .js-nav [data-open] .site-nav {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0.2s;
+  }
+
+  .js-nav .site-nav a:not(.btn) {
+    padding: 10px 0;
+    border: 0;
+    color: var(--brand-on-dark);
+    font-size: 1.125rem;
+  }
+
+  .js-nav [data-open] .contact-icons--menu {
+    display: flex;
+    margin: 8px -12px 0 0;
+  }
+
+  .contact-icons--menu a {
+    color: var(--brand-on-dark);
+  }
+
+  .site-nav__lang {
+    display: block;
+    margin-top: 8px;
+    color: var(--brand-on-dark);
+    font-size: 0.875rem;
+    font-weight: var(--font-bold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 10px 0;
+  }
 
   /* Home, over the photo: transparent header with the cream logo. Past the hero: white, dark logo. */
-  body.home .site-header { background: transparent; }
-  body.home .site-header[data-past-hero] { background: var(--brand-surface); }
-  body.home .site-header:not([data-past-hero]) .brand { color: var(--color-cream); }
-  body.home .site-header:not([data-past-hero]) .brand__logo { display: none; }
-  body.home .site-header:not([data-past-hero]) .brand__logo--light { display: block; }
+  body.home .site-header {
+    background: transparent;
+  }
+
+  body.home .site-header[data-past-hero] {
+    background: var(--brand-surface);
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand {
+    color: var(--color-cream);
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand__logo {
+    display: none;
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand__logo--light {
+    display: block;
+  }
 }
-@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
+
+@media (width <= 767.98px) and (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
+}
 
 /* ==========================================================================
    Hero: full-screen image, text on the left. From 768px the agent stands on the right, above the
@@ -192,274 +680,962 @@ body:not(.home) .site-header { background: var(--brand-surface); }
 .stage {
   /* Geometry shared by the hero, the travelling photo and About.
      Horizontal positions are offsets from the page centre. */
-  --hero-h: clamp(560px, 100svh, 960px);
-  --photo-h: calc(var(--hero-h) * .85);   /* photo top at 15%; with its built-in margin his head starts near 25% */
-  --photo-w: calc(var(--photo-h) * .5623);               /* portrait cut-out; other ratios are contained */
-  --photo-x: calc(50vw - var(--photo-w) - clamp(24px, 6vw, 120px));   /* agent's left edge */
+  --hero-height: clamp(560px, 100svh, 960px);
+
+  /* photo top at 15%; with its built-in margin his head starts near 25% */
+  --photo-height: calc(var(--hero-height) * 0.85);
+
+  /* portrait cut-out; other ratios are contained */
+  --photo-width: calc(var(--photo-height) * 0.5623);
+
+  /* agent's left edge */
+  --photo-x: calc(50vw - var(--photo-width) - clamp(24px, 6vw, 120px));
+
   /* Slash: placed from the agent so it always passes just right of his hands. Hands reach about 88% of
-     the photo's width, about 12% of its height above the bottom; the line leans right as it rises. */
-  --band-x: calc(var(--photo-x) + var(--photo-w) * .8 - var(--photo-h) * .12 * tan(var(--slash-angle)));   /* crosses his right arm, hands stay clear */
-  --red-w: 10px;                            /* Primary Red line: fixed on every screen */
+     the photo's width, about 12% of its height above the bottom; the line leans right as it rises.
+     It crosses his right arm, hands stay clear. */
+  --band-x: calc(
+    var(--photo-x) + var(--photo-width) * 0.8 - var(--photo-height) * 0.12 * tan(var(--slash-angle))
+  );
+  --red-width: 10px; /* Primary Red line: fixed on every screen */
   --name-size: clamp(1.25rem, 1.8vw, 2rem);
-  --sig-w: clamp(88px, 8vw, 140px);                      /* kept smaller than the header logo */
-  --motion-end: calc(var(--hero-h) * .9);                 /* the hero has faded out by 90% of its scroll */
-  --agent-top: max(0px, var(--hero-h) - var(--photo-h));  /* hero photo top: cropped at the bottom when taller */
-  --about-pad: clamp(48px, 8vw, 96px);
-  --about-top: var(--about-pad);
-  --frame-top: calc(var(--about-top) + 24px);             /* phones' About card: section padding + container padding */
+  --signature-width: clamp(88px, 8vw, 140px); /* kept smaller than the header logo */
+  --motion-end: calc(var(--hero-height) * 0.9); /* the hero has faded out by 90% of its scroll */
+
+  /* hero photo top: cropped at the bottom when taller */
+  --agent-top: max(0px, var(--hero-height) - var(--photo-height));
+  --about-padding: clamp(48px, 8vw, 96px);
+  --about-top: var(--about-padding);
+
+  /* phones' About card: section padding + container padding */
+  --frame-top: calc(var(--about-top) + 24px);
 }
+
 /* White under the image, so the hero fades to the page's white as the agent leaves */
-.hero { position: relative; overflow: hidden; height: var(--hero-h); background: var(--brand-surface); }
-.hero__side { position: absolute; inset: 0; z-index: 0; background: var(--color-black); }
-.hero__side img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.hero {
+  position: relative;
+  overflow: hidden;
+  height: var(--hero-height);
+  background: var(--brand-surface);
+}
+
+.hero__side {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-black);
+}
+
+.hero__side img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
 /* Scrim between the image and the text */
-.hero::before { content: ""; position: absolute; inset: 0; z-index: 1; }
-.hero__inner { position: relative; z-index: 2; height: 100%; width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter)); margin-left: var(--wrap-left); }
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
+  margin-left: var(--wrap-left);
+}
 
 /* The text may overlap the photo's transparent left margin, so it sits above the photo */
+
 /* Sits in the lower part of the hero */
-.hero__id { position: absolute; z-index: 1; left: 0; bottom: clamp(48px, 14%, 160px); max-width: calc(50% + var(--photo-x) + var(--photo-w) * .1); }
-.hero__signature { width: var(--sig-w); height: auto; margin-bottom: 12px; }
-.hero__name { margin: 0; font-size: var(--name-size); text-transform: uppercase; letter-spacing: .04em; }
-.hero__role { margin: 6px 0 0; font-weight: var(--font-medium); font-size: clamp(1rem, 1.3vw, 1.2rem); color: var(--brand-ink); }
-.hero__agency { margin: 2px 0 0; font-size: .95rem; color: var(--brand-muted); }
-.hero__tagline { margin: 8px 0 12px; font-size: clamp(1.05rem, 1.5vw, 1.35rem); font-weight: var(--font-medium); line-height: 1.35; color: var(--brand-ink); }
-.hero__cta { margin: 20px 0 0; }
+.hero__id {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: clamp(48px, 14%, 160px);
+  max-width: calc(50% + var(--photo-x) + var(--photo-width) * 0.1);
+}
 
-.hero__photo, .stage__agent img { height: var(--photo-h); width: var(--photo-w); max-width: none; object-fit: contain; object-position: top center; }
+.hero__signature {
+  width: var(--signature-width);
+  height: auto;
+  margin-bottom: 12px;
+}
+
+.hero__name {
+  margin: 0;
+  font-size: var(--name-size);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hero__role {
+  margin: 6px 0 0;
+  font-weight: var(--font-medium);
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: var(--brand-ink);
+}
+
+.hero__agency {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  color: var(--brand-muted);
+}
+
+.hero__tagline {
+  margin: 8px 0 12px;
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  font-weight: var(--font-medium);
+  line-height: 1.35;
+  color: var(--brand-ink);
+}
+
+.hero__cta {
+  margin: 20px 0 0;
+}
+
+.hero__photo,
+.stage__agent img {
+  height: var(--photo-height);
+  width: var(--photo-width);
+  max-width: none;
+  object-fit: contain;
+  object-position: top center;
+}
+
 /* Photo layer: under the text (z 2) and the band (z 4) */
-.hero__figure { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-/* Taller than the hero: starts at the top, cropped at the bottom. Shorter: stands on the bottom edge. */
-.hero__photo { position: absolute; top: var(--agent-top); left: calc(50% + var(--photo-x)); }
-
-.hero__band {
-  --band-h: var(--hero-h);
-  --L: calc(50% + var(--band-x));                       /* bottom-left x */
-  --S: calc(var(--band-h) * tan(var(--slash-angle)));   /* horizontal lean over the band height */
-  --R: calc(var(--L) + var(--red-w));
-  position: absolute; inset: 0; z-index: 4;             /* above the hero photo and its travelling copy */
+.hero__figure {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
 }
-.hero__stripe { position: absolute; inset: 0; }
+
+/* Taller than the hero: starts at the top, cropped at the bottom. Shorter: stands on the bottom edge. */
+.hero__photo {
+  position: absolute;
+  top: var(--agent-top);
+  left: calc(50% + var(--photo-x));
+}
+
+.hero__band {
+  --band-height: var(--hero-height);
+  --slash-left: calc(50% + var(--band-x)); /* bottom-left x */
+
+  /* horizontal lean over the band height */
+  --slash-lean: calc(var(--band-height) * tan(var(--slash-angle)));
+  --slash-right: calc(var(--slash-left) + var(--red-width));
+
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* above the hero photo and its travelling copy */
+  pointer-events: none;
+}
+
+.hero__stripe {
+  position: absolute;
+  inset: 0;
+}
+
 /* Primary Red stripe: solid, from the band's left edge to where the dark band starts (1px overlap avoids a hairline) */
-.hero__stripe--red  { background: var(--color-primary-red); clip-path: polygon(calc(var(--L) + var(--S)) 0, calc(var(--R) + var(--S) + 1px) 0, calc(var(--R) + 1px) 100%, var(--L) 100%); }
+.hero__stripe--red {
+  background: var(--color-primary-red);
+  clip-path: polygon(
+    calc(var(--slash-left) + var(--slash-lean)) 0,
+    calc(var(--slash-right) + var(--slash-lean) + 1px) 0,
+    calc(var(--slash-right) + 1px) 100%,
+    var(--slash-left) 100%
+  );
+}
+
 /* Dark Red fills everything to the right of the red stripe, no fade */
-.hero__stripe--dark { background: var(--color-dark-red);
-  clip-path: polygon(calc(var(--R) + var(--S)) 0, calc(var(--R) + var(--S) + 100vw) 0, calc(var(--R) + 100vw) 100%, var(--R) 100%); }
+.hero__stripe--dark {
+  background: var(--color-dark-red);
+  clip-path: polygon(
+    calc(var(--slash-right) + var(--slash-lean)) 0,
+    calc(var(--slash-right) + var(--slash-lean) + 100vw) 0,
+    calc(var(--slash-right) + 100vw) 100%,
+    var(--slash-right) 100%
+  );
+}
 
 /* Phones and tablet portrait (wireframe): agent in the top half, a short slash band across the
    middle, signature block right-aligned at the bottom right. The photo is cut along the band's
    red stripe, so the agent stays on his side of the slash. */
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   .stage {
-    --hero-h: clamp(560px, 100svh, 900px);
-    --photo-h: min(var(--hero-h) * .62, var(--wrap) * 1.25);
-    --photo-x: calc(var(--photo-w) * -.62);
-    --agent-top: calc(var(--header-h) + 8px);
+    --hero-height: clamp(560px, 100svh, 900px);
+    --photo-height: min(var(--hero-height) * 0.62, var(--wrap) * 1.25);
+    --photo-x: calc(var(--photo-width) * -0.62);
+    --agent-top: calc(var(--header-height) + 8px);
     --name-size: 1.25rem;
-    --sig-w: 80px;
+    --signature-width: 80px;
+
     /* Band: vertical span and position. Its centre sits on the page centre. */
-    --band-y1: calc(var(--hero-h) * .30);
-    --band-y2: calc(var(--hero-h) * .70);
-    --band-S: calc((var(--band-y2) - var(--band-y1)) * tan(var(--slash-angle)));
-    --band-off: calc((var(--band-S) + 40px) / -2);          /* bottom-left x, from the centre */
-    --band-roff: calc(var(--band-off) + 40px * var(--slash-red-ratio));  /* red stripe's right edge */
+    --band-y1: calc(var(--hero-height) * 0.3);
+    --band-y2: calc(var(--hero-height) * 0.7);
+    --band-lean: calc((var(--band-y2) - var(--band-y1)) * tan(var(--slash-angle)));
+    --band-off: calc((var(--band-lean) + 40px) / -2); /* bottom-left x, from the centre */
+
+    /* red stripe's right edge */
+    --band-roff: calc(var(--band-off) + 40px * var(--slash-red-ratio));
+
     /* About card: centred above the text, below the header, 9:16 */
-    --about-top: calc(var(--header-h) + var(--safe-top));
-    --frame-w: min(var(--wrap), 360px, (var(--hero-h) - var(--frame-top) - 24px) * 9 / 16);
-    --frame-h: calc(var(--frame-w) * 16 / 9);
+    --about-top: calc(var(--header-height) + var(--safe-top));
+    --frame-width: min(var(--wrap), 360px, (var(--hero-height) - var(--frame-top) - 24px) * 9 / 16);
+    --frame-height: calc(var(--frame-width) * 16 / 9);
   }
+
   /* Cut along the line of the band's red stripe, extended over the whole hero */
-  .hero__figure { clip-path: polygon(0 0,
-    calc(50% + var(--band-roff) + var(--band-y2) * tan(var(--slash-angle))) 0,
-    calc(50% + var(--band-roff) - (var(--hero-h) - var(--band-y2)) * tan(var(--slash-angle))) 100%, 0 100%); }
-  .hero__id { left: auto; right: 0; bottom: 24px; max-width: min(100%, 22rem); text-align: right; }
-  .hero__signature { margin-left: auto; }
+  .hero__figure {
+    clip-path: polygon(
+      0 0,
+      calc(50% + var(--band-roff) + var(--band-y2) * tan(var(--slash-angle))) 0,
+      calc(50% + var(--band-roff) - (var(--hero-height) - var(--band-y2)) * tan(var(--slash-angle)))
+        100%,
+      0 100%
+    );
+  }
+
+  .hero__id {
+    left: auto;
+    right: 0;
+    bottom: 24px;
+    max-width: min(100%, 22rem);
+    text-align: right;
+  }
+
+  .hero__signature {
+    margin-left: auto;
+  }
 }
 
 /* Phones only: no agent in the hero (he appears directly in About). The side image fills the
    hero, the name block sits mid-screen on the left in white over a dark scrim, and a short slash
    rises from the bottom centre at the fixed 27.5° with solid Dark Red to its right. */
-@media (max-width: 767.98px) {
-  .stage { --hero-h: 100lvh; }   /* the large viewport, so About never shows behind the browser bars */
-  .hero__figure { display: none; }
+@media (width <= 767.98px) {
+  .stage {
+    --hero-height: 100lvh;
+  } /* the large viewport, so About never shows behind the browser bars */
+  .hero__figure {
+    display: none;
+  }
+
   /* Band layer: under the text, full hero */
-  .hero__band { z-index: 0; --L: 50%; --R: calc(var(--L) + 14px); }
+  .hero__band {
+    z-index: 0;
+
+    --slash-left: 50%;
+    --slash-right: calc(var(--slash-left) + 14px);
+  }
+
   /* Scrim: darkens the left of the photo so white text passes contrast on any image */
-  .hero::before { background: linear-gradient(to right, color-mix(in srgb, var(--color-black) 70%, transparent), color-mix(in srgb, var(--color-black) 35%, transparent) 60%, transparent); }
-  .hero__id { top: 50%; bottom: auto; left: 0; right: auto; translate: 0 -50%; max-width: 100%; text-align: left; color: var(--brand-on-dark); }
-  .hero__name, .hero__tagline, .hero__role, .hero__agency { color: var(--brand-on-dark); }
-  .hero__signature { margin-left: 0; filter: invert(1); }
+  .hero::before {
+    background: linear-gradient(
+      to right,
+      color-mix(in sRGB, var(--color-black) 70%, transparent),
+      color-mix(in sRGB, var(--color-black) 35%, transparent) 60%,
+      transparent
+    );
+  }
+
+  .hero__id {
+    inset: 50% auto auto 0;
+    translate: 0 -50%;
+    max-width: 100%;
+    text-align: left;
+    color: var(--brand-on-dark);
+  }
+
+  .hero__name,
+  .hero__tagline,
+  .hero__role,
+  .hero__agency {
+    color: var(--brand-on-dark);
+  }
+
+  .hero__signature {
+    margin-left: 0;
+    filter: invert(1);
+  }
 }
 
 /* From 768px: full-screen image, text on the left in white, agent on the right, a thin Primary Red
    line with a solid Dark Red triangle to its right, over him. Stacking: image (0), scrim (1), agent
    and its travelling copy (3), slash (4), text (6). It starts below the header and leaves by the right edge. */
-@media (min-width: 768px) {
-  .stage { --hero-h: max(560px, 100svh); }
-  .hero__figure { z-index: 3; }
-  .hero__band { inset: calc(var(--header-h) + var(--safe-top)) 0 0 0; --band-h: calc(var(--hero-h) - var(--header-h) - var(--safe-top)); }
+@media (width >= 768px) {
+  .stage {
+    --hero-height: max(560px, 100svh);
+  }
+
+  .hero__figure {
+    z-index: 3;
+  }
+
+  .hero__band {
+    inset: calc(var(--header-height) + var(--safe-top)) 0 0;
+
+    --band-height: calc(var(--hero-height) - var(--header-height) - var(--safe-top));
+  }
+
   /* At least 55% black under the text, whatever the image: white text then passes AA on it. Stops at the agent. */
   .hero::before {
     --text-end: calc(50% + var(--photo-x));
+
     background:
-      linear-gradient(to bottom, color-mix(in srgb, var(--color-black) 62%, transparent), color-mix(in srgb, var(--color-black) 55%, transparent) var(--header-h), transparent calc(var(--header-h) + 120px)),
-      linear-gradient(to right, color-mix(in srgb, var(--color-black) 72%, transparent), color-mix(in srgb, var(--color-black) 55%, transparent) var(--text-end), transparent calc(var(--text-end) + var(--photo-w) * .4));
+      linear-gradient(
+        to bottom,
+        color-mix(in sRGB, var(--color-black) 62%, transparent),
+        color-mix(in sRGB, var(--color-black) 55%, transparent) var(--header-height),
+        transparent calc(var(--header-height) + 120px)
+      ),
+      linear-gradient(
+        to right,
+        color-mix(in sRGB, var(--color-black) 72%, transparent),
+        color-mix(in sRGB, var(--color-black) 55%, transparent) var(--text-end),
+        transparent calc(var(--text-end) + var(--photo-width) * 0.4)
+      );
   }
-  .hero__inner { z-index: 6; }
-  .hero__id { left: 0; right: auto; bottom: clamp(48px, 14%, 160px); max-width: min(34rem, 50vw + var(--photo-x) - var(--wrap-left) - 24px); text-align: left; }
-  .hero__signature { margin-left: 0; filter: invert(1); }
-  .hero__id, .hero__name, .hero__tagline, .hero__role, .hero__agency { color: var(--brand-on-dark); }
+
+  .hero__inner {
+    z-index: 6;
+  }
+
+  .hero__id {
+    left: 0;
+    right: auto;
+    bottom: clamp(48px, 14%, 160px);
+    max-width: min(34rem, 50vw + var(--photo-x) - var(--wrap-left) - 24px);
+    text-align: left;
+  }
+
+  .hero__signature {
+    margin-left: 0;
+    filter: invert(1);
+  }
+
+  .hero__id,
+  .hero__name,
+  .hero__tagline,
+  .hero__role,
+  .hero__agency {
+    color: var(--brand-on-dark);
+  }
 
   /* The logo file has clear space built into its canvas: pull it back so the R sits on the content's left edge */
-  .brand { margin-left: calc(var(--logo-h) * -.24); }
+  .brand {
+    margin-left: calc(var(--logo-height) * -0.24);
+  }
+
   /* Header: menu on the right, next to the icons and language; language without its white chip */
-  .site-nav { margin-left: auto; }
-  .site-header__tools { margin-left: 0; }
+  .site-nav {
+    margin-left: auto;
+  }
+
+  .site-header__tools {
+    margin-left: 0;
+  }
+
   /* Icons take no space until they appear, so the menu sits right next to EN at the top */
-  .contact-icons--header { display: none; }
-  [data-past-hero] .contact-icons--header, body:not(.home) .contact-icons--header { display: flex; }
-  .lang-switch { background: none; }
+  .contact-icons--header {
+    display: none;
+  }
+
+  [data-past-hero] .contact-icons--header,
+  body:not(.home) .contact-icons--header {
+    display: flex;
+  }
+
+  .lang-switch {
+    background: none;
+  }
+
   /* Over the hero: transparent, cream logo, white menu. From About on: white, dark logo. */
-  body.home .site-header { transition: background-color .3s; }
-  body.home .site-header[data-past-hero] { background: var(--brand-surface); }
-  body.home .site-header:not([data-past-hero]) .brand { color: var(--color-cream); }
-  body.home .site-header:not([data-past-hero]) .brand__logo { display: none; }
-  body.home .site-header:not([data-past-hero]) .brand__logo--light { display: block; }
+  body.home .site-header {
+    transition: background-color 0.3s;
+  }
+
+  body.home .site-header[data-past-hero] {
+    background: var(--brand-surface);
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand {
+    color: var(--color-cream);
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand__logo {
+    display: none;
+  }
+
+  body.home .site-header:not([data-past-hero]) .brand__logo--light {
+    display: block;
+  }
+
   body.home .site-header:not([data-past-hero]) .site-nav a:not(.btn),
-  body.home .site-header:not([data-past-hero]) .lang-switch { color: var(--brand-on-dark); }
+  body.home .site-header:not([data-past-hero]) .lang-switch {
+    color: var(--brand-on-dark);
+  }
 }
 
 /* Portrait tablet: a slightly smaller agent, so the text keeps room on the left */
-@media (min-width: 768px) and (max-width: 991.98px) {
-  .stage { --photo-h: calc(var(--hero-h) * .7); }
+@media (width >= 768px) and (width <= 991.98px) {
+  .stage {
+    --photo-height: calc(var(--hero-height) * 0.7);
+  }
 }
-@media (min-width: 768px) and (max-width: 1199.98px) {
-  .hero__id { bottom: 40px; }
-  .hero__name { font-size: 1.125rem; }
+
+@media (width >= 768px) and (width <= 1199.98px) {
+  .hero__id {
+    bottom: 40px;
+  }
+
+  .hero__name {
+    font-size: 1.125rem;
+  }
 }
 
 /* ==========================================================================
    About: white. Desktop: the agent stays where he stood in the hero, text on his left.
    Phones: his picture in a card above the text.
    ========================================================================== */
-.about, .services, .properties { padding-block: clamp(48px, 8vw, 96px); }
-.about { background: var(--brand-surface); padding-top: var(--about-top); overflow-x: clip; }
-.about__inner { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
-.about__card { justify-self: center; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; width: var(--frame-w); height: var(--frame-h); background: var(--color-charcoal) var(--backdrop, var(--grain)) center / var(--backdrop-size, 180px); }
-.about__card img { height: 100%; width: auto; max-width: none; }
-.about__body { max-width: 68ch; }
-@media (min-width: 768px) {
-  /* One screen tall, so the agent ends exactly where he stood in the hero */
-  .about { position: relative; display: grid; align-content: center; min-height: var(--hero-h); padding-top: var(--about-pad); }
-  .about__card { position: absolute; top: var(--agent-top); left: calc(50% + var(--photo-x)); width: var(--photo-w); height: var(--photo-h); background: none; }
-  .about__card img { width: 100%; height: 100%; object-fit: contain; object-position: top center; }
-  .about__body { max-width: min(68ch, 50vw + var(--photo-x) - var(--wrap-left) - 48px); }
+.about,
+.services,
+.properties {
+  padding-block: clamp(48px, 8vw, 96px);
 }
-.about__actions { display: flex; flex-wrap: wrap; gap: 8px 32px; }
-.about__contact { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 4px; color: var(--brand-muted); }
-.stage__track { display: none; }
+
+.about {
+  background: var(--brand-surface);
+  padding-top: var(--about-top);
+  overflow-x: clip;
+}
+
+.about__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 32px;
+}
+
+.about__card {
+  justify-self: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  width: var(--frame-width);
+  height: var(--frame-height);
+  background: var(--color-charcoal) var(--backdrop, var(--grain)) center /
+    var(--backdrop-size, 180px);
+}
+
+.about__card img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
+.about__body {
+  max-width: 68ch;
+}
+
+@media (width >= 768px) {
+  /* One screen tall, so the agent ends exactly where he stood in the hero */
+  .about {
+    position: relative;
+    display: grid;
+    align-content: center;
+    min-height: var(--hero-height);
+    padding-top: var(--about-padding);
+  }
+
+  .about__card {
+    position: absolute;
+    top: var(--agent-top);
+    left: calc(50% + var(--photo-x));
+    width: var(--photo-width);
+    height: var(--photo-height);
+    background: none;
+  }
+
+  .about__card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: top center;
+  }
+
+  .about__body {
+    max-width: min(68ch, 50vw + var(--photo-x) - var(--wrap-left) - 48px);
+  }
+}
+
+.about__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+}
+
+.about__contact {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 4px;
+  color: var(--brand-muted);
+}
+
+.stage__track {
+  display: none;
+}
 
 /* ==========================================================================
    Services: white. Three columns split by slashes; stacked with plain lines on phones.
    ========================================================================== */
-.services { background: var(--brand-surface); }
+.services {
+  background: var(--brand-surface);
+}
+
 /* Subgrid keeps titles, texts and buttons aligned across the three columns */
-.services__list { --svc-gap: clamp(64px, 7vw, 104px); list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto auto; column-gap: var(--svc-gap); }
-.service { position: relative; display: grid; grid-row: span 4; grid-template-rows: subgrid; }
-.service__title { margin: 0 0 12px; font-size: clamp(1.5rem, 2.4vw, 2rem); }
-.service__text { margin: 0 0 24px; }
-.service__actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-.service__more { justify-self: start; margin-top: 16px; font-weight: var(--font-medium); }
+.services__list {
+  --svc-gap: clamp(64px, 7vw, 104px);
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto auto auto;
+  column-gap: var(--svc-gap);
+}
+
+.service {
+  position: relative;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+}
+
+.service__title {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+}
+
+.service__text {
+  margin: 0 0 24px;
+}
+
+.service__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.service__more {
+  justify-self: start;
+  margin-top: 16px;
+  font-weight: var(--font-medium);
+}
+
 /* Slash between titles: 20px, Primary Red 1/4 + Dark Red 3/4, fixed angle (skew keeps vertical lines at the slash angle) */
 .service + .service::before {
-  content: ""; position: absolute; top: -14px; left: calc(var(--svc-gap) / -2 - 10px);
-  width: 20px; height: 64px;
-  background: linear-gradient(90deg, var(--color-primary-red) calc(var(--slash-red-ratio) * 100%), var(--color-dark-red) 0);
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: calc(var(--svc-gap) / -2 - 10px);
+  width: 20px;
+  height: 64px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-red) calc(var(--slash-red-ratio) * 100%),
+    var(--color-dark-red) 0
+  );
   transform: skewX(calc(var(--slash-angle) * -1));
 }
-@media (max-width: 767.98px) {
-  .services__list { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 72px; }
-  .service { grid-row: auto; grid-template-rows: none; }
+
+@media (width <= 767.98px) {
+  .services__list {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 72px;
+  }
+
+  .service {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+
   /* Plain horizontal divider, not a rotated slash */
-  .service + .service::before { top: -38px; left: 0; width: 64px; height: 4px; transform: none; }
+  .service + .service::before {
+    top: -38px;
+    left: 0;
+    width: 64px;
+    height: 4px;
+    transform: none;
+  }
 }
 
 /* ==========================================================================
    Content pages (About, services, legal): one readable column.
    ========================================================================== */
-.page-content { max-width: 72ch; padding-block: clamp(32px, 6vw, 72px); }
-.page-content h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 0 0 24px; }
-.page-content h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); margin: 40px 0 12px; }
-.page-content li + li { margin-top: 6px; }
-.page-content__updated { color: var(--brand-muted); }
+.page-content {
+  max-width: 72ch;
+  padding-block: clamp(32px, 6vw, 72px);
+}
+
+.page-content h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0 0 24px;
+}
+
+.page-content h2 {
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  margin: 40px 0 12px;
+}
+
+.page-content li + li {
+  margin-top: 6px;
+}
+
+.page-content__updated {
+  color: var(--brand-muted);
+}
+
 /* Legal drafts: impossible to miss, before and after the text */
-.legal-banner { margin: 0 0 32px; padding: 24px; border: 4px solid var(--brand-highlight); background: var(--brand-bg); color: var(--color-dark-red); }
-.legal-banner:last-child { margin: 40px 0 0; }
-.legal-banner p { margin: 0; }
-.legal-banner .legal-banner__title { margin-bottom: 6px; font-size: clamp(1.5rem, 4vw, 2.4rem); font-weight: var(--font-bold); line-height: 1.1; text-transform: uppercase; letter-spacing: .02em; }
+.legal-banner {
+  margin: 0 0 32px;
+  padding: 24px;
+  border: 4px solid var(--brand-highlight);
+  background: var(--brand-background);
+  color: var(--color-dark-red);
+}
+
+.legal-banner:last-child {
+  margin: 40px 0 0;
+}
+
+.legal-banner p {
+  margin: 0;
+}
+
+.legal-banner .legal-banner__title {
+  margin-bottom: 6px;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-weight: var(--font-bold);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
 
 /* ==========================================================================
    My properties: grid on tablet and up, card list on phones.
    ========================================================================== */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-bottom: 24px; }
-.card { position: relative; background: var(--brand-surface); border-radius: var(--brand-radius); overflow: hidden; box-shadow: 0 1px 3px var(--brand-shadow); transition: box-shadow .2s; }
-.card:hover { box-shadow: 0 8px 24px var(--brand-shadow-strong); }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.card {
+  position: relative;
+  background: var(--brand-surface);
+  border-radius: var(--brand-radius);
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--brand-shadow);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px var(--brand-shadow-strong);
+}
+
 /* After the button and card rules so it wins at equal specificity */
-@media (prefers-reduced-motion: reduce) { .btn, .btn--cta, .card { transition: none; } }
-.card__media { position: relative; }
-.card__img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--brand-placeholder); }
-.card__status { position: absolute; top: 12px; left: 12px; padding: 2px 12px; background: var(--brand-status); color: var(--brand-on-dark); font-size: .75rem; font-weight: var(--font-medium); }
-.card__body { padding: 16px; }
-.card__number { margin: 0; color: var(--brand-muted); font-size: .875rem; }
-.card__title { margin: 8px 0 2px; font-size: 1rem; line-height: 1.5; }
-.card__title a, .card__title a:hover { color: inherit; text-decoration: none; }
-.card__title a::after { content: ""; position: absolute; inset: 0; }
-.card__title a:focus-visible { outline: none; }
-.card:has(.card__title a:focus-visible) { outline: 3px solid var(--brand-focus); outline-offset: 2px; }
-.card__meta { margin: 0; color: var(--brand-muted); font-size: .75rem; }
-.card__price { margin: 6px 0 0; font-size: 1.1875rem; line-height: 1.3; font-weight: var(--font-bold); color: var(--brand-price); }
-.card__facts { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; padding: 0; list-style: none; font-size: .75rem; font-weight: var(--font-medium); }
-.card__facts li { display: flex; align-items: center; gap: 5px; }
-.card__icon { display: inline-flex; color: var(--brand-muted); }
-.card__icon svg { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn--cta,
+  .card {
+    transition: none;
+  }
+}
+
+.card__media {
+  position: relative;
+}
+
+.card__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: var(--brand-placeholder);
+}
+
+.card__status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 2px 12px;
+  background: var(--brand-status);
+  color: var(--brand-on-dark);
+  font-size: 0.75rem;
+  font-weight: var(--font-medium);
+}
+
+.card__body {
+  padding: 16px;
+}
+
+.card__number {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.875rem;
+}
+
+.card__title {
+  margin: 8px 0 2px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.card__title a,
+.card__title a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.card__title a:focus-visible {
+  outline: none;
+}
+
+.card:has(.card__title a:focus-visible) {
+  outline: 3px solid var(--brand-focus);
+  outline-offset: 2px;
+}
+
+.card__meta {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+}
+
+.card__price {
+  margin: 6px 0 0;
+  font-size: 1.1875rem;
+  line-height: 1.3;
+  font-weight: var(--font-bold);
+  color: var(--brand-price);
+}
+
+.card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  font-weight: var(--font-medium);
+}
+
+.card__facts li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card__icon {
+  display: inline-flex;
+  color: var(--brand-muted);
+}
+
+.card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Above the title link stretched over the card. The button needs JS; without it, the noscript link shows. */
-.card__more { position: relative; z-index: 1; display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; padding: 8px 16px; border: 1px solid var(--brand-button); border-radius: var(--brand-radius); background: var(--brand-surface); color: var(--brand-button); font: inherit; font-size: .8125rem; font-weight: var(--font-bold); text-decoration: none; cursor: pointer; }
-.card__more:hover { background: var(--brand-button); color: var(--brand-on-dark); }
-html:not(.js) button.card__more { display: none; }
-@media (max-width: 767.98px) {
-  .cards { grid-template-columns: 1fr; gap: 12px; }
-  .card { display: grid; grid-template-columns: 120px 1fr; }
-  .card__img { height: 100%; aspect-ratio: auto; min-height: 104px; }
-  .card__status { top: 8px; left: 8px; }
-  .card__body { padding: 12px; }
-  .card__title { margin-top: 4px; }
+.card__more {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 1px solid var(--brand-button);
+  border-radius: var(--brand-radius);
+  background: var(--brand-surface);
+  color: var(--brand-button);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: var(--font-bold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card__more:hover {
+  background: var(--brand-button);
+  color: var(--brand-on-dark);
+}
+
+html:not(.js) button.card__more {
+  display: none;
+}
+
+@media (width <= 767.98px) {
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+  }
+
+  .card__img {
+    height: 100%;
+    aspect-ratio: auto;
+    min-height: 104px;
+  }
+
+  .card__status {
+    top: 8px;
+    left: 8px;
+  }
+
+  .card__body {
+    padding: 12px;
+  }
+
+  .card__title {
+    margin-top: 4px;
+  }
 }
 
 /* ==========================================================================
    Footer: office identification on every page
    ========================================================================== */
-.site-footer { padding-bottom: var(--safe-bottom); background: var(--brand-dark); color: var(--brand-on-dark-muted); font-size: .9rem; }
-.site-footer__inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; padding-block: 40px; }
-/* Phones: one column, kept left of the fixed red corner (which starts at 82% of the width) */
-@media (max-width: 767.98px) {
-  .site-footer__inner { grid-template-columns: 1fr; gap: 28px; padding-bottom: 48px; }
-  .site-footer__inner > div { max-width: calc(82vw - var(--gutter) - 8px); }
+.site-footer {
+  padding-bottom: var(--safe-bottom);
+  background: var(--brand-dark);
+  color: var(--brand-on-dark-muted);
+  font-size: 0.9rem;
 }
-.site-footer p, .site-footer address { margin: 0 0 2px; font-style: normal; }
-.site-footer a { color: var(--brand-on-dark); }
-.site-footer__office { color: var(--brand-on-dark); font-weight: var(--font-bold); }
-.site-footer__notice, .site-footer__copy { margin-top: 12px !important; }
-.site-footer__legal { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+
+.site-footer__inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  padding-block: 40px;
+}
+
+/* Phones: one column, kept left of the fixed red corner (which starts at 82% of the width) */
+@media (width <= 767.98px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 48px;
+  }
+
+  .site-footer__inner > div {
+    max-width: calc(82vw - var(--gutter) - 8px);
+  }
+}
+
+.site-footer p,
+.site-footer address {
+  margin: 0 0 2px;
+  font-style: normal;
+}
+
+.site-footer a {
+  color: var(--brand-on-dark);
+}
+
+.site-footer__office {
+  color: var(--brand-on-dark);
+  font-weight: var(--font-bold);
+}
+
+.site-footer__notice,
+.site-footer__copy {
+  margin-top: 12px !important;
+}
+
+.site-footer__legal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
 
 /* Listing page, also used by the CMS preview template */
-.listing { background: var(--brand-surface); border-radius: var(--brand-radius); padding: 24px; box-shadow: 0 1px 3px var(--brand-shadow); }
-.listing__status { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--brand-accent); color: var(--brand-on-dark); font-size: .75rem; font-weight: var(--font-bold); text-transform: uppercase; letter-spacing: .04em; }
-.listing__address { color: var(--brand-muted); margin-top: -8px; }
-.listing__price { font-size: 1.5rem; font-weight: var(--font-bold); color: var(--brand-primary); }
-.listing__facts { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; color: var(--brand-muted); }
-.listing__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 16px; }
-.listing__photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--brand-radius); }
+.listing {
+  background: var(--brand-surface);
+  border-radius: var(--brand-radius);
+  padding: 24px;
+  box-shadow: 0 1px 3px var(--brand-shadow);
+}
+
+.listing__status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: var(--brand-on-dark);
+  font-size: 0.75rem;
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.listing__address {
+  color: var(--brand-muted);
+  margin-top: -8px;
+}
+
+.listing__price {
+  font-size: 1.5rem;
+  font-weight: var(--font-bold);
+  color: var(--brand-primary);
+}
+
+.listing__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+  color: var(--brand-muted);
+}
+
+.listing__photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.listing__photos img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--brand-radius);
+}
 
 /* Reveal (js/site.js sets data-reveal): blocks fade in and rise 30px, staggered by --reveal-delay.
    The color and box-shadow entries keep the links' and cards' own hover transitions. */
@@ -468,16 +1644,18 @@ html:not(.js) button.card__more { display: none; }
     opacity: 0;
     translate: 0 30px;
     transition:
-      opacity .9s ease-out,
-      translate .7s ease-out,
-      color .2s,
-      box-shadow .2s;
+      opacity 0.9s ease-out,
+      translate 0.7s ease-out,
+      color 0.2s,
+      box-shadow 0.2s;
   }
+
   [data-reveal="in"],
   [data-reveal]:focus-within {
     opacity: 1;
     translate: none;
   }
+
   [data-reveal="in"] {
     transition-delay: var(--reveal-delay, 0s), var(--reveal-delay, 0s), 0s, 0s;
   }
@@ -489,26 +1667,81 @@ html:not(.js) button.card__more { display: none; }
    ========================================================================== */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    @media (min-width: 768px) {
+    @media (width >= 768px) {
       /* The slashes, the image and its scrim fade in place to the page's white */
-      .hero__band, .hero__side, .hero::before { animation: fade-out linear both; animation-timeline: scroll(root); animation-range: 0 var(--motion-end); }
+      .hero__band,
+      .hero__side,
+      .hero::before {
+        animation: fade-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 var(--motion-end);
+      }
+
       /* The name block fades and lifts, gone before About's text reaches it */
-      .hero__id { animation: id-out linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--hero-h) * .35); }
+      .hero__id {
+        animation: id-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 calc(var(--hero-height) * 0.35);
+      }
 
       /* The agent stays still: a pinned copy holds his hero position until the end of About, then
          scrolls up with it. The hero photo and the About card stay invisible and only hold his place. */
-      .stage { position: relative; }
+      .stage {
+        position: relative;
+      }
+
       /* The hero holds still and fades in place while About scrolls over it (About is see-through,
          the hero fades to the same white). z-index keeps the hero's layers under About. */
-      .hero { position: sticky; top: 0; z-index: 0; }
-      .about { background: none; }
-      .stage__track { display: block; position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-      .stage__pin { position: sticky; top: 0; height: var(--hero-h); overflow: clip; }
-      .stage__agent { position: absolute; top: var(--agent-top); left: calc(50% + var(--photo-x)); }
-      .hero__photo, .about__card { visibility: hidden; }
+      .hero {
+        position: sticky;
+        top: 0;
+        z-index: 0;
+      }
+
+      .about {
+        background: none;
+      }
+
+      .stage__track {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      .stage__pin {
+        position: sticky;
+        top: 0;
+        height: var(--hero-height);
+        overflow: clip;
+      }
+
+      .stage__agent {
+        position: absolute;
+        top: var(--agent-top);
+        left: calc(50% + var(--photo-x));
+      }
+
+      .hero__photo,
+      .about__card {
+        visibility: hidden;
+      }
     }
   }
 }
-@keyframes fade-out { to { opacity: 0; } }
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
 /* visibility: hidden at the end takes the invisible links out of the tab order */
-@keyframes id-out { to { opacity: 0; translate: 0 -80px; visibility: hidden; } }
+@keyframes id-out {
+  to {
+    opacity: 0;
+    translate: 0 -80px;
+    visibility: hidden;
+  }
+}

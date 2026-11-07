@@ -1,0 +1,56 @@
+// Content files: their types, inferred from the JSON so they follow content changes, and the
+// helpers the build (eleventy.config.ts) and the tests (tests/support/site.ts) share.
+import fs from "node:fs";
+
+export type Lang = "fr" | "en";
+
+export type Translated<T = string> = Record<Lang, T>;
+
+export type Site = typeof import("../_data/site.json");
+export type Agent = typeof import("../content/agent.json");
+export type Menu = typeof import("../content/menu.json");
+export type Copy = typeof import("../content/i18n.json");
+export type Listing = (typeof import("../content/listings/listings.json"))[number];
+
+export interface ContentPage {
+  title: Translated;
+  description: Translated;
+  body: Translated;
+  updated?: Translated;
+  reviewPending?: boolean;
+}
+
+/** i18n.json holds { fr, en } pairs at every leaf; this is the same tree with one language picked. */
+export type Picked<T> = T extends Translated
+  ? string
+  : T extends object
+    ? { [Key in keyof T]: Picked<T[Key]> }
+    : T;
+
+/** Reads a content file. Read at build time, not imported, so `npm start` picks up CMS edits. */
+/** The caller states the file's type (`readJson(path) as Site`): JSON is not checked at run time. */
+export const readJson = (filePath: string): unknown =>
+  JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+export const isLang = (value: unknown): value is Lang => value === "fr" || value === "en";
+
+export const isTranslated = (value: unknown): value is Translated =>
+  typeof value === "object" &&
+  value !== null &&
+  "fr" in value &&
+  "en" in value &&
+  typeof value.fr === "string" &&
+  typeof value.en === "string";
+
+/** The copy tree with one language picked at every { fr, en } leaf. */
+export const pick = <T>(node: T, lang: Lang): Picked<T> => {
+  if (isTranslated(node)) {
+    return node[lang] as Picked<T>;
+  }
+  if (typeof node !== "object" || node === null) {
+    return node as Picked<T>;
+  }
+  return Object.fromEntries(
+    Object.entries(node).map(([key, value]) => [key, pick(value, lang)]),
+  ) as Picked<T>;
+};

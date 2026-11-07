@@ -1,0 +1,21 @@
+# Build and test output
+_site/
+_site-test/
+coverage/
+playwright-report/
+test-results/
+screenshots/
+
+# Nunjucks templates: Prettier has no Nunjucks parser and would break the tags
+*.njk
+_includes/
+
+# Data written by Decap CMS and the listings workflow: reformatting would churn their diffs
+content/
+_data/
+listings.json
+
+package-lock.json
+
+# Decap CMS config: one field per line reads better than Prettier's expanded flow maps
+admin/config.yml

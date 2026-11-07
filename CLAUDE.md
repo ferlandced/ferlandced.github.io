@@ -3,6 +3,7 @@
 Scope: general website and brand guidelines. Feature-specific work (listing updater, etc.) is documented separately.
 
 ## Project
+
 - Website for a REMAX real estate agent, Montreal, QC
 - Bilingual: French (primary) and English
 - Static site built with Eleventy (11ty), hosted on GitHub Pages
@@ -12,6 +13,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Architect: Matteo. Do not make architecture decisions; flag concerns and options with tradeoffs.
 
 ## Identity
+
 - Agent: Cedrik Ferland, "Courtier immobilier résidentiel"
 - Office: REMAX Privilège, "Agence immobilière"
 - Office address: 103-7750 Boul. Cousineau, St-Hubert, Qc, J3Z 0C8
@@ -21,11 +23,13 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Agent personal mark (house + signature): not a REMAX mark. Must not contain "MAX", a slash, or the Balloon.
 
 ## Source of truth
+
 - REMAX Brand Identity manual + U.S./Canada supplement v1.0 (2026). Not in the repo.
 - If local law and the manual differ, local law wins.
 - Questions or exceptions: standards@remax.com
 
 ## Brand tokens (CSS custom properties, defined once; no hardcoded values elsewhere)
+
 - Primary Red `#FF1200`
 - Primary Blue `#0043FF`
 - Dark Red `#660000`
@@ -41,6 +45,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Typography: Montserrat (self-hosted), Arial fallback. Weights: Light, Medium, Bold.
 
 ## Logo rules
+
 - Primary logotype (Balloon + REMAX): Black or Cream only.
 - Secondary logotype (REMAX only): Black or Cream recommended; any brand color, no gradients.
 - Balloon: full color only. Always paired with the REMAX logotype. Stand-alone only on social profiles.
@@ -52,17 +57,20 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Office logo: full office name required. Office name height 50-100% of REMAX capital height. No ® in office logos.
 
 ## Trademark text
+
 - "REMAX" in capitals, no slash, never broken across lines, no plural or possessive. Use as adjective.
 - ® once per piece at first or most prominent use, only when REMAX stands alone. Never with the office name.
 - Do not create names, team names or logos containing "MAX", "/", "\" or "|".
 
 ## Graphic elements
+
 - Slash Design: one solid brand color, fixed angle, never tilted, flipped, distorted, or surrounded by text.
 - Slash patterns: Primary Red, Primary Blue, Black, Dark Red, Dark Blue, Cream. Angle -27.5°.
 - Two-color angled design: Primary Blue/Dark Blue, Primary Red/Dark Red, Cream/Black.
 - Outlined Balloon shape: background or framing only, single brand color, never as a logo.
 
 ## Mandatory content (home page required; sub-pages recommended)
+
 - Full REMAX office name, prominent
 - Office postal address, phone, email (no home address)
 - "Each Office Independently Owned and Operated." English per manual. French wording must come from REMAX Québec. Do not write our own.
@@ -71,6 +79,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Footer on every page: office name, address, independence notice
 
 ## Content rules
+
 - No misleading claims (market area, transactions, volume, awards, experience). Awards need year, scope, team vs individual.
 - Do not advertise commission rates.
 - Real REMAX Group: About Us section only, approved text only, REMAX more prominent. Never in header, footer, metatags or domain.
@@ -80,9 +89,11 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Mortgage rates/payments: no figures without compliant disclosure.
 
 ## Domain
+
 - Custom domain with no "remax", "rmx" or "MAX" in it. No REMAX-named subdomains or redirects.
 
 ## Design rules
+
 - Palette: Cream, White, Black, Dark Blue/Bridge Blue as base. Red and blue as accents.
 - Header: REMAX logo with full office name.
 - Photography: professional, clipped agent photos where used. No clip art, cartoons or bitmojis.
@@ -98,6 +109,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Listing card: image, price, address/neighbourhood, beds/baths/area, one link and one button. One real `<a>` on the title, stretched over the card with CSS; it is the card's only link. Do not wrap the whole card in an anchor. Mark as external, `rel="noopener"`. A real `<button>` "More info", above the stretched link, opens one shared dialog to call or write the agent about that listing (a link to the Contact page without JS).
 
 ## Bilingual (Eleventy)
+
 - URL structure: `/fr/` and `/en/` (TBC). Default French. `hreflang` on every page. Language switcher maps to the equivalent page.
 - All UI strings in i18n data files. No hardcoded text in templates.
 - French not less prominent than English (Bill 96). Content parity.
@@ -106,6 +118,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Decap i18n: multi-file or multi-folder mode.
 
 ## Listings (general)
+
 - Decap CMS is the source of truth. Agent's own listings only.
 - No on-site listing detail pages. Cards link to the listing on remax.ca (FR site to FR page, EN site to EN page).
 - Fields: Centris number, `remaxUrlFr`, `remaxUrlEn`, `status`, `lastVerified`, bilingual title and description, price, address/neighbourhood, beds, baths, area, photos.
@@ -113,6 +126,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - No per-listing pages means no `RealEstateListing` structured data. Intentional.
 
 ## Contact form and privacy
+
 - Form sends an email to the agent only. No database or CRM on our side.
 - Provider: Web3Forms, retention set to 7 days. Access key is public by design; restrict it to the site domain.
 - hCaptcha: open in dev. Before production: consent gating (or confirm what it sets), domain-restricted key.
@@ -121,10 +135,12 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 - Law 25: consent for analytics/cookies. Self-host fonts (no third-party font CDN).
 
 ## Code conventions
+
 - TBD (CSS approach, JS, image pipeline, testing)
 - No lorem ipsum or stock copy in production.
 
 ## Open items
+
 - French independence notice from REMAX Québec
 - OACIQ identification wording and licence number display
 - Slash Blue/Black hex values (CMYK only in manual)

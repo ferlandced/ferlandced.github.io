@@ -5,23 +5,43 @@
    ========================================================================== */
 
 /* Montserrat, self-hosted (SIL OFL, see /fonts/OFL.txt). Latin subset covers French. */
-@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 300; font-display: swap; src: url("../fonts/montserrat-latin-300-normal.woff2") format("woff2"); }
-@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/montserrat-latin-500-normal.woff2") format("woff2"); }
-@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/montserrat-latin-700-normal.woff2") format("woff2"); }
+@font-face {
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("../fonts/montserrat-latin-300-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/montserrat-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/montserrat-latin-700-normal.woff2") format("woff2");
+}
 
 :root {
   /* Brand palette (REMAX brand identity manual) */
-  --color-primary-red: #FF1200;
-  --color-primary-blue: #0043FF;
+  --color-primary-red: #ff1200;
+  --color-primary-blue: #0043ff;
   --color-dark-red: #660000;
-  --color-dark-blue: #000E35;
-  --color-bridge-red: #AA1120;
-  --color-bridge-blue: #0C2749;
+  --color-dark-blue: #000e35;
+  --color-bridge-red: #aa1120;
+  --color-bridge-blue: #0c2749;
   --color-black: #000000;
-  --color-charcoal: #232323;    /* Dark Charcoal Gray */
-  --color-cream: #F7F5EE;
-  --color-white: #FFFFFF;
-  --color-sky-blue: #A3D4F2;
+  --color-charcoal: #232323; /* Dark Charcoal Gray */
+  --color-cream: #f7f5ee;
+  --color-white: #ffffff;
+  --color-sky-blue: #a3d4f2;
 
   /* Typography: Montserrat, Arial fallback. Weights: Light, Medium, Bold only. */
   --font-family: "Montserrat", Arial, sans-serif;
@@ -30,26 +50,36 @@
   --font-bold: 700;
 
   /* Semantic roles. WCAG 2.1 AA contrast checked for each text pairing. */
-  --brand-bg: var(--color-cream);
+  --brand-background: var(--color-cream);
   --brand-surface: var(--color-white);
-  --brand-ink: var(--color-black);                                                    /* 19.2:1 on cream, 21:1 on white */
-  --brand-muted: color-mix(in srgb, var(--color-charcoal) 75%, var(--color-cream));  /* ≈6.5:1 on cream */
-  --brand-dark: var(--color-dark-blue);         /* header, hero, footer backgrounds */
+  --brand-ink: var(--color-black); /* 19.2:1 on cream, 21:1 on white */
+
+  /* ≈6.5:1 on cream */
+  --brand-muted: color-mix(in sRGB, var(--color-charcoal) 75%, var(--color-cream));
+  --brand-dark: var(--color-dark-blue); /* header, hero, footer backgrounds */
   --brand-on-dark: var(--color-white);
-  --brand-on-dark-muted: color-mix(in srgb, var(--color-white) 75%, var(--color-dark-blue)); /* ≈10.7:1 */
-  --brand-primary: var(--color-black);          /* headings */
-  --brand-price: var(--color-primary-red);      /* 3.9:1 on white: large bold text only (19px and up) */
-  --brand-status: var(--color-primary-blue);    /* white text 6.5:1 */
-  --brand-link: var(--color-black);             /* underlined */
-  --brand-link-hover: var(--color-bridge-red);  /* 6.9:1 on cream, 7.5:1 on white */
-  --brand-accent: var(--color-bridge-red);      /* pills, eyebrows, button hover: white text 7.5:1 */
-  --brand-button: var(--color-dark-red);        /* ghost button text and hover fill: 13.4:1 on white, 12.3:1 on cream */
+
+  /* ≈10.7:1 */
+  --brand-on-dark-muted: color-mix(in sRGB, var(--color-white) 75%, var(--color-dark-blue));
+  --brand-primary: var(--color-black); /* headings */
+  --brand-price: var(--color-primary-red); /* 3.9:1 on white: large bold text only (19px and up) */
+  --brand-status: var(--color-primary-blue); /* white text 6.5:1 */
+  --brand-link: var(--color-black); /* underlined */
+  --brand-link-hover: var(--color-bridge-red); /* 6.9:1 on cream, 7.5:1 on white */
+  --brand-accent: var(--color-bridge-red); /* pills, eyebrows, button hover: white text 7.5:1 */
+
+  /* ghost button text and hover fill: 13.4:1 on white, 12.3:1 on cream */
+  --brand-button: var(--color-dark-red);
   --brand-button-border: var(--color-primary-red);
-  --brand-cta: var(--color-primary-red);        /* white text 3.9:1: large bold text only (18.66px and up) */
-  --brand-highlight: var(--color-primary-red);  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
+
+  /* white text 3.9:1: large bold text only (18.66px and up) */
+  --brand-cta: var(--color-primary-red);
+
+  /* decorative or on dark only (4.8:1 on dark blue); not for text on light */
+  --brand-highlight: var(--color-primary-red);
   --brand-focus: var(--color-primary-blue);
-  --brand-shadow: color-mix(in srgb, var(--color-black) 8%, transparent);
-  --brand-shadow-strong: color-mix(in srgb, var(--color-black) 14%, transparent);
-  --brand-placeholder: color-mix(in srgb, var(--color-charcoal) 12%, var(--color-cream));
+  --brand-shadow: color-mix(in sRGB, var(--color-black) 8%, transparent);
+  --brand-shadow-strong: color-mix(in sRGB, var(--color-black) 14%, transparent);
+  --brand-placeholder: color-mix(in sRGB, var(--color-charcoal) 12%, var(--color-cream));
   --brand-radius: 6px;
 }

@@ -1,24 +1,25 @@
 // Header: phone burger menu, desktop navigation, scroll states, language switch.
-import { test, expect } from "./support/fixtures.js";
-import { site, t, url, menuLinks } from "./support/site.js";
+import type { TestInfo } from "@playwright/test";
+import { test, expect, present } from "./support/fixtures.ts";
+import { site, copyFor, url, menuLinks } from "./support/site.ts";
 
-const isPhone = (testInfo) => testInfo.project.name.endsWith("-phone");
+const isPhone = (testInfo: TestInfo) => testInfo.project.name.endsWith("-phone");
 
 test("phone menu opens, closes with the button, Escape and a link", async ({ page }, testInfo) => {
   test.skip(!isPhone(testInfo), "phones only");
   await page.goto("fr/");
   const root = page.locator("[data-nav-root]");
   const toggle = page.locator(".nav-toggle");
-  const tr = t("fr");
+  const copy = copyFor("fr");
 
   await expect(toggle).toBeVisible();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(toggle.locator(".visually-hidden")).toHaveText(tr.nav.open);
+  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.nav.open);
 
   await toggle.click();
   await expect(root).toHaveAttribute("data-open", "");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(toggle.locator(".visually-hidden")).toHaveText(tr.nav.close);
+  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.nav.close);
   await expect(page.locator(".site-nav a").first()).toBeVisible();
 
   await page.keyboard.press("Escape");
@@ -26,8 +27,11 @@ test("phone menu opens, closes with the button, Escape and a link", async ({ pag
   await expect(toggle).toBeFocused();
 
   // A link closes the menu and goes to its target (first home-page section in the menu)
-  const section = menuLinks("fr").find((l) => l.href.startsWith("/fr/#"));
-  test.skip(!section, "no home-page section in the menu");
+  const section = menuLinks("fr").find((link) => link.href.startsWith("/fr/#"));
+  if (!section) {
+    test.skip(true, "no home-page section in the menu");
+    return;
+  }
   await toggle.click();
   await page.locator(`.site-nav a[href="${url(section.href)}"]`).click();
   await expect(root).not.toHaveAttribute("data-open", "");
@@ -42,15 +46,25 @@ test("desktop shows the menu without a burger", async ({ page }, testInfo) => {
   await expect(page.locator(".lang-switch")).toBeVisible();
 });
 
-test("desktop logo: 72px, its R on the content's left edge, not clipped", async ({ page }, testInfo) => {
+test("desktop logo: 72px, its R on the content's left edge, not clipped", async ({
+  page,
+}, testInfo) => {
   test.skip(isPhone(testInfo), "desktop only");
   for (const width of [992, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("fr/");
-    const logo = await page.locator(".brand__logo:visible").boundingBox();
+    const logo = present(
+      await page.locator(".brand__logo:visible").boundingBox(),
+      "the logo's box",
+    );
     expect(logo.height).toBeCloseTo(72, 0);
-    const content = await page.locator("#services .container").boundingBox();
-    expect(Math.abs(logo.x + logo.height * .24 - content.x), `at ${width}px`).toBeLessThanOrEqual(1);
+    const content = present(
+      await page.locator("#services .container").boundingBox(),
+      "the content's box",
+    );
+    expect(Math.abs(logo.x + logo.height * 0.24 - content.x), `at ${width}px`).toBeLessThanOrEqual(
+      1,
+    );
     expect(logo.x).toBeGreaterThanOrEqual(0);
     await expect(page.locator(".brand__office")).toHaveText(site.office.nameSuffix);
   }
@@ -59,10 +73,15 @@ test("desktop logo: 72px, its R on the content's left edge, not clipped", async 
 test("header turns white when About reaches it, and keeps its height", async ({ page }) => {
   await page.goto("fr/");
   const header = page.locator(".site-header");
-  const height = (await header.boundingBox()).height;
-  const aboutTop = await page.locator("#about").evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  const height = present(await header.boundingBox(), "the header's box").height;
+  const aboutTop = await page
+    .locator("#about")
+    .evaluate((element) => element.getBoundingClientRect().top + scrollY);
   // Instant scrolls: the site scrolls smoothly when motion is allowed, which is slow on a busy machine.
-  const scrollTo = (top) => page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), top);
+  const scrollTo = (top: number) =>
+    page.evaluate((top) => {
+      window.scrollTo({ top, behavior: "instant" });
+    }, top);
 
   await expect(header).not.toHaveAttribute("data-past-hero", "");
   await scrollTo(aboutTop - height - 40);
@@ -71,7 +90,10 @@ test("header turns white when About reaches it, and keeps its height", async ({ 
   await expect(header).toHaveAttribute("data-past-hero", "");
   await expect(header).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await scrollTo(aboutTop + 2000);
-  expect((await header.boundingBox()).height, "the header does not shrink").toBeCloseTo(height, 0);
+  expect(
+    present(await header.boundingBox(), "the header's box").height,
+    "the header does not shrink",
+  ).toBeCloseTo(height, 0);
   await scrollTo(0);
   await expect(header).not.toHaveAttribute("data-past-hero", "");
 });

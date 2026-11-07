@@ -1,0 +1,21 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "ignoreFiles": ["_site/**", "_site-test/**", "coverage/**", "playwright-report/**"],
+  "reportNeedlessDisables": true,
+  "reportInvalidScopeDisables": true,
+  "rules": {
+    "selector-class-pattern": [
+      "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+      { "message": "Use BEM class names in kebab-case: block, block__element, block--modifier" }
+    ],
+    "color-hex-length": "long",
+    "value-keyword-case": [
+      "lower",
+      { "camelCaseSvgKeywords": true, "ignoreProperties": ["/^--font/"] }
+    ],
+    "no-descending-specificity": [true, { "severity": "warning" }],
+    "color-named": "never",
+    "max-nesting-depth": 3,
+    "selector-max-compound-selectors": 4
+  }
+}

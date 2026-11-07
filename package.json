@@ -3,14 +3,33 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "eleventy --serve --port=8080",
-    "build": "eleventy",
+    "start": "eleventy --config=eleventy.config.ts --serve --port=8080",
+    "build": "eleventy --config=eleventy.config.ts",
     "test": "playwright test",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "lint": "npm run typecheck && npm run lint:js && npm run lint:css && npm run format:check",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"**/*.css\"",
+    "format": "prettier --write . && eslint --fix . && stylelint --fix \"**/*.css\"",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p . && tsc -p js && tsc -p admin"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.6",
     "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.64.1"
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "eslint": "10.13.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-playwright": "2.12.1",
+    "eslint-plugin-unicorn": "78.0.0",
+    "globals": "17.13.0",
+    "jiti": "2.7.0",
+    "prettier": "3.9.10",
+    "stylelint": "17.16.0",
+    "stylelint-config-standard": "40.0.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0"
   }
 }
