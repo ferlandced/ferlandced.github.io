@@ -129,14 +129,17 @@ export default function (eleventyConfig: UserConfig) {
     count < 0 ? array.slice(count) : array.slice(0, count),
   );
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
-  // CMS one-liners: escapes the text, then turns **words** into <strong>words</strong>
-  eleventyConfig.addFilter("inlineBold", (text: string | null | undefined) =>
+  // Short CMS texts (e.g. the hero tagline): escapes the text, then **words** become bold,
+  // _words_ smaller and lighter (<span class="text-light">), and a new line a line break.
+  eleventyConfig.addFilter("inlineMarkup", (text: string | null | undefined) =>
     (text ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
-      .replaceAll(/\*\*(.+?)\*\*/g, "<strong>$1</strong>"),
+      .replaceAll(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>")
+      .replaceAll(/_(.+?)_/gs, '<span class="text-light">$1</span>')
+      .replaceAll(/\s*\r?\n\s*/g, " <br>"),
   );
 
   return {

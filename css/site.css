@@ -833,6 +833,12 @@ body:not(.home) .contact-icons--header {
   font-weight: var(--font-bold);
 }
 
+/* The quieter middle of the quote (_words_ in the CMS): smaller and Light */
+.hero__tagline .text-light {
+  font-size: 0.8em;
+  font-weight: var(--font-light);
+}
+
 .hero__cta {
   margin: clamp(20px, 4svh, 32px) 0 0;
 }

@@ -32,12 +32,38 @@ for (const lang of languages) {
     }) => {
       const tagline = copyFor(lang).hero.tagline;
       await expect(page.locator("h1")).toHaveText(agent.name);
-      await expect(page.locator(".hero__tagline")).toHaveText(tagline.replaceAll("**", ""));
+      await expect(page.locator(".hero__tagline")).toHaveText(
+        tagline
+          .replaceAll("**", "")
+          .replaceAll("_", "")
+          .replaceAll(/\s*\n\s*/g, " "),
+      );
       const bold = [...tagline.matchAll(/\*\*(.+?)\*\*/g)].map((match) => match[1]);
       expect(bold.length, "the tagline has bold words").toBeGreaterThan(0);
       await expect(page.locator(".hero__tagline strong")).toHaveText(bold as string[]);
       await expect(page.locator(".hero__role")).toHaveText(agent.title[lang]);
       await expect(page.locator(".hero__agency")).toHaveCount(0);
+    });
+
+    test("the quote's middle is smaller and Light, with the line break from the CMS on every screen", async ({
+      page,
+    }) => {
+      const tagline = page.locator(".hero__tagline");
+      const light = tagline.locator(".text-light");
+      await expect(light).toHaveCount(1);
+      await expect(light).toHaveCSS("font-weight", "300");
+      const [quoteSize, lightSize] = await Promise.all(
+        [tagline, light].map((locator) =>
+          locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+        ),
+      );
+      expect(lightSize).toBeLessThan(present(quoteSize, "the quote's font size"));
+      await expect(tagline.locator("br"), "one line break, as written in the CMS").toHaveCount(1);
+      const lines = await tagline.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return Math.round(element.getBoundingClientRect().height / parseFloat(style.lineHeight));
+      });
+      expect(lines, "two lines, the same on phones and desktop").toBe(2);
     });
 
     test("hero has one action: the contact popup, from a Dark Red pill with an icon", async ({
@@ -381,7 +407,7 @@ test("hero text passes AA against the photo and its scrim, measured on the pixel
 }) => {
   await page.goto("fr/");
   await page.evaluate(() => document.fonts.ready);
-  const parts = [".hero__name", ".hero__role", ".hero__tagline"];
+  const parts = [".hero__name", ".hero__role", ".hero__tagline", ".hero__tagline .text-light"];
   const boxes = await page.evaluate(
     (selectors) =>
       selectors.map((selector) => {

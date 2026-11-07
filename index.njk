@@ -36,7 +36,7 @@ translated: true
           {% if home.signature %}<img class="hero__signature" src="{{ home.signature }}" alt="" width="143" height="140">{% endif %}
           <h1 class="hero__name" id="hero-name">{{ agent.name }}</h1>
           <p class="hero__role">{{ agent.title[lang] }}</p>
-          <p class="hero__tagline">{{ t.hero.tagline | inlineBold | safe }}</p>
+          <p class="hero__tagline">{{ t.hero.tagline | inlineMarkup | safe }}</p>
           {# One action: the contact options, in a dialog with JS, on the Contact page without #}
           <p class="hero__cta"><a class="btn btn--cta" href="{{ site.pages.contact[lang] }}" data-dialog="dialog-contact">{% include "icons/pen-line.svg" %}{{ t.hero.cta }}</a></p>
         </div>

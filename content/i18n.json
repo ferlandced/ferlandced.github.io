@@ -33,8 +33,8 @@
   },
   "hero": {
     "tagline": {
-      "fr": "« **C'est l'humain** derrière chaque transaction **qui compte.** »",
-      "en": "“**It's the person** behind every transaction **that matters.**”"
+      "fr": "« **C'est l'humain** _derrière chaque\ntransaction_ **qui compte.** »",
+      "en": "“**It's the person** _behind every\ntransaction_ **that matters.**”"
     },
     "cta": {
       "fr": "Me contacter",

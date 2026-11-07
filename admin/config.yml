@@ -150,12 +150,13 @@ collections:
             collapsed: true
             fields:
               - name: tagline
-                label: "Slogan au centre du bandeau (entourer de ** ** les mots en gras)"
+                label: "Slogan au centre du bandeau"
+                hint: "**mots** en gras, _mots_ plus petits et légers, retour à la ligne là où le texte doit passer à la ligne (même coupure sur téléphone et ordinateur)."
                 widget: object
                 collapsed: false
                 fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+                  - { name: fr, label: "Français", widget: text }
+                  - { name: en, label: "English", widget: text }
               - name: cta
                 label: "Bouton du bandeau : ouvre les options de contact"
                 widget: object
