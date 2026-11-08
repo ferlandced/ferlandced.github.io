@@ -123,12 +123,13 @@ test("theme colours come from the brand tokens", () => {
 test("safe-area insets reach the About layout", () => {
   const css = fs.readFileSync("css/site.css", "utf8");
   for (const rule of [
-    // The agent clear of a landscape notch, the phone About card under the header and above
-    // the home indicator, the held About text clear of both
+    // The agent clear of a landscape notch; phones: About under the header and the notch, its text
+    // above the menu corner (which sits above the home indicator); desktop: the held text clear of both
     /--photo-x: calc\([^;]*var\(--safe-right\)\)/,
-    /--frame-width: min\([^;]*var\(--safe-bottom\)/,
-    /\.about__card \{[^}]*top: calc\(var\(--header-height\) \+ var\(--safe-top\) \+ 16px\)/,
-    /\.about__inner \{[^}]*padding-block: calc\(var\(--header-height\) \+ var\(--safe-top\)\)\s+calc\(24px \+ var\(--safe-bottom\)\)/,
+    /--about-top: calc\(var\(--header-height\) \+ var\(--safe-top\)\)/,
+    /--corner-x-closed: calc\([^;]*var\(--safe-bottom\)/,
+    /--about-text-clear: calc\([^;]*var\(--corner-x-closed\)/,
+    /\.about__pin \{[^}]*padding-block: calc\(var\(--header-height\) \+ var\(--safe-top\)\)\s+calc\(24px \+ var\(--safe-bottom\)\)/,
   ]) {
     expect(css).toMatch(rule);
   }
