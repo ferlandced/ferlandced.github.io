@@ -830,21 +830,15 @@ collections:
           # OACIQ licence: the footer shows it on every page once the number is filled in.
           - { name: licence, label: "OACIQ licence number", widget: string, required: false }
           - { name: licenceRegisterUrl, label: "OACIQ register link", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Must be an oaciq.com link'] }
-          # About section on the home page: three parts, shown one after the other while scrolling.
-          - name: story_introduction
-            label: "Story, part 1 (agent photo)"
-            widget: object
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
+          # About section on the home page: two parts, each played by a short scroll through About.
           - name: story_paramedic
-            label: "Story, part 2 (the paramedic photo appears)"
+            label: "Story, part 1 (the paramedic photo appears)"
             widget: object
             fields:
               - { name: fr, label: "Français", widget: text }
               - { name: en, label: "English", widget: text }
           - name: story_today
-            label: "Story, part 3 (the agent photo comes back)"
+            label: "Story, part 2 (the agent photo comes back, then the link and contact)"
             widget: object
             fields:
               - { name: fr, label: "Français", widget: text }

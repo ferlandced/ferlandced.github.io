@@ -32,7 +32,7 @@
 
 // Home page blocks fade in and rise into place as their section arrives, on a timer like Apple's
 // product pages, and then stay. Blocks side by side (a row of cards) appear together, and each row
-// starts a step after the previous one. About is driven by the scroll instead (css/site.css, Motion).
+// starts a step after the previous one. About has its own sequence (About story, below).
 // Without JS or with reduced motion everything just shows (see [data-reveal] in site.css).
 (() => {
   const STEP_MS = 150;
@@ -124,6 +124,122 @@
 
   groups.forEach((group) => {
     observer.observe(group);
+  });
+})();
+
+// About story. About holds on screen while the visitor scrolls a few short steps (css/site.css,
+// About story). Reaching each trigger starts the next part, which then plays on its own: its text
+// shows and the photo changes at once. Part 1 comes with the title and brings the paramedic; part 2
+// brings the agent back, then the link and contact once he is back. Parts play in order, one photo
+// change at a time. The state lives on .stage, which also holds the desktop's pinned copy of the
+// photo. Without JS or with reduced motion, all of it shows.
+(() => {
+  const FIRST_PART_DELAY_MS = 150; // part 1 right after the title
+  const PHOTO_CHANGE_MS = 900; // the wipe's transition in site.css
+  const STEP_MS = 400;
+  const LAST_PART = 2;
+
+  const stage = document.querySelector<HTMLElement>(".stage");
+  const about = stage?.querySelector<HTMLElement>(".about");
+  if (!stage || !about) {
+    return;
+  }
+  if (!("IntersectionObserver" in window)) {
+    return;
+  }
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  const steps = [...about.querySelectorAll<HTMLElement>(".about__step")];
+  const triggers = [...about.querySelectorAll<HTMLElement>("[data-story-trigger]")];
+  const stepsOfPart = (part: number) =>
+    steps.filter((step) => step.dataset.storyPart === String(part));
+  const title = steps.find((step) => !step.dataset.storyPart);
+
+  // The starting state applies at once, without transitions from the no-JS one (seen after a
+  // reload in the middle of the page)
+  stage.toggleAttribute("data-story-instant", true);
+  stage.dataset.story = "start";
+  for (const step of steps) {
+    step.setAttribute("data-reveal", "");
+  }
+  stage.getBoundingClientRect(); // applies the styles above before transitions come back
+  stage.toggleAttribute("data-story-instant", false);
+
+  const show = (step: HTMLElement, delayMs: number) => {
+    step.style.setProperty("--reveal-delay", `${delayMs}ms`);
+    step.dataset.reveal = "in";
+  };
+
+  // Part 1: its text and the paramedic. Part 2: its text and the agent back, then the rest one
+  // after the other, with the overlay's end state (phones), once his photo has settled.
+  const playPart = (part: number) => {
+    const [text, ...rest] = stepsOfPart(part);
+    stage.dataset.story = part === 1 ? "paramedic" : "agent";
+    if (text) {
+      show(text, 0);
+    }
+    if (part < LAST_PART) {
+      return;
+    }
+    const afterPhotoMs = PHOTO_CHANGE_MS + STEP_MS;
+    rest.forEach((step, index) => {
+      show(step, afterPhotoMs + index * STEP_MS);
+    });
+    setTimeout(() => {
+      stage.dataset.story = "done";
+    }, afterPhotoMs);
+  };
+
+  let partsStarted = 0;
+  let nextFreeAt = 0;
+  const playUpTo = (lastPart: number) => {
+    if (title) {
+      show(title, 0);
+    }
+    while (partsStarted < lastPart) {
+      partsStarted += 1;
+      const part = partsStarted;
+      const now = performance.now();
+      const earliest = part === 1 ? now + FIRST_PART_DELAY_MS : now;
+      const start = Math.max(earliest, nextFreeAt);
+      nextFreeAt = start + PHOTO_CHANGE_MS;
+      setTimeout(() => {
+        playPart(part);
+      }, start - now);
+    }
+  };
+
+  const showAll = () => {
+    partsStarted = LAST_PART;
+    stage.dataset.story = "done";
+    for (const step of steps) {
+      show(step, 0);
+    }
+  };
+
+  // A trigger fires when it reaches the top of the screen: the first one as About pins, bringing
+  // the title and part 1. Each one runs to the end of About, so it cannot be scrolled past between
+  // two checks. Already above on load (e.g. opened at #services): everything shows at once.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const part = Number(entry.target.getAttribute("data-story-trigger"));
+        if (entry.isIntersecting) {
+          playUpTo(part);
+          observer.unobserve(entry.target);
+        } else if (entry.boundingClientRect.top < 0 && partsStarted === 0) {
+          showAll();
+          observer.disconnect();
+          return;
+        }
+      }
+    },
+    { rootMargin: "0px 0px -99% 0px" },
+  );
+  triggers.forEach((trigger) => {
+    observer.observe(trigger);
   });
 })();
 

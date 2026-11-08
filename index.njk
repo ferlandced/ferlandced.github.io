@@ -11,8 +11,8 @@ translated: true
 {%- set t = i18n[lang] -%}
 {%- set photo = home.hero_photo or agent.photo -%}
 {%- set paramedicPhoto = home.paramedic_photo -%}
-{#- The agent picture in About. With scroll-driven motion, the paramedic photo wipes in from the right
-    and replaces him, then he wipes back in the same way (css/site.css, Motion). Otherwise only the agent shows. -#}
+{#- The agent picture in About. As the story plays, the paramedic photo wipes in from the right and
+    replaces him, then he wipes back in the same way (js/site.ts, About story). Otherwise only the agent shows. -#}
 {%- macro agentPhotos(photo, paramedicPhoto, eager) -%}
 <span class="agent-photos__layer agent-photos__layer--agent"><img src="{{ photo }}" alt=""{% if not eager %} loading="lazy"{% endif %} decoding="async"></span>
 {%- if paramedicPhoto %}
@@ -48,28 +48,37 @@ translated: true
     {% if photo %}
     <div class="stage__track" aria-hidden="true">
       <div class="stage__pin">
-        <div class="stage__agent agent-photos">{{ agentPhotos(photo, paramedicPhoto, true) }}</div>
+        <div class="stage__agent agent-photos{% if paramedicPhoto %} agent-photos--swap{% endif %}">{{ agentPhotos(photo, paramedicPhoto, true) }}</div>
       </div>
     </div>
     {% endif %}
 
+    {# The pin holds About on screen while the visitor scrolls past the two triggers; each one
+       plays the next part of the story (js/site.ts, About story). #}
     <section id="about" class="about">
-      {# The agent's picture in About: on the right where he stood in the hero (desktop), in a card
-         with the CMS backdrop (phones). Invisible on desktop while the pinned copy stands in for it. #}
-      {% if photo %}<div class="about__media"><div class="about__card agent-photos" aria-hidden="true"{% if home.about_backdrop %} style="--backdrop: url('{{ home.about_backdrop | url }}')"{% endif %}>{{ agentPhotos(photo, paramedicPhoto, false) }}</div></div>{% endif %}
-      <div class="container about__inner">
-        <div class="about__body">
-          <h2 data-story-step="1">{{ t.about.heading }}</h2>
-          {% for part in ["story_introduction", "story_paramedic", "story_today"] %}{% if agent[part][lang] %}
-          <p class="about__line" data-story-step="{{ loop.index }}">{{ agent[part][lang] }}</p>
-          {%- endif %}{% endfor %}
-          <p class="about__actions" data-story-step="3"><a class="link-accent" href="{{ site.pages.about[lang] }}">{{ t.about.more }}</a></p>
-          <ul class="about__contact" data-story-step="3">
-            {% if agent.phone %}<li>{{ t.about.cellLabel }} <a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></li>{% endif %}
-            {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
-          </ul>
+      <div class="about__pin">
+        <div class="container about__inner">
+          <div class="about__body">
+            <div class="about__step about__title"><h2>{{ t.about.heading }}</h2></div>
+            <div class="about__story">
+              {# The agent's picture: on the right where he stood in the hero (desktop), behind the text
+                 (phones). Invisible on desktop while the pinned copy stands in for it. #}
+              {% if photo %}<div class="about__media"><div class="about__card agent-photos{% if paramedicPhoto %} agent-photos--swap{% endif %}" aria-hidden="true"{% if home.about_backdrop %} style="--backdrop: url('{{ home.about_backdrop | url }}')"{% endif %}>{{ agentPhotos(photo, paramedicPhoto, false) }}</div></div>{% endif %}
+              <div class="about__stack">
+                {% for part in ["story_paramedic", "story_today"] %}{% if agent[part][lang] %}
+                <div class="about__step" data-story-part="{{ loop.index }}"><p class="about__line">{{ agent[part][lang] }}</p></div>
+                {%- endif %}{% endfor %}
+                <div class="about__step" data-story-part="2"><p class="about__actions"><a class="link-accent" href="{{ site.pages.about[lang] }}">{{ t.about.more }}</a></p></div>
+                <div class="about__step" data-story-part="2"><ul class="about__contact">
+                  {% if agent.phone %}<li>{{ t.about.cellLabel }} <a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></li>{% endif %}
+                  {% if agent.email %}<li><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></li>{% endif %}
+                </ul></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      {% for index in [1, 2] %}<span class="about__trigger" data-story-trigger="{{ index }}"></span>{% endfor %}
     </section>
   </div>
 
