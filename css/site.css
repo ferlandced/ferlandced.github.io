@@ -46,8 +46,26 @@
   box-sizing: border-box;
 }
 
+/* iOS 26 Safari paints a solid strip behind the status bar while the page rests at its very top,
+   and behind the toolbar at its very end. So on iPhones the page has a runway at each end: on top,
+   photo above the hero (home) or page above the content; at the bottom, footer below the footer.
+   js/site.ts opens the page past the top one and brings it back inside them whenever it comes to
+   rest in one, so the page runs under the clock and the toolbar. (-webkit-touch-callout: iOS
+   WebKit only.) */
 html {
+  --top-runway: 0px;
+  --footer-runway: 0px;
+
   scroll-padding-top: calc(var(--header-height) + var(--safe-top) + 8px);
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (width <= 767.98px) {
+    :root {
+      --top-runway: 80px;
+      --footer-runway: 120px;
+    }
+  }
 }
 
 /* Overscroll and any gap around the hero match the surface under the status bar */
@@ -63,7 +81,7 @@ html:has(body.home) {
 
 body {
   margin: 0;
-  padding-top: calc(var(--header-height) + var(--safe-top));
+  padding-top: calc(var(--header-height) + var(--safe-top) + var(--top-runway));
   min-height: 100lvh;
   display: flex;
   flex-direction: column;
@@ -76,9 +94,9 @@ body {
   overflow-x: clip;
 }
 
-/* Home page content runs under the transparent header. iOS Safari tints its status bar and toolbar
-   from the body's background: dark over the hero, white once the page is past it (the header marks
-   that, see js/site.ts). The content itself is white. */
+/* Home page content runs under the transparent header. Where no fixed element sits at an edge,
+   iOS Safari tints its status bar and toolbar from the body's background: dark over the hero, white
+   once the page is past it (the header marks that, see js/site.ts). The content itself is white. */
 body.home {
   padding-top: 0;
   background: var(--color-charcoal);
@@ -270,6 +288,20 @@ a:hover {
 /* Inner pages have no hero behind the header, so it stays white there */
 body:not(.home) .site-header {
   background: var(--brand-surface);
+}
+
+/* iOS 26 Safari paints the strip behind the status bar with the background of a fixed element at
+   the top edge, white when that background is transparent. It skips one that lets taps through,
+   so over the hero (and over the open menu) the page shows behind the clock; the header's own
+   controls stay tappable. */
+body.home .site-header:is(:not([data-past-hero]), [data-open]) {
+  pointer-events: none;
+}
+
+body.home
+  .site-header:is(:not([data-past-hero]), [data-open])
+  :is(.brand, .nav-toggle, .site-nav, .site-header__tools) {
+  pointer-events: auto;
 }
 
 /* Office logo, stacked: REMAX logo with the office name underneath, left-aligned with the R.
@@ -537,56 +569,127 @@ body:not(.home) .contact-icons--header {
 }
 
 .menu-corner,
+.page-corner,
 .site-nav__lang,
 .brand__logo--light {
   display: none;
 }
 
-@media (width <= 767.98px) {
-  /* Same small corner everywhere, over the hero too; only opening the menu moves it */
-  .site-header {
-    --corner-x: 82vw;
-    --corner-stripe-width: 14px;
-
-    transition:
-      --corner-x 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-      background-color 0.3s;
+@keyframes page-corner-follow {
+  from {
+    translate: 0 0;
   }
 
-  .site-header[data-open] {
+  to {
+    translate: 0 100000px;
+  }
+}
+
+@media (width <= 767.98px) {
+  /* The red stripe stays 8px clear of the burger's bars: their left end is 46px from the right
+     edge (12px offset, half the 44px button, half the 24px bars), their top 42px above the
+     viewport's bottom (44px with a little slack). */
+  :root {
+    --corner-stripe-width: 14px;
+    --corner-x: calc(
+      100vw - var(--safe-right) - 46px - 8px - var(--corner-stripe-width) -
+        (44px + var(--safe-bottom)) * tan(var(--slash-angle))
+    );
+
+    transition: --corner-x 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  :root:has(.site-header[data-open]) {
     --corner-x: -45vw;
   }
 
+  .site-header {
+    transition: background-color 0.3s;
+  }
+
+  /* Both corners below draw the same line: through --corner-x at the viewport's bottom, at the
+     slash angle. Each sets --corner-line-x (where the line meets its box's bottom) and
+     --corner-rise (its box's height). The fixed one stops short of the viewport's top and bottom:
+     iOS 26 Safari paints a solid strip behind its bars when a wide fixed element touches them. */
   .menu-corner {
+    --corner-edge-gap: 6px;
+    --corner-rise: calc(100dvh - 2 * var(--corner-edge-gap));
+    --corner-line-x: calc(var(--corner-x) + var(--corner-edge-gap) * tan(var(--slash-angle)));
+
     display: block;
     position: fixed;
-    inset: 0;
+    inset: auto 0 var(--corner-edge-gap);
+    height: var(--corner-rise);
     pointer-events: none;
   }
 
-  .menu-corner > span {
+  /* iOS 26 Safari cuts fixed elements off at its bottom toolbar, but draws the page under it. So
+     the corner is drawn twice: fixed, over the header (above), and as page content under it, a
+     layer over the whole page whose shape follows the scroll (a scroll-driven animation) and
+     reaches past the viewport's edges, so it carries on under the toolbar and the status bar. */
+  @supports (animation-timeline: scroll()) {
+    body {
+      position: relative;
+    }
+
+    .page-corner {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 99;
+      overflow: clip;
+      pointer-events: none;
+    }
+
+    .page-corner__shape {
+      --corner-overhang: 160px;
+      --corner-rise: calc(100dvh + 2 * var(--corner-overhang));
+      --corner-line-x: calc(var(--corner-x) - var(--corner-overhang) * tan(var(--slash-angle)));
+
+      position: absolute;
+      inset: 0 0 auto;
+      height: var(--corner-rise);
+      transform: translateY(calc(-1 * var(--corner-overhang)));
+      animation: page-corner-follow linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100000px;
+    }
+  }
+
+  :is(.menu-corner, .page-corner__shape) > span {
     position: absolute;
     inset: 0;
   }
 
   .menu-corner__red {
-    background: var(--color-primary-red);
+    background: linear-gradient(var(--color-primary-red) 0 0);
     clip-path: polygon(
-      calc(var(--corner-x) + 100lvh * tan(var(--slash-angle))) 0,
-      calc(var(--corner-x) + var(--corner-stripe-width) + 1px + 100lvh * tan(var(--slash-angle))) 0,
-      calc(var(--corner-x) + var(--corner-stripe-width) + 1px) 100%,
-      var(--corner-x) 100%
+      calc(var(--corner-line-x) + var(--corner-rise) * tan(var(--slash-angle))) 0,
+      calc(
+          var(--corner-line-x) + var(--corner-stripe-width) + 1px + var(--corner-rise) *
+            tan(var(--slash-angle))
+        )
+        0,
+      calc(var(--corner-line-x) + var(--corner-stripe-width) + 1px) 100%,
+      var(--corner-line-x) 100%
     );
   }
 
   .menu-corner__dark {
-    background: var(--color-dark-red);
+    background: linear-gradient(var(--color-dark-red) 0 0);
     clip-path: polygon(
-      calc(var(--corner-x) + var(--corner-stripe-width) + 100lvh * tan(var(--slash-angle))) 0,
-      calc(var(--corner-x) + var(--corner-stripe-width) + 100lvh * tan(var(--slash-angle)) + 200vw)
+      calc(
+          var(--corner-line-x) + var(--corner-stripe-width) + var(--corner-rise) *
+            tan(var(--slash-angle))
+        )
         0,
-      calc(var(--corner-x) + var(--corner-stripe-width) + 200vw) 100%,
-      calc(var(--corner-x) + var(--corner-stripe-width)) 100%
+      calc(
+          var(--corner-line-x) + var(--corner-stripe-width) + var(--corner-rise) *
+            tan(var(--slash-angle)) + 200vw
+        )
+        0,
+      calc(var(--corner-line-x) + var(--corner-stripe-width) + 200vw) 100%,
+      calc(var(--corner-line-x) + var(--corner-stripe-width)) 100%
     );
   }
 
@@ -690,9 +793,15 @@ body:not(.home) .contact-icons--header {
   body.home .site-header:not([data-past-hero]) .brand__logo--light {
     display: block;
   }
+
+  /* Menu open on home: the header lets the corner through, so it also shows behind the status bar */
+  body.home .site-header[data-open] {
+    background: transparent;
+  }
 }
 
 @media (width <= 767.98px) and (prefers-reduced-motion: reduce) {
+  :root,
   .site-header {
     transition: none;
   }
@@ -740,7 +849,8 @@ body:not(.home) .contact-icons--header {
 .hero {
   position: relative;
   overflow: hidden;
-  height: var(--hero-height);
+  height: calc(var(--hero-height) + var(--top-runway));
+  padding-top: var(--top-runway);
   background: var(--brand-surface);
 }
 
@@ -1658,7 +1768,7 @@ html:not(.js) button.card__more {
    Footer: office identification on every page
    ========================================================================== */
 .site-footer {
-  padding-bottom: var(--safe-bottom);
+  padding-bottom: calc(var(--safe-bottom) + var(--footer-runway));
   background: var(--brand-dark);
   color: var(--brand-on-dark-muted);
   font-size: 0.9rem;

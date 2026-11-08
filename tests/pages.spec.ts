@@ -118,17 +118,12 @@ test("theme colours come from the brand tokens", () => {
   }
 });
 
-// Playwright cannot emulate iOS insets: this checks they are wired in. The visual check needs a real iPhone.
-test("safe-area insets reach the header, the phone menu, the footer and the dialogs", () => {
+// The header, burger, menu, dialogs and footer are measured under emulated insets in
+// tests/mobile/. The About layout's inset rules are only checked here, in the CSS.
+test("safe-area insets reach the About layout", () => {
   const css = fs.readFileSync("css/site.css", "utf8");
-  for (const side of ["top", "right", "bottom", "left"]) {
-    expect(css).toContain(`--safe-${side}: env(safe-area-inset-${side}, 0px)`);
-  }
   for (const rule of [
-    /\.site-header \{[^}]*padding-top: var\(--safe-top\)/,
-    /\.nav-toggle \{[^}]*position: fixed;[^}]*right: calc\(12px \+ var\(--safe-right\)\);[^}]*bottom: calc\(12px \+ var\(--safe-bottom\)\)/,
-    /\.site-footer \{[^}]*padding-bottom: var\(--safe-bottom\)/,
-    // Home: the agent clear of a landscape notch, the phone About card under the header and above
+    // The agent clear of a landscape notch, the phone About card under the header and above
     // the home indicator, the held About text clear of both
     /--photo-x: calc\([^;]*var\(--safe-right\)\)/,
     /--frame-width: min\([^;]*var\(--safe-bottom\)/,
@@ -137,9 +132,6 @@ test("safe-area insets reach the header, the phone menu, the footer and the dial
   ]) {
     expect(css).toMatch(rule);
   }
-  expect(fs.readFileSync("css/forms.css", "utf8")).toMatch(
-    /\.form-panel \{[^}]*calc\(var\(--form-padding\) \+ var\(--safe-bottom\)\)/,
-  );
 });
 
 test("site root redirects to the French home page", async ({ page }) => {

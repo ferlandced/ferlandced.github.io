@@ -145,6 +145,40 @@
   addEventListener("resize", update);
 })();
 
+// iPhones: the page has a runway at each end (--top-runway, --footer-runway, css/site.css). It opens
+// past the top one, and whenever it comes to rest inside one it glides back out, so Safari keeps
+// showing the page under the status bar and the toolbar.
+(() => {
+  const rootStyle = getComputedStyle(document.documentElement);
+  const runway = (name: string) => Number.parseFloat(rootStyle.getPropertyValue(name)) || 0;
+  if (runway("--top-runway") > 0 && scrollY === 0 && !location.hash) {
+    scrollTo({ top: runway("--top-runway"), behavior: "instant" });
+  }
+
+  const settle = () => {
+    const top = runway("--top-runway");
+    const bottom = document.documentElement.scrollHeight - innerHeight - runway("--footer-runway");
+    const target = scrollY < top ? top : Math.min(scrollY, Math.max(bottom, top));
+    if (target !== scrollY) {
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      scrollTo({ top: target, behavior: reduce ? "instant" : "smooth" });
+    }
+  };
+  if ("onscrollend" in window) {
+    addEventListener("scrollend", settle);
+  } else {
+    let idleTimer: ReturnType<typeof setTimeout> | undefined;
+    addEventListener(
+      "scroll",
+      () => {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(settle, 150);
+      },
+      { passive: true },
+    );
+  }
+})();
+
 // Form dialogs: a link with data-dialog="<id>" opens that <dialog> on the home page. Without JS
 // (or without <dialog> support) the link opens the form page. [data-close] links and the backdrop close it.
 // The form inside gets "wizard:open" with the link's data-intent (see js/forms.ts).

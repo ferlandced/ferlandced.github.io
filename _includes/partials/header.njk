@@ -20,7 +20,7 @@
     <a class="site-nav__lang" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}">{{ t.langSwitch[l] }}</a>
     {%- endif %}{% endfor %}
   </nav>
-  {# Phones: the slash as a fixed bottom-right corner. Tapping the burger grows it into the menu. #}
+  {# Phones: tapping the burger grows the slash's corner into the menu, over the header #}
   <div class="menu-corner" aria-hidden="true"><span class="menu-corner__red"></span><span class="menu-corner__dark"></span></div>
   <div class="site-header__tools">
     {# Contact icons: fade in once the visitor scrolls past the hero (see js/site.js) #}
