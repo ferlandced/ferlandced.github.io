@@ -1,9 +1,3 @@
-# Fetches the agent's listings from the REMAX Québec API and, when they change, opens a PR
-# against the branch the workflow runs on and squash-merges it right away (main requires PRs,
-# with no approvals or checks). Commits made with GITHUB_TOKEN don't trigger other workflows,
-# so on main it starts the deploy itself.
-# Requires: repo secret REMAX_API_KEY, and repo Settings → Actions → General →
-# "Allow GitHub Actions to create and approve pull requests".
 name: Update listings
 
 on:
@@ -35,77 +29,191 @@ jobs:
         env:
           REMAX_API_KEY: ${{ secrets.REMAX_API_KEY }}
         run: |
-          curl --fail --silent --show-error 'https://api.remax-quebec.com/api/inscriptions/search?BrokerId=26237&PageSize=20' --compressed \
-          -X 'GET' \
-          -H 'Pragma: no-cache' \
-          -H 'Accept: application/json, text/plain, */*' \
-          -H 'Content-Language: fr' \
-          -H 'Sec-Fetch-Site: same-site' \
-          -H 'Accept-Language: en-CA,en-US;q=0.9,en;q=0.8' \
-          -H 'Cache-Control: no-cache' \
-          -H 'Sec-Fetch-Mode: cors' \
-          -H 'Accept-Encoding: gzip, deflate, br, zstd' \
-          -H 'Origin: https://www.remax-quebec.com' \
-          -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Safari/605.1.15' \
-          -H 'Referer: https://www.remax-quebec.com/' \
-          -H 'Sec-Fetch-Dest: empty' \
-          -H "X-Header-Api: $REMAX_API_KEY" \
-          -H 'Priority: u=3, i' > "$RUNNER_TEMP/response.json"
+          curl "https://api.remax-quebec.com/api/inscriptions/search?BrokerId=26237&PageSize=20" \
+            --fail --silent --show-error --compressed \
+            --header "X-Header-Api: $REMAX_API_KEY" \
+            --header "Accept: application/json, text/plain, */*" \
+            --header "Accept-Encoding: gzip, deflate, br, zstd" \
+            --header "Accept-Language: en-CA,en-US;q=0.9,en;q=0.8" \
+            --header "Content-Language: fr" \
+            --header "Cache-Control: no-cache" \
+            --header "Pragma: no-cache" \
+            --header "Origin: https://www.remax-quebec.com" \
+            --header "Referer: https://www.remax-quebec.com/" \
+            --header "Sec-Fetch-Dest: empty" \
+            --header "Sec-Fetch-Mode: cors" \
+            --header "Sec-Fetch-Site: same-site" \
+            --header "Priority: u=3, i" \
+            --header "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Safari/605.1.15" \
+            --output "$RUNNER_TEMP/response.json"
 
-      # Fails on an unexpected response, or on more listings than one page holds.
-      - name: Save the data array
+      - name: Keep a copy of the previous listings
         run: |
-          jq -e '(.data | type) == "array" and .meta.last_page == 1' "$RUNNER_TEMP/response.json" > /dev/null
-          jq '.data' "$RUNNER_TEMP/response.json" > "$LISTINGS_FILE"
+          if [ -f "$LISTINGS_FILE" ]; then
+            cp "$LISTINGS_FILE" "$RUNNER_TEMP/old-listings.json"
+          else
+            echo "[]" > "$RUNNER_TEMP/old-listings.json"
+          fi
+
+      - name: Save the new listings
+        run: |
+          response_file="$RUNNER_TEMP/response.json"
+
+          if [ "$(jq -r '.data | type' "$response_file")" != "array" ]; then
+            echo "The API response does not contain a list of listings."
+            exit 1
+          fi
+
+          if [ "$(jq -r '.meta.last_page' "$response_file")" != "1" ]; then
+            echo "The API returned more than one page of listings."
+            exit 1
+          fi
+
+          jq '.data' "$response_file" > "$LISTINGS_FILE"
 
       - name: Download the card photos
         run: |
-          rm -f "${PHOTOS_DIR:?}"/*.jpg
-          jq -r '.[] | select(.photos[0]) | "\(.no_inscription) \(.photos[0].url)"' "$LISTINGS_FILE" | while read -r id photo; do
-            curl --fail --silent --show-error -o "$PHOTOS_DIR/$id.jpg" "https://media.remax-quebec.com/img/www_small/$photo"
+          old_listings_file="$RUNNER_TEMP/old-listings.json"
+
+          find_listing() {
+            jq --sort-keys --arg id "$1" '.[] | select((.no_inscription | tostring) == $id)' "$2"
+          }
+
+          for photo_file in $(find "$PHOTOS_DIR" -name '*.jpg'); do
+            listing_id=$(basename "$photo_file" .jpg)
+            photo_url=$(find_listing "$listing_id" "$LISTINGS_FILE" | jq -r '.photos[0].url // empty')
+
+            if [ -z "$photo_url" ]; then
+              echo "Removing the photo of $listing_id."
+              rm "$photo_file"
+            fi
           done
 
+          for listing_id in $(jq -r '.[] | select(.photos[0]) | .no_inscription' "$LISTINGS_FILE"); do
+            photo_file="$PHOTOS_DIR/$listing_id.jpg"
+            new_listing=$(find_listing "$listing_id" "$LISTINGS_FILE")
+            old_listing=$(find_listing "$listing_id" "$old_listings_file")
+
+            new_url=$(echo "$new_listing" | jq -r '.photos[0].url')
+            old_url=$(echo "$old_listing" | jq -r '.photos[0].url')
+            new_date=$(echo "$new_listing" | jq -r '.photo_last_modified')
+            old_date=$(echo "$old_listing" | jq -r '.photo_last_modified')
+
+            if [ -f "$photo_file" ] && [ "$new_url" = "$old_url" ] && [ "$new_date" = "$old_date" ]; then
+              echo "Keeping the photo of $listing_id."
+            else
+              echo "Downloading the photo of $listing_id."
+              curl "https://media.remax-quebec.com/img/www_small/$new_url" \
+                --fail --silent --show-error \
+                --output "$photo_file"
+            fi
+          done
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add --all "$LISTINGS_FILE" "$PHOTOS_DIR"
+
+          if git diff --cached --quiet; then
+            echo "Listings unchanged."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Write the PR description
+        if: steps.changes.outputs.found == 'true'
+        run: |
+          old_listings_file="$RUNNER_TEMP/old-listings.json"
+          description_file="$RUNNER_TEMP/description.md"
+          touch "$description_file"
+
+          find_listing() {
+            jq --sort-keys --arg id "$1" '.[] | select((.no_inscription | tostring) == $id)' "$2"
+          }
+
+          for listing_id in $(jq -r '.[].no_inscription' "$LISTINGS_FILE"); do
+            new_listing=$(find_listing "$listing_id" "$LISTINGS_FILE")
+            old_listing=$(find_listing "$listing_id" "$old_listings_file")
+
+            name=$(echo "$new_listing" | jq -r '.address.short_display.en')
+            new_price=$(echo "$new_listing" | jq -r '.display_price.en')
+            old_price=$(echo "$old_listing" | jq -r '.display_price.en')
+            new_status=$(echo "$new_listing" | jq -r '.status')
+            old_status=$(echo "$old_listing" | jq -r '.status')
+            new_photo_count=$(echo "$new_listing" | jq -r '.nb_of_photos')
+            old_photo_count=$(echo "$old_listing" | jq -r '.nb_of_photos')
+
+            if [ -z "$old_listing" ]; then
+              echo "Added $name, listed at $new_price." >> "$description_file"
+            elif [ "$new_listing" != "$old_listing" ]; then
+              described=false
+
+              if [ "$new_price" != "$old_price" ]; then
+                echo "Changed the price of $name from $old_price to $new_price." >> "$description_file"
+                described=true
+              fi
+
+              if [ "$new_status" != "$old_status" ]; then
+                echo "Changed the status of $name to $new_status." >> "$description_file"
+                described=true
+              fi
+
+              if [ "$new_photo_count" != "$old_photo_count" ]; then
+                echo "Updated the photos on $name." >> "$description_file"
+                described=true
+              fi
+
+              if [ "$described" = false ]; then
+                echo "Updated the details for $name." >> "$description_file"
+              fi
+            fi
+          done
+
+          for listing_id in $(jq -r '.[].no_inscription' "$old_listings_file"); do
+            if [ -z "$(find_listing "$listing_id" "$LISTINGS_FILE")" ]; then
+              name=$(find_listing "$listing_id" "$old_listings_file" | jq -r '.address.short_display.en')
+              echo "Removed $name." >> "$description_file"
+            fi
+          done
+
+          cat "$description_file"
+
+      - name: Push the update branch
+        if: steps.changes.outputs.found == 'true'
+        run: |
+          if git ls-remote --exit-code origin "refs/heads/$BRANCH" > /dev/null; then
+            git fetch --quiet origin "$BRANCH"
+
+            if git diff --cached --quiet FETCH_HEAD; then
+              echo "The listings are already on $BRANCH, nothing to push."
+              exit 0
+            fi
+          fi
+
+          git config user.name "Cedrik Ferland"
+          git config user.email "info@cedrikferland.com"
+          git commit --message "Listing update"
+          git push --force origin "HEAD:refs/heads/$BRANCH"
+
       - name: Open and merge the PR
+        if: steps.changes.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add -A "$LISTINGS_FILE" "$PHOTOS_DIR"
-          if git diff --cached --quiet; then
-            echo "Listings unchanged."
-            exit 0
-          fi
-          git show "HEAD:$LISTINGS_FILE" > "$RUNNER_TEMP/old.json" 2>/dev/null || echo '[]' > "$RUNNER_TEMP/old.json"
-          jq -rn --slurpfile old "$RUNNER_TEMP/old.json" --slurpfile new "$LISTINGS_FILE" '
-            def name: .address.short_display.en;
-            def by_id: map({key: (.no_inscription | tostring), value: .}) | from_entries;
-            def changes($a; $b):
-              [ (if $a.display_price.en != $b.display_price.en then "Changed the price of \($b | name) from \($a.display_price.en) to \($b.display_price.en)." else empty end),
-                (if $a.status != $b.status then "Changed the status of \($b | name) to \($b.status)." else empty end),
-                (if $a.nb_of_photos != $b.nb_of_photos then "Updated the photos on \($b | name)." else empty end) ]
-              | if length == 0 then ["Updated the details for \($b | name)."] else . end | .[];
-            ($old[0] | by_id) as $o | ($new[0] | by_id) as $n
-            | ($n | to_entries[] | .key as $k | .value as $b | $o[$k] as $a
-                | if $a == null then "Added \($b | name), listed at \($b.display_price.en)."
-                  elif $a == $b then empty
-                  else changes($a; $b) end),
-              ($o | to_entries[] | select($n[.key] == null) | "Removed \(.value | name).")
-          ' > "$RUNNER_TEMP/body.md"
-          if git fetch --quiet origin "$BRANCH" && git diff --cached --quiet FETCH_HEAD; then
-            echo "Listings already on $BRANCH, nothing to push."
+          description_file="$RUNNER_TEMP/description.md"
+          open_pull_requests=$(gh pr list --base "$BASE_BRANCH" --head "$BRANCH" --state open --json number --jq length)
+
+          if [ "$open_pull_requests" = "0" ]; then
+            gh pr create --base "$BASE_BRANCH" --head "$BRANCH" --title "Listing update" --body-file "$description_file"
           else
-            git config user.name "Cedrik Ferland"
-            git config user.email "info@cedrikferland.com"
-            git commit -m "Listing update"
-            git push --force origin "HEAD:refs/heads/$BRANCH"
+            gh pr edit "$BRANCH" --body-file "$description_file"
           fi
-          if [ "$(gh pr list --base "$BASE_BRANCH" --head "$BRANCH" --state open --json number --jq length)" = "0" ]; then
-            gh pr create --base "$BASE_BRANCH" --head "$BRANCH" \
-              --title "Listing update" \
-              --body-file "$RUNNER_TEMP/body.md"
-          else
-            gh pr edit "$BRANCH" --body-file "$RUNNER_TEMP/body.md"
-          fi
-          gh pr merge "$BRANCH" --squash --delete-branch --body-file "$RUNNER_TEMP/body.md"
-          if [ "$BASE_BRANCH" = "main" ]; then
-            gh workflow run deploy.yml --ref main
-          fi
+
+          gh pr merge "$BRANCH" --squash --delete-branch --body-file "$description_file"
+
+      - name: Deploy the site
+        if: steps.changes.outputs.found == 'true' && github.ref_name == 'main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

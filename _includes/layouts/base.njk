@@ -25,5 +25,7 @@
   {% include "partials/header.njk" %}
   {{ content | safe }}
   {% include "partials/footer.njk" %}
+  {# Phones: the menu corner as page content, so iOS Safari draws it under its toolbar (css/site.css) #}
+  <div class="page-corner" aria-hidden="true"><div class="page-corner__shape"><span class="menu-corner__red"></span><span class="menu-corner__dark"></span></div></div>
 </body>
 </html>
