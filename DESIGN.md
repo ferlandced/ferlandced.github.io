@@ -132,7 +132,7 @@ Where each colour may go:
   - Outlined (`.btn--outline`): pill, 2px Dark Red border and label; fills Dark
     Red on hover.
 - Listing card: photo fading into a Dark Charcoal Gray panel, price, address or
-  neighbourhood, beds, baths, area, one button. Its structure is in CLAUDE.md.
+  neighbourhood, beds, baths, area, one button.
 
 ## Focus
 

@@ -53,7 +53,7 @@ test("known issue: the listings page exists in English only", async ({ page }) =
 });
 
 test("known issue: the French independence notice is still the English text", async ({ page }) => {
-  test.fail(true, "Open item in CLAUDE.md: French wording must come from REMAX Québec.");
+  test.fail(true, "Issue #46: French wording must come from REMAX Québec.");
   await page.goto("fr/");
   await expect(page.locator(".site-footer__notice")).toHaveAttribute("lang", "fr");
 });
