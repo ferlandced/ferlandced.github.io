@@ -2030,20 +2030,21 @@ html:not(.js) button.card__more {
      part 1  as About pins, with the title (which fades in place): the paramedic photo wipes in
              from the right and covers the agent
      part 2  one short scroll later: the agent wipes back in from the left, then the link and contact
-   Desktop: each part's text plays on the same clock. Pinned phones: the text and the overlay follow
-   the scroll instead (data-story-scroll, below).
+   Pinned (phones and desktop): the text follows the scroll (data-story-scroll, below); on phones the
+   overlay too. Short screens, not pinned: each part's text plays on the same clock as its photo.
    Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
    ========================================================================== */
 
 /* The pin sits after a runway (::before) and sticks by its bottom edge: it holds on screen while
-   the runway scrolls by, three steps (one to part 2, then two to read). On phones, once the text
+   the runway scrolls by, four steps (one to part 2, one more to part 3, then two to read). On
+   phones, once the text
    grows taller than the screen, the newest lines stay in view and the first ones move up. Short
    screens (phones in landscape) are not pinned; their triggers keep the unpinned place. */
 @media (height >= 600px) {
   .stage[data-story] .about::before {
     content: "";
     display: block;
-    height: calc(3 * var(--story-scroll-step));
+    height: calc(4 * var(--story-scroll-step));
   }
 
   .stage[data-story] .about__pin {
@@ -2057,6 +2058,10 @@ html:not(.js) button.card__more {
 
   .stage[data-story] .about__trigger[data-story-trigger="2"] {
     top: var(--story-scroll-step);
+  }
+
+  .stage[data-story] .about__trigger[data-story-trigger="3"] {
+    top: calc(2 * var(--story-scroll-step));
   }
 }
 
@@ -2125,28 +2130,45 @@ html:not(.js) button.card__more {
   translate: 0 0;
 }
 
-/* Pinned phones: the text and the overlay follow the scroll (Figma: iPhone 18 Pro 2-4). js/site.ts
-   sets data-story-scroll on .stage, --story-progress on each block and the overlay's three shares
-   on .stage, each from 0 to 1. Each block of text takes its height as it comes in, pushing the ones
-   above it up, and fades in as it rises. The overlay: none at first; with part 1 over his lower 61%;
-   with part 2 over all of him; with the link and contact the white base comes in under it. */
-@media (width <= 767.98px) {
-  .stage[data-story-scroll] .about__step {
-    opacity: var(--story-progress, 1);
-  }
+/* Pinned: the text follows the scroll. js/site.ts sets data-story-scroll on .stage and
+   --story-progress on each block, from 0 to 1. Each block fades in as it rises; the title only fades. */
+.stage[data-story-scroll] .about__step {
+  opacity: var(--story-progress, 1);
+}
 
+.stage[data-story-scroll] .about__stack .about__step {
+  translate: 0 calc((1 - var(--story-progress, 1)) * 30px);
+}
+
+/* Fully in, or reached with the keyboard */
+.stage[data-story-scroll] .about__step:is([data-story-shown], :focus-within) {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Desktop: the blocks keep their place; a short transition smooths a mouse wheel's steps */
+@media (width >= 768px) {
+  .stage[data-story-scroll] .about__step {
+    transition:
+      opacity 0.2s linear,
+      translate 0.2s linear;
+  }
+}
+
+/* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text also takes its height as it comes
+   in, pushing the ones above it up. js/site.ts also sets the overlay's three shares on .stage, from
+   0 to 1: none at first; with part 1 over his lower 61%; with part 2 over all of him; with the link
+   and contact the white base comes in under it. */
+@media (width <= 767.98px) {
   .stage[data-story-scroll] .about__stack .about__step {
     height: calc(var(--story-progress, 1) * var(--step-height));
     overflow: clip;
-    translate: 0 calc((1 - var(--story-progress, 1)) * 30px);
   }
 
   /* Fully in, or reached with the keyboard: its own height, unclipped */
   .stage[data-story-scroll] .about__step:is([data-story-shown], :focus-within) {
-    opacity: 1;
     height: auto;
     overflow: visible;
-    translate: 0 0;
   }
 
   .stage[data-story-scroll] .about__media::before {

@@ -129,18 +129,21 @@
 
 // About story. About holds on screen while the visitor scrolls a few short steps (css/site.css,
 // About story). The photo always changes on a timer: reaching a part starts its wipe, which then
-// plays on its own, one change at a time. Part 1 brings the paramedic, part 2 the agent back.
-// Pinned phones: the text and the blur overlay follow the scroll itself, forwards and back, and the
-// photo follows where the scroll is. Desktop and short screens: each part's text plays on a timer
-// with its photo, then the link and contact once he is back. The state lives on .stage, which also
-// holds the desktop's pinned copy of the photo. Without JS or with reduced motion, all of it shows.
+// plays on its own, one change at a time. Part 1 brings the paramedic, who then stays at least
+// PARAMEDIC_SHOWN_MS; part 2 brings the agent back; part 3, a step later, the link and contact.
+// Pinned (phones and desktop): the text follows the scroll itself, forwards and back, so it is there
+// however fast the visitor scrolls; on phones the blur overlay too. The photo follows where the
+// scroll is. Short screens, not pinned: each part's text plays on a timer with its photo, one after
+// the other. The state lives on .stage, which also holds the desktop's pinned copy of the photo. Without JS or with reduced motion, all of it shows.
 (() => {
   const FIRST_PART_DELAY_MS = 150; // part 1 right after the title
   const PHOTO_CHANGE_MS = 900; // the wipe's transition in site.css
+  const PARAMEDIC_SHOWN_MS = 2000; // once in, he stays at least this long before the agent returns
   const STEP_MS = 400;
-  const LAST_PART = 2;
-  // The pinned phone layout in css/site.css (About story)
-  const PINNED_PHONE = "(width <= 767.98px) and (height >= 600px)";
+  const LAST_PART = 3;
+  // The pinned layouts in css/site.css (About story)
+  const PINNED = "(height >= 600px)";
+  const PINNED_PHONE = `(width <= 767.98px) and ${PINNED}`;
 
   const stage = document.querySelector<HTMLElement>(".stage");
   const about = stage?.querySelector<HTMLElement>(".about");
@@ -182,42 +185,62 @@
     }
   };
 
-  // Pinned phones. Where each block plays, in steps of scroll from where About pins (0) to where it
-  // moves on (3): the title as About settles, each part over most of its step, then the link and
-  // the contact. The overlay rises with each part's text; its white base comes in with the last two.
-  // Each value goes from 0 to 1 (css/site.css, About story). Returns a function that stops it.
+  const progress = (position: number, from: number, to: number) =>
+    Math.min(1, Math.max(0, (position - from) / (to - from)));
+
+  // Where the scroll is, in steps from where About pins (0). One step is the scroll between the
+  // first two triggers.
+  const stepSize = () => (triggers[1]?.offsetTop ?? 0) - (triggers[0]?.offsetTop ?? 0);
+  const position = () => -about.getBoundingClientRect().top / Math.max(1, stepSize());
+
+  // Pinned layouts. Where each block plays, in steps of scroll from where About pins (0) to where it
+  // moves on (4): the title as About settles, each paragraph over most of its step, then, after a
+  // pause to read, the link and the contact. On phones the overlay rises with each paragraph; its
+  // white base comes in with the link and contact.
+  // Each value goes from 0 to 1 (css/site.css, About story). Each part's photo change starts as its
+  // text starts to show (on phones, once its first line is in), so the photo matches what is being
+  // read. Returns a function that stops it.
   const followScroll = () => {
     const [firstText] = stepsOfPart(1);
-    const [secondText, link, contact] = stepsOfPart(2);
+    const [secondText] = stepsOfPart(2);
+    const [link, contact] = stepsOfPart(3);
+    const firstPart = { step: firstText, from: 0, to: 0.8 };
+    const secondPart = { step: secondText, from: 1, to: 1.8 };
     const blocks = [
       { step: title, from: -0.5, to: 0 },
-      { step: firstText, from: 0, to: 0.8 },
-      { step: secondText, from: 1, to: 1.8 },
-      { step: link, from: 2, to: 2.4 },
-      { step: contact, from: 2.4, to: 2.8 },
+      firstPart,
+      secondPart,
+      { step: link, from: 2.4, to: 2.7 },
+      { step: contact, from: 2.7, to: 3 },
     ];
     const overlay = [
       { property: "--overlay-first", from: 0, to: 0.8 },
       { property: "--overlay-second", from: 1, to: 1.8 },
-      { property: "--overlay-base", from: 2, to: 2.8 },
+      { property: "--overlay-base", from: 2.4, to: 3 },
     ];
     const photos = ["start", "paramedic", "agent"];
-    const partStarts = [0, 1];
 
-    const progress = (position: number, from: number, to: number) =>
-      Math.min(1, Math.max(0, (position - from) / (to - from)));
-
-    // One step is the scroll between the two triggers
-    const stepSize = () => (triggers[1]?.offsetTop ?? 0) - (triggers[0]?.offsetTop ?? 0);
-    const position = () => -about.getBoundingClientRect().top / Math.max(1, stepSize());
+    // On phones a block grows from the top, so its first line is in once it is one line tall: that
+    // share of its full height, measured below. Until measured, the whole text. On desktop the
+    // whole block fades in at once.
+    const growsLineByLine = matchMedia(PINNED_PHONE).matches;
+    const firstLineShares = new Map<Element, number>();
+    const firstLineIn = ({ step, from, to }: typeof firstPart) => {
+      if (!growsLineByLine) {
+        return from;
+      }
+      const text = step?.firstElementChild;
+      const share = (text && firstLineShares.get(text)) ?? 1;
+      return from + share * (to - from);
+    };
 
     const onScreen = () => {
       const bounds = about.getBoundingClientRect();
       return bounds.bottom > 0 && bounds.top < innerHeight;
     };
 
-    // The photo goes one change at a time towards the one for where the scroll is. Out of sight
-    // (e.g. opened at #services), it goes there at once.
+    // The photo goes one change at a time towards the one for where the scroll is, the paramedic
+    // held for his minimum time. Out of sight (e.g. opened at #services), it goes there at once.
     let wantedPhoto = 0;
     let shownPhoto = -1;
     let photoTimer: ReturnType<typeof setTimeout> | undefined;
@@ -234,10 +257,11 @@
       }
       shownPhoto += Math.sign(wantedPhoto - shownPhoto);
       stage.dataset.story = photos[shownPhoto];
+      const holdMs = photos[shownPhoto] === "paramedic" ? PARAMEDIC_SHOWN_MS : 0;
       photoTimer = setTimeout(() => {
         photoTimer = undefined;
         changePhoto();
-      }, PHOTO_CHANGE_MS);
+      }, PHOTO_CHANGE_MS + holdMs);
     };
 
     const update = () => {
@@ -250,7 +274,7 @@
       for (const { property, from, to } of overlay) {
         stage.style.setProperty(property, String(progress(now, from, to)));
       }
-      wantedPhoto = partStarts.filter((start) => now >= start).length;
+      wantedPhoto = [firstPart, secondPart].filter((part) => now >= firstLineIn(part)).length;
       changePhoto();
     };
 
@@ -267,7 +291,12 @@
       for (const { target, borderBoxSize } of entries) {
         const height = borderBoxSize[0]?.blockSize ?? target.getBoundingClientRect().height;
         target.parentElement?.style.setProperty("--step-height", `${height}px`);
+        const lineHeight = Number.parseFloat(getComputedStyle(target).lineHeight);
+        if (height > 0 && lineHeight > 0) {
+          firstLineShares.set(target, Math.min(1, lineHeight / height));
+        }
       }
+      requestUpdate();
     });
     for (const step of about.querySelectorAll(".about__stack .about__step > *")) {
       heights.observe(step);
@@ -287,7 +316,7 @@
     };
   };
 
-  // Desktop and short screens. Returns a function that stops it.
+  // Short screens, not pinned. Returns a function that stops it.
   const playOnTimers = () => {
     const timers: ReturnType<typeof setTimeout>[] = [];
     const later = (callback: () => void, delayMs: number) => {
@@ -301,24 +330,18 @@
       }
     });
 
-    // Part 1: its text and the paramedic. Part 2: its text and the agent back, then the rest one
-    // after the other once his photo has settled.
+    // Part 1: its text and the paramedic. Part 2: its text and the agent back. Part 3, once his
+    // photo has settled: the link and contact, one after the other.
     const playPart = (part: number) => {
-      const [text, ...rest] = stepsOfPart(part);
-      stage.dataset.story = part === 1 ? "paramedic" : "agent";
-      if (text) {
-        show(text, 0);
-      }
+      const blocks = stepsOfPart(part);
       if (part < LAST_PART) {
-        return;
-      }
-      const afterPhotoMs = PHOTO_CHANGE_MS + STEP_MS;
-      rest.forEach((step, index) => {
-        show(step, afterPhotoMs + index * STEP_MS);
-      });
-      later(() => {
+        stage.dataset.story = part === 1 ? "paramedic" : "agent";
+      } else {
         stage.dataset.story = "done";
-      }, afterPhotoMs);
+      }
+      blocks.forEach((step, index) => {
+        show(step, index * STEP_MS);
+      });
     };
 
     let partsStarted = 0;
@@ -333,7 +356,7 @@
         const now = performance.now();
         const earliest = part === 1 ? now + FIRST_PART_DELAY_MS : now;
         const start = Math.max(earliest, nextFreeAt);
-        nextFreeAt = start + PHOTO_CHANGE_MS;
+        nextFreeAt = start + PHOTO_CHANGE_MS + (part === 1 ? PARAMEDIC_SHOWN_MS : STEP_MS);
         later(() => {
           playPart(part);
         }, start - now);
@@ -372,17 +395,22 @@
     };
   };
 
-  // Crossing between the two layouts (a phone turned, a window resized) ends the story: all shows
+  // Crossing between layouts (a phone turned, a window resized) ends the story: all shows
   const pinnedPhone = matchMedia(PINNED_PHONE);
-  const stop = pinnedPhone.matches ? followScroll() : playOnTimers();
-  pinnedPhone.addEventListener(
-    "change",
-    () => {
-      stop();
-      showAll();
-    },
-    { once: true },
-  );
+  const pinned = matchMedia(PINNED);
+  const stop = pinned.matches ? followScroll() : playOnTimers();
+  const layoutChanged = new AbortController();
+  for (const layout of [pinnedPhone, pinned]) {
+    layout.addEventListener(
+      "change",
+      () => {
+        layoutChanged.abort();
+        stop();
+        showAll();
+      },
+      { signal: layoutChanged.signal },
+    );
+  }
 })();
 
 // The header is past the hero once About reaches it: from there it is white, with the dark logo and

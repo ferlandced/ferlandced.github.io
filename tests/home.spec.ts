@@ -594,15 +594,6 @@ const pauseClock = async (page: Page) => {
   await page.clock.pauseAt(new Date("2026-01-01T09:00:01"));
 };
 
-/** Scrolls instantly with the clock paused (animation frames wait for it), then lets the
-    intersection observers see the new position. */
-const jumpToY = async (page: Page, y: number) => {
-  await page.evaluate((top: number) => {
-    window.scrollTo({ top, behavior: "instant" });
-  }, y);
-  await page.waitForTimeout(150);
-};
-
 /** Where each photo layer of the visible picture stands, in widths of the picture from its place. */
 const layerOffsets = (page: Page, container: string) =>
   page.locator(container).evaluate((element) => {
@@ -623,145 +614,12 @@ const layerOffsets = (page: Page, container: string) =>
 const paramedicOnly = { agent: -1, paramedic: 0, back: -1 };
 const agentBack = { agent: -1, paramedic: 1, back: 0 };
 
-test.describe("About story: each short scroll plays the next part, its text and photo together", () => {
-  test.skip(({ isMobile }) => isMobile, "phones follow the scroll (About story on phones)");
+/** The paramedic photo: its wipe (0.9 s), then at least 2 s fully shown before the agent returns. */
+const PARAMEDIC_HELD_MS = 900 + 2000;
 
-  /** Desktop with scroll timelines: the pinned copy over About; otherwise the picture in About. */
-  const pictureOf = async (page: Page) =>
-    (await page.locator(".stage__agent").isVisible()) ? ".stage__agent" : ".about__card";
-
-  /** Scroll position where a part's trigger reaches the top of the screen. */
-  const triggerAt = (page: Page, part: number) =>
-    page
-      .locator(`[data-story-trigger="${part}"]`)
-      .evaluate((element) => element.getBoundingClientRect().top + scrollY + 2);
-
-  const stage = (page: Page) => page.locator(".stage");
-  const storySteps = (page: Page) => page.locator(".about__stack .about__step");
-
-  const noSideScroll = async (page: Page) => {
-    expect(
-      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
-      "no sideways scroll",
-    ).toBeLessThanOrEqual(0);
-  };
-
-  test.beforeEach(async ({ page }) => {
-    await pauseClock(page);
-    await page.goto("fr/");
-  });
-
-  test("part by part, each waiting for its scroll, never two photos side by side at rest", async ({
-    page,
-  }) => {
-    const picture = await pictureOf(page);
-    const steps = storySteps(page);
-    const title = page.locator(".about__title");
-
-    await jumpToY(page, (await triggerAt(page, 1)) - 200);
-    await expect(stage(page)).toHaveAttribute("data-story", "start");
-    await expect(title, "the title waits for About to settle").toHaveCSS("opacity", "0");
-    expect(await layerOffsets(page, picture)).toEqual({ agent: 0, paramedic: 1, back: -1 });
-
-    await jumpToY(page, await triggerAt(page, 1));
-    await page.clock.runFor(200);
-    await expect(stage(page), "part 1 right after the title").toHaveAttribute(
-      "data-story",
-      "paramedic",
-    );
-    await expect(title).toHaveCSS("opacity", "1");
-    await expect(steps.nth(0)).toHaveCSS("opacity", "1");
-    await expect(steps.nth(1), "part 2 waits for its scroll").toHaveAttribute("data-reveal", "");
-    await expect
-      .poll(() => layerOffsets(page, picture), { message: "paramedic only" })
-      .toEqual({ agent: -1, paramedic: 0, back: -1 });
-    await page.clock.runFor(5000);
-    await expect(steps.nth(1), "time alone does not play part 2").toHaveAttribute(
-      "data-reveal",
-      "",
-    );
-    await noSideScroll(page);
-
-    await jumpToY(page, await triggerAt(page, 2));
-    await page.clock.runFor(100);
-    await expect(stage(page)).toHaveAttribute("data-story", "agent");
-    await expect(steps.nth(1)).toHaveCSS("opacity", "1");
-    await expect
-      .poll(() => layerOffsets(page, picture), { message: "the agent again only" })
-      .toEqual({ agent: -1, paramedic: 1, back: 0 });
-
-    await page.clock.runFor(1500);
-    await expect(stage(page), "then the rest, once he is back").toHaveAttribute(
-      "data-story",
-      "done",
-    );
-    for (const step of await steps.all()) {
-      await expect(step).toHaveCSS("opacity", "1");
-    }
-    await noSideScroll(page);
-  });
-
-  test("a fast scroll past both triggers plays the parts in order, one photo change at a time", async ({
-    page,
-  }) => {
-    await jumpToY(page, (await triggerAt(page, 1)) - 200);
-    await jumpToY(page, (await triggerAt(page, 2)) + 10);
-    await page.clock.runFor(200);
-    await expect(stage(page)).toHaveAttribute("data-story", "paramedic");
-    await page.clock.runFor(900);
-    await expect(stage(page)).toHaveAttribute("data-story", "agent");
-    await page.clock.runFor(1300);
-    await expect(stage(page)).toHaveAttribute("data-story", "done");
-  });
-
-  test("the title appears in place as About settles, and stays there", async ({ page }) => {
-    const title = page.locator(".about__title");
-    await jumpToY(page, await triggerAt(page, 1));
-    await page.clock.runFor(200);
-    await expect(title).toHaveCSS("opacity", "1");
-    await expect(title, "it fades, it does not rise").toHaveCSS("translate", "0px");
-    const shown = present(await title.boundingBox(), "the title");
-    await jumpToY(page, await triggerAt(page, 2));
-    await page.clock.runFor(3000);
-    await settled(contactStep(page));
-    const end = present(await title.boundingBox(), "the title at the end");
-    expect(end.y, "the text never pushes it up").toBeCloseTo(shown.y, 0);
-  });
-
-  test("the whole text stays on screen for two steps of reading before About moves on", async ({
-    page,
-  }) => {
-    const step = (await triggerAt(page, 2)) - (await triggerAt(page, 1));
-    await jumpToY(page, await triggerAt(page, 1));
-    await jumpToY(page, await triggerAt(page, 2));
-    await page.clock.runFor(4000);
-    const contact = page.locator(".about__contact");
-    await settled(contactStep(page));
-    await jumpToY(page, (await triggerAt(page, 2)) + 2 * step - 8);
-    await expect(contact).toBeInViewport({ ratio: 1 });
-    await expect(page.locator(".about__pin")).toHaveCSS("position", "sticky");
-  });
-
-  test("a link reached with the keyboard shows even before its part of the story", async ({
-    page,
-  }) => {
-    const step = page.locator(".about__step", { has: page.locator(".about__actions") });
-    await expect(step).toHaveAttribute("data-reveal", "");
-    await step.locator("a").focus();
-    await expect(step).toHaveCSS("opacity", "1");
-    await expect
-      .poll(async () => (await step.boundingBox())?.height ?? 0, { message: "it takes its space" })
-      .toBeGreaterThan(10);
-    await expect(stage(page), "the story itself has not moved on").toHaveAttribute(
-      "data-story",
-      "start",
-    );
-  });
-});
-
-test("opened at a later section, About is shown in full at once", async ({ page, isMobile }) => {
+test("opened at a later section, About is shown in full at once", async ({ page }) => {
   await page.goto("fr/#services");
-  await expect(page.locator(".stage")).toHaveAttribute("data-story", isMobile ? "agent" : "done");
+  await expect(page.locator(".stage")).toHaveAttribute("data-story", /^(agent|done)$/);
   for (const step of await page.locator(".about__step").all()) {
     await expect(step).toHaveCSS("opacity", "1");
   }
@@ -784,8 +642,21 @@ test("short landscape screens: About is not held, its parts play one after the o
   ).toBeLessThanOrEqual(0);
 });
 
-test.describe("About story on phones", () => {
-  test.skip(({ isMobile }) => !isMobile, "phone layout");
+test.describe("About story: the text follows the scroll, the photo changes on its own clock", () => {
+  /** Desktop with scroll timelines: the pinned copy over About; otherwise the picture in About. */
+  const pictureOf = async (page: Page) =>
+    (await page.locator(".stage__agent").isVisible()) ? ".stage__agent" : ".about__card";
+
+  /** How far a block has come in with the scroll, from 0 to 1 (its opacity once it settles). */
+  const shown = async (locator: Locator) =>
+    Number(await locator.evaluate((element) => element.style.getPropertyValue("--story-progress")));
+
+  const noSideScroll = async (page: Page) => {
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - innerWidth),
+      "no sideways scroll",
+    ).toBeLessThanOrEqual(0);
+  };
 
   /** Contrast of each fully shown block's text against the darkest 5% of the pixels behind it. */
   const worstContrast = async (page: Page, selector: string) => {
@@ -864,7 +735,7 @@ test.describe("About story on phones", () => {
       };
     });
 
-  /** Scrolls to a point of the story, in steps from where About pins (0) to where it moves on (3),
+  /** Scrolls to a point of the story, in steps from where About pins (0) to where it moves on (4),
       then lets one animation frame run on the paused clock. */
   const scrollToStep = async (page: Page, position: number) => {
     const { top, step } = await storyScroll(page);
@@ -891,6 +762,7 @@ test.describe("About story on phones", () => {
 
   test("the text follows the scroll, forwards and back; time alone does not move it", async ({
     page,
+    isMobile,
   }) => {
     const title = page.locator(".about__title");
     const steps = storySteps(page);
@@ -900,45 +772,81 @@ test.describe("About story on phones", () => {
     }
 
     await scrollToStep(page, -1);
-    expect(await opacity(title), "the title waits for About to settle").toBe(0);
-    expect(await opacity(firstText)).toBe(0);
+    expect(await shown(title), "the title waits for About to settle").toBe(0);
+    expect(await shown(firstText)).toBe(0);
+    await expect(title).toHaveCSS("opacity", "0");
 
     await scrollToStep(page, -0.25);
-    expect(await opacity(title), "the title, half way in").toBeCloseTo(0.5, 1);
+    expect(await shown(title), "the title, half way in").toBeCloseTo(0.5, 1);
     await expect(title, "it fades, it does not rise").toHaveCSS("translate", "none");
 
     await scrollToStep(page, 0.4);
-    expect(await opacity(title)).toBe(1);
-    expect(await opacity(firstText), "part 1, half way through its step").toBeCloseTo(0.5, 1);
+    expect(await shown(title)).toBe(1);
+    expect(await shown(firstText), "part 1, half way through its step").toBeCloseTo(0.5, 1);
+    await expect(firstText).not.toHaveCSS("opacity", "0");
     const halfHeight = present(await firstText.boundingBox(), "part 1").height;
     await page.clock.runFor(5000);
-    expect(await opacity(firstText), "time alone does not move it").toBeCloseTo(0.5, 1);
-    expect(await opacity(secondText), "part 2 waits for its step").toBe(0);
+    expect(await shown(firstText), "time alone does not move it").toBeCloseTo(0.5, 1);
+    expect(await shown(secondText), "part 2 waits for its step").toBe(0);
 
     await scrollToStep(page, 0.9);
-    expect(await opacity(firstText)).toBe(1);
-    const fullHeight = present(await firstText.boundingBox(), "part 1").height;
-    expect(halfHeight / fullHeight, "it takes its height as it comes in").toBeCloseTo(0.5, 1);
+    expect(await shown(firstText)).toBe(1);
+    if (isMobile) {
+      const fullHeight = present(await firstText.boundingBox(), "part 1").height;
+      expect(halfHeight / fullHeight, "it takes its height as it comes in").toBeCloseTo(0.5, 1);
+    }
 
     await scrollToStep(page, 1.4);
-    expect(await opacity(secondText), "part 2, half way through its step").toBeCloseTo(0.5, 1);
-    expect(await opacity(link)).toBe(0);
+    expect(await shown(secondText), "part 2, half way through its step").toBeCloseTo(0.5, 1);
+    expect(await shown(link)).toBe(0);
 
-    await scrollToStep(page, 2.9);
-    for (const step of [firstText, secondText, link, contact]) {
+    await scrollToStep(page, 2.3);
+    expect(await shown(secondText)).toBe(1);
+    expect(await shown(link), "a pause to read part 2 before the link").toBe(0);
+    expect(await shown(contact)).toBe(0);
+    await page.clock.runFor(5000);
+    expect(await shown(link), "time alone does not bring it").toBe(0);
+
+    await scrollToStep(page, 2.55);
+    expect(await shown(link), "the link, half way in").toBeCloseTo(0.5, 1);
+    expect(await shown(contact), "the contact after it").toBe(0);
+
+    await scrollToStep(page, 3.1);
+    for (const step of [title, firstText, secondText, link, contact]) {
       await settled(step);
     }
+    await noSideScroll(page);
 
     await scrollToStep(page, 0.4);
-    expect(await opacity(firstText), "scrolled back, part 1 half way again").toBeCloseTo(0.5, 1);
+    expect(await shown(firstText), "scrolled back, part 1 half way again").toBeCloseTo(0.5, 1);
     for (const step of [secondText, link, contact]) {
-      expect(await opacity(step), "scrolled back, the later blocks go").toBe(0);
+      expect(await shown(step), "scrolled back, the later blocks go").toBe(0);
     }
+  });
+
+  test("a fast scroll past About still shows all its text, the photo catching up one change at a time", async ({
+    page,
+  }) => {
+    const picture = await pictureOf(page);
+    await scrollToStep(page, -1);
+    await scrollToStep(page, 4.2);
+    for (const step of await page.locator(".about__step").all()) {
+      expect(await shown(step), "every block in at once").toBe(1);
+    }
+    await expect(stage(page), "part 1's photo first").toHaveAttribute("data-story", "paramedic");
+    await scrollToStep(page, 3.5);
+    for (const step of await page.locator(".about__step").all()) {
+      await settled(step);
+    }
+    await page.clock.runFor(PARAMEDIC_HELD_MS);
+    await expect(stage(page), "then part 2's").toHaveAttribute("data-story", "agent");
+    await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
   test("the overlay rises with each part's text, its white base comes in with the link and contact", async ({
     page,
   }) => {
+    test.skip(!(await page.locator(".about__media").isVisible()), "phones: text over the photo");
     /** The blur's height in heights of the picture, and the white base's opacity. */
     const overlay = () =>
       page.locator(".about__media").evaluate((media) => {
@@ -962,44 +870,122 @@ test.describe("About story on phones", () => {
     expect((await overlay()).share, "over all of him").toBeGreaterThanOrEqual(1);
     expect((await overlay()).base).toBe(0);
 
-    await scrollToStep(page, 2.4);
+    await scrollToStep(page, 2.3);
+    expect((await overlay()).base, "not yet while part 2 is read").toBe(0);
+
+    await scrollToStep(page, 2.7);
     expect((await overlay()).base, "the white base, half way in").toBeCloseTo(0.5, 1);
 
-    await scrollToStep(page, 2.9);
+    await scrollToStep(page, 3.1);
     expect((await overlay()).base).toBe(1);
 
     await scrollToStep(page, 0.9);
     expect(await overlay(), "scrolled back, it goes down again").toEqual({ share: 0.61, base: 0 });
   });
 
-  test("each part starts its photo change, which plays on its own clock, one at a time, both ways", async ({
+  test("each photo change starts as its part's first line is in, then plays on its own clock, one at a time, both ways", async ({
     page,
+    isMobile,
   }) => {
+    test.skip(!isMobile, "phones: each block grows line by line");
     const picture = ".about__card";
+    const firstText = storySteps(page).nth(0);
+    /** Height shown of part 1, in lines of its text. */
+    const linesShown = () =>
+      firstText.evaluate((step) => {
+        const text = step.firstElementChild ?? step;
+        const lineHeight = Number.parseFloat(getComputedStyle(text).lineHeight);
+        return step.getBoundingClientRect().height / lineHeight;
+      });
+
     await scrollToStep(page, -1);
     await expect(stage(page)).toHaveAttribute("data-story", "start");
     expect(await layerOffsets(page, picture)).toEqual({ agent: 0, paramedic: 1, back: -1 });
 
-    await scrollToStep(page, 1.5);
-    await expect(stage(page), "a fast scroll: part 1's photo first").toHaveAttribute(
+    await scrollToStep(page, 0.05);
+    await page.clock.runFor(2000);
+    expect(await linesShown(), "part 1 just starting").toBeLessThan(1);
+    await expect(stage(page), "the agent until its first line is in").toHaveAttribute(
+      "data-story",
+      "start",
+    );
+
+    await scrollToStep(page, 0.3);
+    expect(await linesShown(), "its first line in").toBeGreaterThanOrEqual(1);
+    expect(await opacity(firstText), "the rest still coming").toBeLessThan(1);
+    await expect(stage(page), "the paramedic comes with it").toHaveAttribute(
       "data-story",
       "paramedic",
     );
     await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
-    await page.clock.runFor(900);
-    await expect(stage(page), "then part 2's").toHaveAttribute("data-story", "agent");
+
+    await page.clock.runFor(PARAMEDIC_HELD_MS);
+    await scrollToStep(page, 2);
+    await expect(stage(page), "part 2's photo").toHaveAttribute("data-story", "agent");
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
 
     await page.clock.runFor(900);
-    await scrollToStep(page, 0.5);
-    await expect(stage(page), "scrolled back to part 1").toHaveAttribute("data-story", "paramedic");
+    await scrollToStep(page, 1.02);
+    await expect(stage(page), "scrolled back to the start of part 2").toHaveAttribute(
+      "data-story",
+      "paramedic",
+    );
+
+    await page.clock.runFor(PARAMEDIC_HELD_MS);
+    await scrollToStep(page, 0.05);
+    await expect(stage(page), "scrolled back to the start of part 1").toHaveAttribute(
+      "data-story",
+      "start",
+    );
+  });
+
+  test("the paramedic stays at least 2 seconds once in, even if the scroll moves on at once", async ({
+    page,
+  }) => {
+    const picture = await pictureOf(page);
+    await scrollToStep(page, -1);
+    await scrollToStep(page, 0.3);
+    await expect(stage(page)).toHaveAttribute("data-story", "paramedic");
     await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
+
+    await scrollToStep(page, -1);
+    await page.clock.runFor(PARAMEDIC_HELD_MS - 100);
+    await expect(stage(page), "scrolled back at once: he stays").toHaveAttribute(
+      "data-story",
+      "paramedic",
+    );
+    await page.clock.runFor(100);
+    await expect(stage(page), "then the agent returns").toHaveAttribute("data-story", "start");
+
+    await page.clock.runFor(900);
+    await scrollToStep(page, 0.3);
+    await scrollToStep(page, 2);
+    await page.clock.runFor(PARAMEDIC_HELD_MS - 100);
+    await expect(stage(page), "scrolled on at once: he stays").toHaveAttribute(
+      "data-story",
+      "paramedic",
+    );
+    await page.clock.runFor(100);
+    await expect(stage(page)).toHaveAttribute("data-story", "agent");
+  });
+
+  test("a fast scroll changes the photo one at a time, in order", async ({ page }) => {
+    const picture = await pictureOf(page);
+    await scrollToStep(page, -1);
+    await scrollToStep(page, 2);
+    await expect(stage(page), "part 1's photo first").toHaveAttribute("data-story", "paramedic");
+    await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
+    await page.clock.runFor(PARAMEDIC_HELD_MS);
+    await expect(stage(page), "then part 2's").toHaveAttribute("data-story", "agent");
+    await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
   test("the title above the agent, the text at the bottom over him, clear of the menu corner", async ({
     page,
+    isMobile,
   }) => {
-    await scrollToStep(page, 2.9);
+    test.skip(!isMobile, "phone layout");
+    await scrollToStep(page, 3.1);
     const contact = page.locator(".about__contact");
     await settled(contactStep(page));
     await expect(page.locator(".about__title")).toHaveCSS("opacity", "1");
@@ -1021,7 +1007,8 @@ test.describe("About story on phones", () => {
     await expect(page.locator(".about__pin")).toHaveCSS("position", "sticky");
   });
 
-  test("the text at AA over the picture at each step", async ({ page }) => {
+  test("the text at AA over the picture at each step", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "phones: text over the photo");
     const picture = ".about__card";
     const text =
       ".about__stack :is(.about__line, .about__actions a, .about__contact li, .about__contact a)";
@@ -1033,13 +1020,13 @@ test.describe("About story on phones", () => {
     }
 
     await scrollToStep(page, 1.9);
-    await page.clock.runFor(900);
+    await page.clock.runFor(PARAMEDIC_HELD_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
     for (const ratio of await worstContrast(page, text)) {
       expect(ratio, "parts 1 and 2 over the agent").toBeGreaterThanOrEqual(4.5);
     }
 
-    await scrollToStep(page, 2.9);
+    await scrollToStep(page, 3.1);
     for (const ratio of await worstContrast(page, text)) {
       expect(ratio, "the whole text over the agent").toBeGreaterThanOrEqual(4.5);
     }
@@ -1056,6 +1043,25 @@ test.describe("About story on phones", () => {
     await expect
       .poll(async () => (await step.boundingBox())?.height ?? 0, { message: "it takes its space" })
       .toBeGreaterThan(10);
+  });
+
+  test("desktop: the title stays in place, and the whole text a step on screen before About moves on", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "desktop layout");
+    const title = page.locator(".about__title");
+    await scrollToStep(page, 0);
+    await settled(title);
+    const start = present(await title.boundingBox(), "the title");
+    await scrollToStep(page, 3);
+    await settled(contactStep(page));
+    const end = present(await title.boundingBox(), "the title at the end");
+    expect(end.y, "the text never pushes it up").toBeCloseTo(start.y, 0);
+
+    await scrollToStep(page, 3.95);
+    await expect(page.locator(".about__contact")).toBeInViewport({ ratio: 1 });
+    await expect(page.locator(".about__pin")).toHaveCSS("position", "sticky");
   });
 });
 
