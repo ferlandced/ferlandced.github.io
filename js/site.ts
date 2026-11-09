@@ -138,7 +138,7 @@
 (() => {
   const FIRST_PART_DELAY_MS = 150; // part 1 right after the title
   const PHOTO_CHANGE_MS = 900; // the wipe's transition in site.css
-  const PARAMEDIC_SHOWN_MS = 2000; // once in, he stays at least this long before the agent returns
+  const PARAMEDIC_SHOWN_MS = 1000; // once in, he stays at least this long before the agent returns
   const STEP_MS = 400;
   const LAST_PART = 3;
   // The pinned layouts in css/site.css (About story)

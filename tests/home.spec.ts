@@ -614,8 +614,8 @@ const layerOffsets = (page: Page, container: string) =>
 const paramedicOnly = { agent: -1, paramedic: 0, back: -1 };
 const agentBack = { agent: -1, paramedic: 1, back: 0 };
 
-/** The paramedic photo: its wipe (0.9 s), then at least 2 s fully shown before the agent returns. */
-const PARAMEDIC_HELD_MS = 900 + 2000;
+/** The paramedic photo: its wipe (0.9 s), then at least 1 s fully shown before the agent returns. */
+const PARAMEDIC_HELD_MS = 900 + 1000;
 
 test("opened at a later section, About is shown in full at once", async ({ page }) => {
   await page.goto("fr/#services");
@@ -947,7 +947,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
-  test("the paramedic stays at least 2 seconds once in, even if the scroll moves on at once", async ({
+  test("the paramedic stays at least 1 second once in, even if the scroll moves on at once", async ({
     page,
   }) => {
     const picture = await pictureOf(page);
