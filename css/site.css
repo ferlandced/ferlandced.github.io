@@ -2025,11 +2025,13 @@ html:not(.js) button.card__more {
 
 /* ==========================================================================
    About story (js/site.ts sets data-story on .stage: start, paramedic, agent, done).
-   About holds on screen for a few short scroll steps. Each step plays the next part on its own clock:
+   About holds on screen for a few short scroll steps. Each step starts the next photo change, which
+   plays on its own clock:
      part 1  as About pins, with the title (which fades in place): the paramedic photo wipes in
              from the right and covers the agent
-     part 2  one short scroll later: the agent wipes back in from the left (phones: the overlay
-             covers all of him), then the link and contact (phones: nearly white over him)
+     part 2  one short scroll later: the agent wipes back in from the left, then the link and contact
+   Desktop: each part's text plays on the same clock. Pinned phones: the text and the overlay follow
+   the scroll instead (data-story-scroll, below).
    Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
    ========================================================================== */
 
@@ -2123,59 +2125,36 @@ html:not(.js) button.card__more {
   translate: 0 0;
 }
 
-/* Phones: the overlay rises with the story (Figma: iPhone 18 Pro 2-4). None at first; part 1 over
-   his lower 61%; part 2 over all of him; with the link and contact the white base comes in under
-   it. Each block of text takes its height as it appears, pushing the ones above it up. */
+/* Pinned phones: the text and the overlay follow the scroll (Figma: iPhone 18 Pro 2-4). js/site.ts
+   sets data-story-scroll on .stage, --story-progress on each block and the overlay's three shares
+   on .stage, each from 0 to 1. Each block of text takes its height as it comes in, pushing the ones
+   above it up, and fades in as it rises. The overlay: none at first; with part 1 over his lower 61%;
+   with part 2 over all of him; with the link and contact the white base comes in under it. */
 @media (width <= 767.98px) {
-  .stage[data-story] .about__media::before {
-    transition: opacity 0.9s ease-in-out;
+  .stage[data-story-scroll] .about__step {
+    opacity: var(--story-progress, 1);
   }
 
-  .stage[data-story] .about__media::after {
-    transition: height 0.9s ease-in-out;
-  }
-
-  .stage[data-story]:not([data-story="done"]) .about__media::before {
-    opacity: 0;
-  }
-
-  .stage[data-story="start"] .about__media::after {
-    height: 0;
-  }
-
-  .stage[data-story="paramedic"] .about__media::after {
-    height: 61%;
-  }
-
-  .stage[data-story="agent"] .about__media::after {
-    height: calc(100% + 12px);
-  }
-
-  .stage[data-story] .about__stack .about__step {
-    display: grid;
-    grid-template-rows: 1fr;
-    transition:
-      opacity 0.9s ease-out,
-      translate 0.7s ease-out,
-      grid-template-rows 0.6s ease-out;
-  }
-
-  .stage[data-story] .about__stack .about__step[data-reveal="in"] {
-    transition-delay: var(--reveal-delay, 0s);
-  }
-
-  .stage[data-story] .about__stack .about__step:not([data-reveal="in"], :focus-within) {
-    grid-template-rows: 0fr;
-  }
-
-  .stage[data-story] .about__stack .about__step > * {
-    transition: padding-bottom 0.6s ease-out var(--reveal-delay, 0s);
-  }
-
-  .stage[data-story] .about__stack .about__step:not([data-reveal="in"], :focus-within) > * {
-    min-height: 0;
-    padding-bottom: 0;
+  .stage[data-story-scroll] .about__stack .about__step {
+    height: calc(var(--story-progress, 1) * var(--step-height));
     overflow: clip;
+    translate: 0 calc((1 - var(--story-progress, 1)) * 30px);
+  }
+
+  /* Fully in, or reached with the keyboard: its own height, unclipped */
+  .stage[data-story-scroll] .about__step:is([data-story-shown], :focus-within) {
+    opacity: 1;
+    height: auto;
+    overflow: visible;
+    translate: 0 0;
+  }
+
+  .stage[data-story-scroll] .about__media::before {
+    opacity: var(--overlay-base, 1);
+  }
+
+  .stage[data-story-scroll] .about__media::after {
+    height: calc(61% * var(--overlay-first, 1) + (39% + 12px) * var(--overlay-second, 1));
   }
 }
 
