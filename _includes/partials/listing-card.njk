@@ -1,26 +1,27 @@
 {%- set address = item.address.display[lang] if item.flag_show_addresse -%}
-{%- set statusLabel = t.properties.status[item.status] -%}
+{%- set cards = t.properties.cards -%}
+{%- set statusLabel = cards.status[item.status] -%}
 <article class="card">
   <div class="card__media">
     {% if item.photos and item.photos[0] %}<img class="card__img" src="/images/listings/{{ item.no_inscription }}.jpg" alt="" loading="lazy" decoding="async">{% else %}<div class="card__img card__img--empty"></div>{% endif %}
     {% if statusLabel %}<span class="card__status">{{ statusLabel }}</span>{% endif %}
   </div>
   <div class="card__body">
-    <p class="card__number">{{ t.properties.number }} {{ item.no_inscription }}</p>
-    <h3 class="card__title"><a href="{{ site.listingUrl[lang] }}{{ item.slug[lang] }}" target="_blank" rel="noopener" aria-label="{{ item.property_kind[lang] }}{% if address %}, {{ address }}{% endif %} {{ t.contactIcons.newTab }}">{{ item.property_kind[lang] }}</a></h3>
+    <p class="card__number">{{ cards.number }} {{ item.no_inscription }}</p>
+    <h3 class="card__title"><a href="{{ site.listingUrl[lang] }}{{ item.slug[lang] }}" target="_blank" rel="noopener" aria-label="{{ item.property_kind[lang] }}{% if address %}, {{ address }}{% endif %} {{ cards.newTab }}">{{ item.property_kind[lang] }}</a></h3>
     {% if address %}<p class="card__meta">{{ address }}</p>{% endif %}
     <p class="card__price">{{ item.display_price[lang] | listingPrice(lang) }}</p>
     {% if item.nb_of_bedrooms or item.nb_of_bathrooms or item.nb_of_powder_rooms or item.superficie_habitable %}
     <ul class="card__facts">
-      {% if item.nb_of_bedrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bed-double.svg" %}</span><span class="visually-hidden">{{ t.properties.bedrooms }}</span> {{ item.nb_of_bedrooms }}</li>{% endif %}
-      {% if item.nb_of_bathrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bath.svg" %}</span><span class="visually-hidden">{{ t.properties.bathrooms }}</span> {{ item.nb_of_bathrooms }}</li>{% endif %}
-      {% if item.nb_of_powder_rooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/toilet.svg" %}</span><span class="visually-hidden">{{ t.properties.powderRooms }}</span> {{ item.nb_of_powder_rooms }}</li>{% endif %}
-      {% if item.superficie_habitable %}<li><span class="card__icon" aria-hidden="true">{% include "icons/ruler.svg" %}</span><span class="visually-hidden">{{ t.properties.area }}</span> {{ item.superficie_habitable[lang] }}</li>{% endif %}
+      {% if item.nb_of_bedrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bed-double.svg" %}</span><span class="visually-hidden">{{ cards.bedrooms }}</span> {{ item.nb_of_bedrooms }}</li>{% endif %}
+      {% if item.nb_of_bathrooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/bath.svg" %}</span><span class="visually-hidden">{{ cards.bathrooms }}</span> {{ item.nb_of_bathrooms }}</li>{% endif %}
+      {% if item.nb_of_powder_rooms %}<li><span class="card__icon" aria-hidden="true">{% include "icons/toilet.svg" %}</span><span class="visually-hidden">{{ cards.powderRooms }}</span> {{ item.nb_of_powder_rooms }}</li>{% endif %}
+      {% if item.superficie_habitable %}<li><span class="card__icon" aria-hidden="true">{% include "icons/ruler.svg" %}</span><span class="visually-hidden">{{ cards.area }}</span> {{ item.superficie_habitable[lang] }}</li>{% endif %}
     </ul>
     {% endif %}
   </div>
   {%- set propertyLabel = item.property_kind[lang] ~ (", " ~ address if address else "") %}
   {# Under the dark panel, above the title link stretched over the card. Needs JS; without it, the noscript link shows. #}
-  <button class="card__more" type="button" data-property-info data-listing-number="{{ item.no_inscription }}" data-property-address="{{ address }}" data-property-label="{{ propertyLabel }}" data-subject="{{ t.properties.infoSubject }} · {{ t.properties.number }} {{ item.no_inscription }} · {{ item.property_kind[lang] }}" aria-label="{{ t.properties.moreInfo }}, {{ propertyLabel }}, {{ t.properties.number }} {{ item.no_inscription }}">{% include "icons/phone.svg" %}<span>{{ t.properties.moreInfo }}</span></button>
-  <noscript><a class="card__more" href="{{ site.pages.contact[lang] }}">{% include "icons/phone.svg" %}<span>{{ t.properties.moreInfo }}</span></a></noscript>
+  <button class="card__more" type="button" data-property-info data-listing-number="{{ item.no_inscription }}" data-property-address="{{ address }}" data-property-label="{{ propertyLabel }}" data-subject="{{ t.forms.propertyInfo.emailSubjectStart }} · {{ cards.number }} {{ item.no_inscription }} · {{ item.property_kind[lang] }}" aria-label="{{ cards.moreInfo }}, {{ propertyLabel }}, {{ cards.number }} {{ item.no_inscription }}">{% include "icons/phone.svg" %}<span>{{ cards.moreInfo }}</span></button>
+  <noscript><a class="card__more" href="{{ site.pages.contact[lang] }}">{% include "icons/phone.svg" %}<span>{{ cards.moreInfo }}</span></a></noscript>
 </article>

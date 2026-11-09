@@ -1,16 +1,16 @@
 {#- Icon links to the agent's phone, email and social profiles. Each shows only when filled in.
     Set `iconsClass` before including to add a modifier class. -#}
-<ul class="contact-icons {{ iconsClass }}" aria-label="{{ t.contactIcons.label }}">
+<ul class="contact-icons {{ iconsClass }}" aria-label="{{ t.menu.contactIcons.label }}">
   {%- if agent.phone %}
-  <li><a href="tel:+1{{ agent.phone | replace(' ', '') }}" aria-label="{{ t.contactIcons.phone }} {{ agent.phone }}" title="{{ agent.phone }}">{% include "icons/phone.svg" %}</a></li>
+  <li><a href="tel:+1{{ agent.phone | replace(' ', '') }}" aria-label="{{ t.menu.contactIcons.phone }} {{ agent.phone }}" title="{{ agent.phone }}">{% include "icons/phone.svg" %}</a></li>
   {%- endif %}
   {%- if agent.email %}
-  <li><a href="mailto:{{ agent.email }}" aria-label="{{ t.contactIcons.email }} {{ agent.email }}" title="{{ agent.email }}">{% include "icons/mail.svg" %}</a></li>
+  <li><a href="mailto:{{ agent.email }}" aria-label="{{ t.menu.contactIcons.email }} {{ agent.email }}" title="{{ agent.email }}">{% include "icons/mail.svg" %}</a></li>
   {%- endif %}
   {%- if agent.social and agent.social.instagram %}
-  <li><a href="{{ agent.social.instagram }}" target="_blank" rel="noopener" aria-label="Instagram {{ t.contactIcons.newTab }}" title="Instagram">{% include "icons/instagram.svg" %}</a></li>
+  <li><a href="{{ agent.social.instagram }}" target="_blank" rel="noopener" aria-label="Instagram {{ t.menu.contactIcons.newTab }}" title="Instagram">{% include "icons/instagram.svg" %}</a></li>
   {%- endif %}
   {%- if agent.social and agent.social.facebook %}
-  <li><a href="{{ agent.social.facebook }}" target="_blank" rel="noopener" aria-label="Facebook {{ t.contactIcons.newTab }}" title="Facebook">{% include "icons/facebook.svg" %}</a></li>
+  <li><a href="{{ agent.social.facebook }}" target="_blank" rel="noopener" aria-label="Facebook {{ t.menu.contactIcons.newTab }}" title="Facebook">{% include "icons/facebook.svg" %}</a></li>
   {%- endif %}
 </ul>

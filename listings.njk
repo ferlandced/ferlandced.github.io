@@ -1,20 +1,21 @@
 ---
 layout: layouts/base.njk
-title: Properties
 bodyClass: page
 lang: en
 permalink: /listings/
+eleventyComputed:
+  title: "{{ i18n[lang].properties.title }}"
 ---
 {%- set t = i18n[lang] -%}
 <main class="container">
-  <h1>Properties</h1>
+  <h1>{{ t.properties.title }}</h1>
   {% if listings.length %}
   <div class="cards">
     {% for item in listings %}{% include "partials/listing-card.njk" %}{% endfor %}
   </div>
   {% include "partials/property-dialog.njk" %}
   {% else %}
-  <p class="muted">No properties listed yet.</p>
+  <p class="muted">{{ t.properties.empty }}</p>
   {% endif %}
 </main>
 <script src="/js/forms.js" defer></script>

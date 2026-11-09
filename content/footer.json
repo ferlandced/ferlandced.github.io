@@ -1,0 +1,40 @@
+{
+  "office": {
+    "type": {
+      "fr": "Agence immobilière",
+      "en": "Real estate agency"
+    },
+    "phoneLabel": {
+      "fr": "Bureau",
+      "en": "Office"
+    }
+  },
+  "licence": {
+    "text": {
+      "fr": "Courtier titulaire d'un permis de l'OACIQ",
+      "en": "Broker licensed by the OACIQ"
+    },
+    "numberLabel": {
+      "fr": "Permis no",
+      "en": "Licence no."
+    },
+    "registerLink": {
+      "fr": "Vérifier au registre de l'OACIQ",
+      "en": "Check the OACIQ register"
+    }
+  },
+  "legalLinks": {
+    "label": {
+      "fr": "Liens juridiques",
+      "en": "Legal"
+    },
+    "privacy": {
+      "fr": "Politique de confidentialité",
+      "en": "Privacy policy"
+    },
+    "terms": {
+      "fr": "Conditions d'utilisation",
+      "en": "Terms of use"
+    }
+  }
+}

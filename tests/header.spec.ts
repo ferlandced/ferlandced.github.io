@@ -14,12 +14,12 @@ test("phone menu opens, closes with the button, Escape and a link", async ({ pag
 
   await expect(toggle).toBeVisible();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.nav.open);
+  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.menu.nav.open);
 
   await toggle.click();
   await expect(root).toHaveAttribute("data-open", "");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.nav.close);
+  await expect(toggle.locator(".visually-hidden")).toHaveText(copy.menu.nav.close);
   await expect(page.locator(".site-nav a").first()).toBeVisible();
 
   await page.keyboard.press("Escape");

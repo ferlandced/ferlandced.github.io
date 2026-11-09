@@ -1,0 +1,40 @@
+{%- import "forms/fields.njk" as fields with context -%}
+{%- set common = t.forms.common -%}
+{%- set form = t.forms.propertyInfo -%}
+{#- The property's address and number are filled in from the card's button (js/site.ts) -#}
+<form class="form form--property-info" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+  <input type="hidden" name="form_type" value="property-info">
+  <input type="hidden" name="subject" value="{{ form.emailSubject }}">
+  <input type="hidden" name="property_address" value="">
+  <input type="hidden" name="listing_number" value="">
+  {{ fields.hiddenEnd() }}
+
+  <section class="form-step" data-step>
+    <div class="form-field">
+      <label for="pi-name">{{ form.name }}</label>
+      <input id="pi-name" name="name" type="text" autocomplete="name" required>
+    </div>
+    <p class="form-hint form-hint--group" id="pi-either">{{ common.eitherHint }}</p>
+    <div class="form-field">
+      <label for="pi-phone">{{ common.phone }}</label>
+      <input id="pi-phone" name="phone" type="tel" autocomplete="tel" placeholder="{{ common.phonePlaceholder }}" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="pi-either pi-phone-hint" data-one-of="contact" data-one-of-message="{{ common.phoneOrEmailMissing }}">
+      <p class="form-hint" id="pi-phone-hint">{{ common.phoneHint }}</p>
+    </div>
+    <div class="form-field">
+      <label for="pi-email">{{ common.email }}</label>
+      <input id="pi-email" name="email" type="email" autocomplete="email" aria-describedby="pi-either" data-one-of="contact">
+    </div>
+    <div class="form-field">
+      <label for="pi-message">{{ form.message }}</label>
+      <textarea id="pi-message" name="message"></textarea>
+    </div>
+    {{ fields.consent("pi") }}
+    <div class="form-actions">
+      {{ fields.cancel() }}
+      <button type="submit">{{ common.send }}</button>
+    </div>
+  </section>
+
+  {{ fields.outcome() }}
+</form>

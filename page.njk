@@ -12,19 +12,18 @@ const eleventyComputed = {
   description: (data) => data.entry.data.description[data.entry.lang],
 };
 ---
-{%- set t = i18n[lang] -%}
 {%- set d = entry.data -%}
 {#- Legal drafts: a banner before and after the text until the review is done (reviewPending in the CMS) -#}
 {%- macro pendingBanner() -%}
 <div class="legal-banner" role="note">
-  <p class="legal-banner__title">{{ t.legal.pending }}</p>
-  <p>{{ t.legal.pendingText }}</p>
+  <p class="legal-banner__title">{{ d.draftBanner.title[lang] }}</p>
+  <p>{{ d.draftBanner.text[lang] }}</p>
 </div>
 {%- endmacro -%}
 <main class="container page-content">
   {% if d.reviewPending %}{{ pendingBanner() }}{% endif %}
   <h1>{{ d.title[lang] }}</h1>
-  {% if d.updated and d.updated[lang] %}<p class="page-content__updated">{{ t.legal.updated }} {{ d.updated[lang] }}</p>{% endif %}
+  {% if d.updated and d.updated[lang] %}<p class="page-content__updated">{{ d.updatedLabel[lang] }} {{ d.updated[lang] }}</p>{% endif %}
   {{ d.body[lang] | renderContent("md") | safe }}
   {% if d.reviewPending %}{{ pendingBanner() }}{% endif %}
 </main>

@@ -1,7 +1,7 @@
 // Content pages (About, services, legal), edited in the CMS as content/pages/<key>.json:
 // title and text in the page's language, and the review banner on legal drafts.
 import { test, expect, present } from "./support/fixtures.ts";
-import { pages, content, copyFor, type SitePage } from "./support/site.ts";
+import { pages, content, type SitePage } from "./support/site.ts";
 
 const contentPages = pages.filter(
   (candidate): candidate is SitePage & { contentKey: string } => candidate.contentKey !== undefined,
@@ -26,7 +26,11 @@ for (const sitePage of contentPages) {
     const banners = page.locator("main > .legal-banner");
     if (pageContent.reviewPending) {
       await expect(banners).toHaveCount(2);
-      await expect(banners.first()).toContainText(copyFor(sitePage.lang).legal.pending);
+      await expect(banners.first()).toContainText(
+        present(pageContent.draftBanner, `draft banner for ${sitePage.contentKey}`).title[
+          sitePage.lang
+        ],
+      );
       await expect(page.locator("main > :first-child")).toHaveClass(/legal-banner/);
       await expect(page.locator("main > :last-child")).toHaveClass(/legal-banner/);
     } else {

@@ -142,7 +142,7 @@ for (const [key, formConfig] of FORM_ENTRIES) {
           await pick(form, "pa-loc-montreal-rive-sud-saint-hubert");
           await next(form);
           await pick(form, formConfig.typeTile);
-          await form.locator("#pa-tabtype-terrain-ferme").click();
+          await form.locator("#pa-tabtype-terrain-et-ferme").click();
           await pick(form, "pa-type-terrain");
           await next(form);
           await form.locator("#pa-budget-min").fill("300000");

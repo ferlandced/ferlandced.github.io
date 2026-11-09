@@ -109,7 +109,7 @@ Scope: general website and brand guidelines. Feature-specific work (listing upda
 ## Bilingual (Eleventy)
 
 - URL structure: `/fr/` and `/en/` (TBC). Default French. `hreflang` on every page. Language switcher maps to the equivalent page.
-- All UI strings in i18n data files. No hardcoded text in templates.
+- All UI strings in the content file of the page or part where they appear (`content/pages/<page>.json`, `menu.json`, `footer.json`, `forms.json`), French and English side by side. Agent details once, in `content/agent.json`. No hardcoded text in templates.
 - French not less prominent than English (Bill 96). Content parity.
 - Locale formatting `fr-CA` / `en-CA` (e.g. 450 000 $).
 - Brand names (REMAX, office name) are not translated.

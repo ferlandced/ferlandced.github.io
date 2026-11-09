@@ -1,25 +1,26 @@
 <footer class="site-footer">
   <div class="container site-footer__inner">
     <div>
-      <p class="site-footer__office">{{ t.office.name }}</p>
-      <p>{{ t.office.type }}</p>
-      <address>{{ t.office.address }}</address>
-      <p>{{ t.office.phoneLabel }} <a href="tel:+1{{ t.office.phone | replace(' ', '') }}">{{ t.office.phone }}</a></p>
+      {# Office identity is fixed in _data/site.json (brand rules), not edited in the CMS #}
+      <p class="site-footer__office">{{ site.office.name }}</p>
+      <p>{{ t.footer.office.type }}</p>
+      <address>{{ site.office.address }}</address>
+      <p>{{ t.footer.office.phoneLabel }} <a href="tel:+1{{ site.office.phone | replace(' ', '') }}">{{ site.office.phone }}</a></p>
       {# French wording must come from REMAX Québec (CLAUDE.md open item). Until then the English notice is shown, marked as English. #}
-      <p class="site-footer__notice" lang="{{ t.office.independenceLang }}">{{ t.office.independence }}</p>
+      <p class="site-footer__notice" lang="{{ site.office.independenceLang[lang] }}">{{ site.office.independence[lang] }}</p>
     </div>
     <div>
       <p class="site-footer__office">{{ agent.name }}</p>
       <p>{{ agent.title[lang] }}</p>
       {# Wording to be confirmed (CLAUDE.md open item). Shows only once the licence number is filled in. #}
-      {% if agent.licence %}<p class="site-footer__licence">{{ t.office.licence }}, {{ t.office.licenceNumber }} {{ agent.licence }}{% if agent.licenceRegisterUrl %}<br><a href="{{ agent.licenceRegisterUrl }}">{{ t.office.licenceRegister }}</a>{% endif %}</p>{% endif %}
+      {% if agent.licence %}<p class="site-footer__licence">{{ t.footer.licence.text }}, {{ t.footer.licence.numberLabel }} {{ agent.licence }}{% if agent.licenceRegisterUrl %}<br><a href="{{ agent.licenceRegisterUrl }}">{{ t.footer.licence.registerLink }}</a>{% endif %}</p>{% endif %}
       {% if agent.phone %}<p><a href="tel:+1{{ agent.phone | replace(' ', '') }}">{{ agent.phone }}</a></p>{% endif %}
       {% if agent.email %}<p><a href="mailto:{{ agent.email }}">{{ agent.email }}</a></p>{% endif %}
       <p class="site-footer__copy">© {{ "" | year }} {{ agent.name }}</p>
     </div>
-    <nav class="site-footer__legal" aria-label="{{ t.office.legalLabel }}">
-      <a href="{{ site.pages.privacy[lang] }}">{{ t.office.privacy }}</a>
-      <a href="{{ site.pages.terms[lang] }}">{{ t.office.terms }}</a>
+    <nav class="site-footer__legal" aria-label="{{ t.footer.legalLinks.label }}">
+      <a href="{{ site.pages.privacy[lang] }}">{{ t.footer.legalLinks.privacy }}</a>
+      <a href="{{ site.pages.terms[lang] }}">{{ t.footer.legalLinks.terms }}</a>
     </nav>
   </div>
 </footer>

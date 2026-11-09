@@ -1,0 +1,99 @@
+{%- import "forms/fields.njk" as fields with context -%}
+{%- set form = t.forms.propertyAlert -%}
+{#- Ids come from the French text, so they are the same in both languages -#}
+{%- set french = i18n[site.defaultLang].forms.propertyAlert -%}
+{#- Buy or rent wording: the buy text shows by default, the rent text once Rent is checked (css/forms.css) -#}
+{%- macro byIntent(buyText, rentText) -%}
+<span data-when-intent="achat">{{ buyText }}</span><span data-when-intent="location">{{ rentText }}</span>
+{%- endmacro -%}
+{#- Budget field; the $ goes after the amount in French, before it in English -#}
+{%- macro budgetField(id, name, buyLabel, rentLabel, attributes) -%}
+        <div class="form-field">
+          <label for="{{ id }}">{{ byIntent(buyLabel, rentLabel) }}</label>
+          <div class="form-affix">
+            {%- if lang == "en" %}<span class="form-affix__unit" aria-hidden="true">$</span>{% endif -%}
+            <input id="{{ id }}" name="{{ name }}" type="number" inputmode="numeric" min="0" step="1"{{ attributes | safe }}>
+            {%- if lang != "en" %}<span class="form-affix__unit" aria-hidden="true">$</span>{% endif -%}
+          </div>
+        </div>
+{%- endmacro -%}
+<form class="form form--property-alert" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+  <input type="hidden" name="form_type" value="property_alert">
+  <input type="hidden" name="subject" value="{{ form.emailSubject }}" data-subject-location="{{ form.emailSubjectRental }}">
+  {{ fields.hiddenEnd() }}
+
+  {{ fields.progress() }}
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.intent.heading }}</h2>
+    <fieldset class="form-tiles form-tiles--intent">
+      <legend class="visually-hidden">{{ form.intent.label }}</legend>
+      <label for="pa-intent-achat"><input id="pa-intent-achat" type="radio" name="intent" value="achat" required> <span data-icon="house" aria-hidden="true"></span> {{ form.intent.buy }}</label>
+      <label for="pa-intent-location"><input id="pa-intent-location" type="radio" name="intent" value="location" required> <span data-icon="key-round" aria-hidden="true"></span> {{ form.intent.rent }}</label>
+    </fieldset>
+    <div class="form-actions">
+      {{ fields.cancel() }}
+      {{ fields.next() }}
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.contact.heading }}</h2>
+    {{ fields.nameRow("pa") }}
+    {{ fields.phoneAndEmail("pa") }}
+    {{ fields.consent("pa") }}
+    <div class="form-actions">
+      {{ fields.back() }}
+      {{ fields.next() }}
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    {%- set locations = form.locations %}
+    <h2 tabindex="-1"><span data-icon="bell-ring" aria-hidden="true"></span> {{ byIntent(locations.headingBuy, locations.headingRent) }}</h2>
+    <p class="form-hint">{{ locations.hint }}</p>
+    <div class="form-tabs" role="tablist" aria-label="{{ locations.tabsLabel }}" data-tabs hidden>
+      {%- for region in locations.regions %}{% set regionId = french.locations.regions[loop.index0].name | slugify %}
+      <button type="button" role="tab" id="pa-tab-{{ regionId }}" aria-controls="pa-region-{{ regionId }}">{{ region.tab }}</button>
+      {%- endfor %}
+    </div>
+    {%- for region in locations.regions %}{% set regionId = french.locations.regions[loop.index0].name | slugify %}
+    <fieldset class="form-tiles" id="pa-region-{{ regionId }}" role="tabpanel" aria-labelledby="pa-tab-{{ regionId }}">
+      <legend><span data-icon="map" aria-hidden="true"></span> {{ region.name }}</legend>
+      {%- for city in region.cities %}{% set cityId = "pa-loc-" ~ regionId ~ "-" ~ (city | slugify) %}
+      <label for="{{ cityId }}"><input id="{{ cityId }}" type="checkbox" name="locations" value="{{ city }}"> <span data-icon="map-pin" aria-hidden="true"></span> {{ city }}</label>
+      {%- endfor %}
+    </fieldset>
+    {%- endfor %}
+    {{ fields.middleActions() }}
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.propertyType.heading }}</h2>
+    {{ fields.propertyTypeTabs("pa", form.propertyType, french.propertyType, "checkbox", "property_types") }}
+    <div class="form-field">
+      <label for="pa-other">{{ form.propertyType.other }}</label>
+      <input id="pa-other" name="other" type="text">
+    </div>
+    {{ fields.middleActions() }}
+  </section>
+
+  <section class="form-step" data-step>
+    {%- set budget = form.budget %}
+    <h2 tabindex="-1">{{ budget.heading }}</h2>
+    <fieldset class="form-field form-budget">
+      <legend class="visually-hidden"><span data-icon="wallet" aria-hidden="true"></span> {{ budget.label }}</legend>
+      <div class="form-row">
+        {{ budgetField("pa-budget-min", "budget_min", budget.minimumBuy, budget.minimumRent, "") }}
+        {{ budgetField("pa-budget-max", "budget_max", budget.maximumBuy, budget.maximumRent, ' data-gte="budget_min" data-gte-message="' ~ (budget.maximumTooLow | escape) ~ '"') }}
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      {{ fields.back() }}
+      <button type="submit">{{ budget.send }}</button>
+    </div>
+  </section>
+
+  {{ fields.outcome() }}
+</form>
