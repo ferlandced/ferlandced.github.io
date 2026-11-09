@@ -1,0 +1,131 @@
+{%- import "forms/fields.njk" as fields with context -%}
+{%- set form = t.forms.estimation -%}
+{#- Ids come from the French text, so they are the same in both languages -#}
+{%- set french = i18n[site.defaultLang].forms.estimation -%}
+{#- Segmented choices: 0 to the last number, then "and more" -#}
+{%- macro countChoice(prefix, name, label, icon, last) -%}
+      <fieldset class="form-field form-segmented">
+        <legend><span data-icon="{{ icon }}" aria-hidden="true"></span> {{ label }}</legend>
+        <div class="form-segments">
+          {%- for count in range(0, last + 1) %}
+          <label for="est-{{ prefix }}-{{ count }}"><input id="est-{{ prefix }}-{{ count }}" type="radio" name="{{ name }}" value="{{ count }}"> {{ count }}</label>
+          {%- endfor %}
+          <label for="est-{{ prefix }}-{{ last }}-plus"><input id="est-{{ prefix }}-{{ last }}-plus" type="radio" name="{{ name }}" value="{{ last }}+"> {{ last }}+</label>
+        </div>
+      </fieldset>
+{%- endmacro -%}
+{%- macro textChoice(prefix, name, label, icon, options, frenchOptions) -%}
+    <fieldset class="form-field form-segmented">
+      <legend><span data-icon="{{ icon }}" aria-hidden="true"></span> {{ label }}</legend>
+      <div class="form-segments">
+        {%- for option in options %}{% set optionId = "est-" ~ prefix ~ "-" ~ (frenchOptions[loop.index0] | slugify) %}
+        <label for="{{ optionId }}"><input id="{{ optionId }}" type="radio" name="{{ name }}" value="{{ option }}"> {{ option }}</label>
+        {%- endfor %}
+      </div>
+    </fieldset>
+{%- endmacro -%}
+{%- macro select(id, name, label, icon, options) -%}
+    <div class="form-field">
+      <label for="{{ id }}"><span data-icon="{{ icon }}" aria-hidden="true"></span> {{ label }}</label>
+      <select id="{{ id }}" name="{{ name }}">
+        <option value="">{{ form.project.choose }}</option>
+        {%- for option in options %}
+        <option>{{ option }}</option>
+        {%- endfor %}
+      </select>
+    </div>
+{%- endmacro -%}
+<form class="form form--estimation" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+  <input type="hidden" name="form_type" value="estimation">
+  <input type="hidden" name="subject" value="{{ form.emailSubject }}" data-subject-location="{{ form.emailSubjectRental }}">
+  <input type="hidden" name="intent" value="">
+  {{ fields.hiddenEnd() }}
+
+  {{ fields.progress() }}
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.address.heading }}</h2>
+    <div class="form-field">
+      <label for="est-address"><span data-icon="map-pin" aria-hidden="true"></span> {{ form.address.address }}</label>
+      <input id="est-address" name="address" type="text" autocomplete="street-address" required>
+    </div>
+    <h3>{{ form.address.contactHeading }}</h3>
+    {{ fields.nameRow("est") }}
+    {{ fields.phoneAndEmail("est") }}
+    {{ fields.consent("est") }}
+    <div class="form-actions">
+      {{ fields.cancel() }}
+      {{ fields.next() }}
+    </div>
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.propertyType.heading }}</h2>
+    {{ fields.propertyTypeTabs("est", form.propertyType, french.propertyType, "radio", "property_type") }}
+    {{ fields.middleActions() }}
+  </section>
+
+  <section class="form-step" data-step>
+    <h2 tabindex="-1">{{ form.property.heading }}</h2>
+    <div class="form-field">
+      <label for="est-year"><span data-icon="calendar" aria-hidden="true"></span> {{ form.property.yearBuilt }}</label>
+      <input id="est-year" name="construction_year" type="number" inputmode="numeric" min="1000" max="9999" step="1">
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="est-living-area"><span data-icon="ruler" aria-hidden="true"></span> {{ form.property.livingArea }}</label>
+        <input id="est-living-area" name="living_area_sqft" type="number" inputmode="numeric" min="0" step="1">
+      </div>
+      <div class="form-field">
+        <label for="est-lot-size"><span data-icon="ruler" aria-hidden="true"></span> {{ form.property.lotSize }}</label>
+        <input id="est-lot-size" name="lot_size_sqft" type="number" inputmode="numeric" min="0" step="1">
+      </div>
+    </div>
+    {{ fields.middleActions() }}
+  </section>
+
+  <section class="form-step" data-step>
+    {%- set features = form.features %}
+    <h2 tabindex="-1">{{ features.heading }}</h2>
+    <div class="form-row">
+      {{ countChoice("bedrooms", "bedrooms", features.bedrooms, "bed-double", 5) }}
+      {{ countChoice("bathrooms", "bathrooms", features.bathrooms, "bath", 3) }}
+    </div>
+    <div class="form-row">
+      {{ countChoice("parking", "outdoor_parking", features.outdoorParking, "car", 3) }}
+      {{ countChoice("garages", "garages", features.garages, "warehouse", 3) }}
+    </div>
+    {{ textChoice("basement", "basement", features.basement, "arrow-down-to-line", features.basementOptions, french.features.basementOptions) }}
+    {{ textChoice("pool", "pool", features.pool, "waves", features.poolOptions, french.features.poolOptions) }}
+    {{ fields.middleActions() }}
+  </section>
+
+  <section class="form-step" data-step>
+    {%- set project = form.project %}
+    <h2 tabindex="-1">{{ project.heading }}</h2>
+    <div class="form-field">
+      <label for="est-sale-reason">{{ project.saleReason }}</label>
+      <input id="est-sale-reason" name="sale_reason" type="text">
+    </div>
+    <div class="form-field">
+      <label for="est-renovations"><span data-icon="hammer" aria-hidden="true"></span> {{ project.renovations }}</label>
+      <textarea id="est-renovations" name="renovations"></textarea>
+    </div>
+    {{ select("est-purpose", "request_purpose", project.purpose, "target", project.purposeOptions) }}
+    {{ select("est-moving", "moving_timeline", project.moving, "clock", project.movingOptions) }}
+    <fieldset class="form-field">
+      <legend><span data-icon="file-check" aria-hidden="true"></span> {{ project.appraisal }}</legend>
+      <label for="est-appraisal-yes"><input id="est-appraisal-yes" type="radio" name="certified_appraisal_5y" value="{{ project.appraisalYes }}"> {{ project.appraisalYes }}</label>
+      <label for="est-appraisal-no"><input id="est-appraisal-no" type="radio" name="certified_appraisal_5y" value="{{ project.appraisalNo }}"> {{ project.appraisalNo }}</label>
+      <label for="est-appraisal-older"><input id="est-appraisal-older" type="radio" name="certified_appraisal_5y" value="{{ project.appraisalOlder }}"> {{ project.appraisalOlder }}</label>
+    </fieldset>
+    {{ select("est-listing", "listing_timeline", project.listing, "clock", project.listingOptions) }}
+    <div class="form-actions">
+      {{ fields.back() }}
+      <button type="submit">{{ project.send }}</button>
+    </div>
+  </section>
+
+  {{ fields.outcome() }}
+</form>

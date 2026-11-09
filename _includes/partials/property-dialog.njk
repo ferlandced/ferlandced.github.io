@@ -2,10 +2,10 @@
   <div class="form-panel">
     <div class="form-panel__head">
       <h2 class="form-panel__title" id="dialog-propertyInfo-title">{{ t.forms.propertyInfo.title }}</h2>
-      <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.close }}"><span data-icon="x" aria-hidden="true"></span></a>
+      <a class="form-panel__close" href="/{{ lang }}/" data-close aria-label="{{ t.forms.common.close }}"><span data-icon="x" aria-hidden="true"></span></a>
     </div>
     <p class="form-panel__next" data-property-label></p>
     {% include "partials/call-option.njk" %}
-    {% include "forms/" + lang + "/property-info.html" %}
+    {% include "forms/property-info.njk" %}
   </div>
 </dialog>

@@ -62,5 +62,6 @@ fixed, as a reminder to remove the marker.
 - `coverage/js-coverage.txt`: share of `js/*.ts` lines run by the tests (Chromium) and the lines never run.
 - `playwright-report/`: HTML report; failed tests keep a trace and a screenshot in `test-results/`.
 
-Tests read copy from `content/i18n.json`, `content/agent.json` and `_data/site.json` (`support/site.ts`),
+Tests read copy from the content files (`content/pages/*.json`, `content/menu.json`, `content/footer.json`,
+`content/forms.json`, `content/agent.json`) and `_data/site.json` (`support/site.ts`),
 so editing text in the CMS does not break them.

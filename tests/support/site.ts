@@ -1,12 +1,12 @@
 // Site data read from the same files the build uses, so tests follow content changes instead of
-// hardcoding copy. `copyFor(lang)` returns i18n.json for one language, merged like eleventy.config.ts does.
+// hardcoding copy. `copyFor(lang)` returns the text of every page and part in one language, as templates read it.
 import {
+  copyFor as copyInLanguage,
   isLang,
-  pick,
+  readCopy,
   readJson,
   type Agent,
   type ContentPage,
-  type Copy,
   type Lang,
   type Listing,
   type Menu,
@@ -27,8 +27,8 @@ export const menuLinks = (lang: Lang) =>
     .map((item) => ({ href: item.url[lang], label: item.label[lang] }))
     .filter((link) => link.href && link.label);
 
-const copy = readJson("content/i18n.json") as Copy;
-export const copyFor = (lang: Lang) => pick(copy, lang);
+const copy = readCopy();
+export const copyFor = (lang: Lang) => copyInLanguage(copy, lang);
 
 export const languages: Lang[] = site.languages.filter(isLang);
 
@@ -85,7 +85,7 @@ export const pageUrl = (key: string, lang: Lang) => {
 
 /**
  * The string at a key path in a copy object, for keys that come from data or are built at run time,
- * e.g. textAt(copy.contactOptions, option.id) or textAt(copy.services.buy, "action1.label").
+ * e.g. textAt(copy.contact.options, option.id) or textAt(copy.home.services, "search.button").
  */
 export const textAt = (record: object, keyPath: string) => {
   let value: unknown = record;

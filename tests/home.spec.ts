@@ -30,7 +30,7 @@ for (const lang of languages) {
     test("hero shows the agent, his title and the tagline with its bold words", async ({
       page,
     }) => {
-      const tagline = copyFor(lang).hero.tagline;
+      const tagline = copyFor(lang).home.hero.tagline;
       await expect(page.locator("h1")).toHaveText(agent.name);
       await expect(page.locator(".hero__tagline")).toHaveText(
         tagline
@@ -71,7 +71,7 @@ for (const lang of languages) {
     }) => {
       const action = page.locator(".hero a");
       await expect(action).toHaveCount(1);
-      await expect(action).toHaveText(copyFor(lang).hero.cta);
+      await expect(action).toHaveText(copyFor(lang).home.hero.button);
       await expect(action).toHaveAttribute("href", url(site.pages.contact[lang]));
       await expect(action.locator("svg")).toBeVisible();
       await expect(action, "Dark Red: white text passes AA at any size").toHaveCSS(
@@ -103,7 +103,7 @@ for (const lang of languages) {
 
     test("About links to the story page", async ({ page }) => {
       await expect(page.locator(`.about a[href="${url(site.pages.about[lang])}"]`)).toHaveText(
-        copyFor(lang).about.more,
+        copyFor(lang).home.about.storyLink,
       );
     });
 
@@ -118,14 +118,14 @@ for (const lang of languages) {
     test("two services: looking (buy or rent) and selling, each linking to its information pages", async ({
       page,
     }) => {
-      const services = copyFor(lang).services;
+      const services = copyFor(lang).home.services;
       await expect(page.locator(".service")).toHaveCount(2);
       const expected = {
         search: [
-          ["buy", services.search.moreBuy],
-          ["rent", services.search.moreRent],
+          ["buy", services.search.buyLink],
+          ["rent", services.search.rentLink],
         ],
-        sell: [["sell", services.sell.more]],
+        sell: [["sell", services.sell.sellLink]],
       } as const;
       for (const [id, links] of Object.entries(expected)) {
         await expect(page.locator(`.service--${id} .service__title`)).toHaveText(
@@ -152,14 +152,14 @@ for (const lang of languages) {
         await expect(button).toHaveAttribute("href", url(pageUrl(key, lang)));
         await expect(button).toHaveAttribute("data-dialog", `dialog-${key}`);
         await expect(button).not.toHaveAttribute("data-intent", /.*/);
-        await expect(button).toHaveText(textAt(copyFor(lang).services, `${id}.action`));
+        await expect(button).toHaveText(textAt(copyFor(lang).home.services, `${id}.button`));
       }
     });
 
     test("About tells the story in two parts, in reading order", async ({ page }) => {
       await expect(page.locator(".about__line")).toHaveText([
-        agent.story_paramedic[lang],
-        agent.story_today[lang],
+        copyFor(lang).home.about.storyPart1,
+        copyFor(lang).home.about.storyPart2,
       ]);
     });
   });
@@ -198,12 +198,12 @@ for (const lang of languages) {
         await expect(card.locator(".card__img--empty")).toHaveCount(1);
       }
       const more = card.locator("button[data-property-info]");
-      await expect(more).toHaveText(copyFor(lang).properties.moreInfo);
+      await expect(more).toHaveText(copyFor(lang).properties.cards.moreInfo);
       await expect(more.locator("svg"), "phone icon").toHaveCount(1);
       await expect(more).toHaveAttribute(
         "aria-label",
         new RegExp(
-          `^${copyFor(lang).properties.moreInfo}.*${item.property_kind[lang]}.*${item.no_inscription}`,
+          `^${copyFor(lang).properties.cards.moreInfo}.*${item.property_kind[lang]}.*${item.no_inscription}`,
         ),
       );
       await card.scrollIntoViewIfNeeded();

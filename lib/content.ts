@@ -9,8 +9,26 @@ export type Translated<T = string> = Record<Lang, T>;
 export type Site = typeof import("../_data/site.json");
 export type Agent = typeof import("../content/agent.json");
 export type Menu = typeof import("../content/menu.json");
-export type Copy = typeof import("../content/i18n.json");
 export type Listing = (typeof import("../content/listings/listings.json"))[number];
+
+/** The text of the site, one file per page or shared part, each with { fr, en } at every text. */
+export interface Copy {
+  home: typeof import("../content/pages/home.json");
+  contact: typeof import("../content/pages/contact.json");
+  properties: typeof import("../content/pages/properties.json");
+  menu: Menu;
+  footer: typeof import("../content/footer.json");
+  forms: typeof import("../content/forms.json");
+}
+
+const COPY_FILES: Record<keyof Copy, string> = {
+  home: "content/pages/home.json",
+  contact: "content/pages/contact.json",
+  properties: "content/pages/properties.json",
+  menu: "content/menu.json",
+  footer: "content/footer.json",
+  forms: "content/forms.json",
+};
 
 export interface ContentPage {
   title: Translated;
@@ -18,9 +36,11 @@ export interface ContentPage {
   body: Translated;
   updated?: Translated;
   reviewPending?: boolean;
+  draftBanner?: { title: Translated; text: Translated };
+  updatedLabel?: Translated;
 }
 
-/** i18n.json holds { fr, en } pairs at every leaf; this is the same tree with one language picked. */
+/** A content tree with { fr, en } pairs at its texts; this is the same tree with one language picked. */
 export type Picked<T> = T extends Translated
   ? string
   : T extends object
@@ -50,7 +70,19 @@ export const pick = <T>(node: T, lang: Lang): Picked<T> => {
   if (typeof node !== "object" || node === null) {
     return node as Picked<T>;
   }
+  if (Array.isArray(node)) {
+    return node.map((item: unknown) => pick(item, lang)) as Picked<T>;
+  }
   return Object.fromEntries(
     Object.entries(node).map(([key, value]) => [key, pick(value, lang)]),
   ) as Picked<T>;
 };
+
+/** Every copy file, read now. */
+export const readCopy = (): Copy =>
+  Object.fromEntries(
+    Object.entries(COPY_FILES).map(([key, filePath]) => [key, readJson(filePath)]),
+  ) as unknown as Copy;
+
+/** The text of the site in one language, as templates read it: i18n[lang].home.hero.tagline. */
+export const copyFor = (copy: Copy, lang: Lang) => pick(copy, lang);

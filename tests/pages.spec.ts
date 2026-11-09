@@ -88,16 +88,16 @@ test.describe("every page", () => {
       const licence = footer.locator(".site-footer__licence");
       await expect(licence).toHaveCount(agent.licence ? 1 : 0);
       if (agent.licence) {
-        await expect(licence).toContainText(copy.office.licence);
+        await expect(licence).toContainText(copy.footer.licence.text);
         await expect(licence).toContainText(agent.licence);
         await expect(licence.locator("a")).toHaveCount(agent.licenceRegisterUrl ? 1 : 0);
       }
       // Legal links on every page
       await expect(
         footer.locator(`a[href="${url(site.pages.privacy[sitePage.lang])}"]`),
-      ).toHaveText(copy.office.privacy);
+      ).toHaveText(copy.footer.legalLinks.privacy);
       await expect(footer.locator(`a[href="${url(site.pages.terms[sitePage.lang])}"]`)).toHaveText(
-        copy.office.terms,
+        copy.footer.legalLinks.terms,
       );
 
       await expect(page.locator("body")).not.toContainText(/lorem ipsum/i);

@@ -1,0 +1,46 @@
+{
+  "title": {
+    "fr": "Me contacter",
+    "en": "Contact me"
+  },
+  "photo": "",
+  "photoAlt": "",
+  "closeButton": {
+    "fr": "Fermer",
+    "en": "Close"
+  },
+  "options": {
+    "call": {
+      "fr": "M'appeler",
+      "en": "Call me"
+    },
+    "copy": {
+      "fr": "Copier le numéro",
+      "en": "Copy the number"
+    },
+    "copied": {
+      "fr": "Numéro copié",
+      "en": "Number copied"
+    },
+    "write": {
+      "fr": "M'écrire",
+      "en": "Write me"
+    },
+    "estimate": {
+      "fr": "Estimer ma propriété",
+      "en": "Estimate my property"
+    },
+    "alert": {
+      "fr": "Créer une alerte immobilière",
+      "en": "Set up a property alert"
+    },
+    "findRental": {
+      "fr": "Trouver un logement à louer",
+      "en": "Find a rental"
+    },
+    "postRental": {
+      "fr": "Mettre ma propriété en location",
+      "en": "Post a rental"
+    }
+  }
+}

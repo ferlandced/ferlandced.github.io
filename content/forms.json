@@ -1,0 +1,905 @@
+{
+  "common": {
+    "close": {
+      "fr": "Fermer",
+      "en": "Close"
+    },
+    "cancel": {
+      "fr": "Annuler",
+      "en": "Cancel"
+    },
+    "back": {
+      "fr": "Précédent",
+      "en": "Back"
+    },
+    "next": {
+      "fr": "Suivant",
+      "en": "Next"
+    },
+    "skip": {
+      "fr": "Passer et envoyer",
+      "en": "Skip and send"
+    },
+    "send": {
+      "fr": "Envoyer",
+      "en": "Send"
+    },
+    "stepWord": {
+      "fr": "Étape",
+      "en": "Step"
+    },
+    "stepOf": {
+      "fr": "sur",
+      "en": "of"
+    },
+    "firstName": {
+      "fr": "Prénom",
+      "en": "First name"
+    },
+    "lastName": {
+      "fr": "Nom",
+      "en": "Last name"
+    },
+    "eitherHint": {
+      "fr": "Un téléphone ou un courriel suffit.",
+      "en": "A phone number or an email is enough."
+    },
+    "phone": {
+      "fr": "Téléphone",
+      "en": "Phone"
+    },
+    "phonePlaceholder": {
+      "fr": "514 555-0123",
+      "en": "514 555-0123"
+    },
+    "phoneHint": {
+      "fr": "Au moins 10 chiffres, indicatif régional compris.",
+      "en": "At least 10 digits, including the area code."
+    },
+    "phoneOrEmailMissing": {
+      "fr": "Indiquez un téléphone ou un courriel.",
+      "en": "Enter a phone number or an email."
+    },
+    "extension": {
+      "fr": "Poste",
+      "en": "Extension"
+    },
+    "extensionPlaceholder": {
+      "fr": "Ext",
+      "en": "Ext"
+    },
+    "email": {
+      "fr": "Courriel",
+      "en": "Email"
+    },
+    "consent": {
+      "fr": "J'accepte que ces renseignements soient transmis à Cedrik Ferland pour répondre à ma demande, selon la [politique de confidentialité].",
+      "en": "I agree that this information is sent to Cedrik Ferland to answer my request, as described in the [privacy policy]."
+    },
+    "error": {
+      "fr": "Une erreur est survenue. Veuillez réessayer ou me joindre par téléphone.",
+      "en": "Something went wrong. Please try again or reach me by phone."
+    },
+    "success": {
+      "fr": "Merci! Je vous reviens très bientôt.",
+      "en": "Thank you! I'll get back to you very soon."
+    },
+    "senderName": {
+      "fr": "Site web Cedrik Ferland",
+      "en": "Cedrik Ferland website"
+    }
+  },
+  "writeMe": {
+    "title": {
+      "fr": "Écrivez-moi",
+      "en": "Write me"
+    },
+    "intro": {
+      "fr": "Je vous réponds sous 24 heures ouvrables, par courriel ou par téléphone.",
+      "en": "I reply within one business day, by email or by phone."
+    },
+    "message": {
+      "fr": "Message",
+      "en": "Message"
+    },
+    "emailSubject": {
+      "fr": "Message via le formulaire de contact",
+      "en": "Message from the contact form"
+    }
+  },
+  "estimation": {
+    "title": {
+      "fr": "Estimation de ma propriété",
+      "en": "Property valuation"
+    },
+    "intro": {
+      "fr": "Après l'envoi : je vous réponds sous 24 heures ouvrables pour préciser votre projet, puis je vous remets mon opinion de la valeur marchande de votre propriété.",
+      "en": "After you send it: I reply within one business day to go over your project, then give you my opinion of your property's market value."
+    },
+    "emailSubject": {
+      "fr": "Demande d'estimation immobilière",
+      "en": "Property valuation request"
+    },
+    "emailSubjectRental": {
+      "fr": "Mise en location de ma propriété",
+      "en": "Renting out my property"
+    },
+    "address": {
+      "heading": {
+        "fr": "Quelle est l'adresse de votre propriété?",
+        "en": "What is the address of your property?"
+      },
+      "address": {
+        "fr": "Adresse",
+        "en": "Address"
+      },
+      "contactHeading": {
+        "fr": "Vos coordonnées",
+        "en": "Your contact information"
+      }
+    },
+    "propertyType": {
+      "heading": {
+        "fr": "Quel type de propriété avez-vous? (facultatif)",
+        "en": "What type of property do you have? (optional)"
+      },
+      "tabsLabel": {
+        "fr": "Catégories",
+        "en": "Categories"
+      },
+      "categories": [
+        {
+          "name": {
+            "fr": "Résidentiel",
+            "en": "Residential"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Maison à étages",
+                "en": "Two or more storey house"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Maison à paliers multiples",
+                "en": "Split-level house"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Maison à un étage et demi",
+                "en": "One-and-a-half-storey house"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Maison mobile",
+                "en": "Mobile home"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Maison de plain-pied",
+                "en": "One-storey house"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Loft/Studio",
+                "en": "Loft/Studio"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Duplex",
+                "en": "Duplex"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Triplex",
+                "en": "Triplex"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Quadruplex",
+                "en": "Quadruplex"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Quintuplex",
+                "en": "Quintuplex"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Appartement",
+                "en": "Apartment"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Chalet",
+                "en": "Cottage"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Propriété à revenu",
+                "en": "Revenue property"
+              },
+              "icon": "building-2"
+            }
+          ]
+        },
+        {
+          "name": {
+            "fr": "Commercial",
+            "en": "Commercial"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Condo commercial",
+                "en": "Commercial condo"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Condo industriel",
+                "en": "Industrial condo"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Bâtisse commerciale/Bureau",
+                "en": "Commercial building/Office"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Bâtisse industrielle",
+                "en": "Industrial building"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Bâtisse et terrain commerciaux",
+                "en": "Commercial building and land"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Bâtisse et terrain industriels",
+                "en": "Industrial building and land"
+              },
+              "icon": "store"
+            }
+          ]
+        },
+        {
+          "name": {
+            "fr": "Terrain et ferme",
+            "en": "Land and farm"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Fermette",
+                "en": "Hobby farm"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Ferme",
+                "en": "Farm"
+              },
+              "icon": "trees"
+            },
+            {
+              "label": {
+                "fr": "Terrain vacant",
+                "en": "Vacant lot"
+              },
+              "icon": "trees"
+            },
+            {
+              "label": {
+                "fr": "Terre à bois",
+                "en": "Woodland"
+              },
+              "icon": "trees"
+            }
+          ]
+        }
+      ]
+    },
+    "property": {
+      "heading": {
+        "fr": "Votre propriété (facultatif)",
+        "en": "Your property (optional)"
+      },
+      "yearBuilt": {
+        "fr": "Année de construction",
+        "en": "Year built"
+      },
+      "livingArea": {
+        "fr": "Superficie habitable (pi²)",
+        "en": "Living area (sq ft)"
+      },
+      "lotSize": {
+        "fr": "Superficie du terrain (pi²)",
+        "en": "Lot size (sq ft)"
+      }
+    },
+    "features": {
+      "heading": {
+        "fr": "Caractéristiques (facultatif)",
+        "en": "Features (optional)"
+      },
+      "bedrooms": {
+        "fr": "Chambres à coucher",
+        "en": "Bedrooms"
+      },
+      "bathrooms": {
+        "fr": "Salles de bain",
+        "en": "Bathrooms"
+      },
+      "outdoorParking": {
+        "fr": "Stationnements extérieurs",
+        "en": "Outdoor parking spaces"
+      },
+      "garages": {
+        "fr": "Garages",
+        "en": "Garages"
+      },
+      "basement": {
+        "fr": "Sous-sol",
+        "en": "Basement"
+      },
+      "basementOptions": [
+        {
+          "fr": "Aucun",
+          "en": "None"
+        },
+        {
+          "fr": "Non fini",
+          "en": "Unfinished"
+        },
+        {
+          "fr": "Partiellement fini",
+          "en": "Partially finished"
+        },
+        {
+          "fr": "Fini",
+          "en": "Finished"
+        }
+      ],
+      "pool": {
+        "fr": "Piscine",
+        "en": "Pool"
+      },
+      "poolOptions": [
+        {
+          "fr": "Aucune",
+          "en": "None"
+        },
+        {
+          "fr": "Hors terre",
+          "en": "Above-ground"
+        },
+        {
+          "fr": "Creusée",
+          "en": "In-ground"
+        }
+      ]
+    },
+    "project": {
+      "heading": {
+        "fr": "Votre projet (facultatif)",
+        "en": "Your project (optional)"
+      },
+      "choose": {
+        "fr": "Sélectionner",
+        "en": "Select"
+      },
+      "saleReason": {
+        "fr": "Raison de la vente",
+        "en": "Reason for selling"
+      },
+      "renovations": {
+        "fr": "Quelles sont les rénovations et les améliorations majeures apportées à votre propriété, l'année des travaux?",
+        "en": "What major renovations and improvements have been made to your property, and in what year?"
+      },
+      "purpose": {
+        "fr": "Motif de la demande",
+        "en": "Purpose of the request"
+      },
+      "purposeOptions": [
+        {
+          "fr": "Vente de la propriété",
+          "en": "Selling the property"
+        },
+        {
+          "fr": "Refinancement de la propriété",
+          "en": "Refinancing the property"
+        },
+        {
+          "fr": "Simplement connaître la valeur marchande",
+          "en": "Just knowing the market value"
+        },
+        {
+          "fr": "Autre",
+          "en": "Other"
+        }
+      ],
+      "moving": {
+        "fr": "Quand prévoyez-vous déménager?",
+        "en": "When do you plan to move?"
+      },
+      "movingOptions": [
+        {
+          "fr": "Maintenant",
+          "en": "Now"
+        },
+        {
+          "fr": "D'ici 3 mois",
+          "en": "Within 3 months"
+        },
+        {
+          "fr": "Entre 3 et 6 mois",
+          "en": "In 3 to 6 months"
+        },
+        {
+          "fr": "Entre 6 mois et un an",
+          "en": "In 6 months to a year"
+        },
+        {
+          "fr": "1 an et plus",
+          "en": "1 year or more"
+        }
+      ],
+      "appraisal": {
+        "fr": "Avez-vous fait faire une évaluation agréée au cours des 5 dernières années?",
+        "en": "Have you had a certified appraisal done in the last 5 years?"
+      },
+      "appraisalYes": {
+        "fr": "Oui",
+        "en": "Yes"
+      },
+      "appraisalNo": {
+        "fr": "Non",
+        "en": "No"
+      },
+      "appraisalOlder": {
+        "fr": "Oui, il y a plus de 5 ans",
+        "en": "Yes, more than 5 years ago"
+      },
+      "listing": {
+        "fr": "Quand prévoyez-vous mettre votre propriété en vente?",
+        "en": "When do you plan to put your property on the market?"
+      },
+      "listingOptions": [
+        {
+          "fr": "Maintenant",
+          "en": "Now"
+        },
+        {
+          "fr": "D'ici 3 mois",
+          "en": "Within 3 months"
+        },
+        {
+          "fr": "Entre 3 et 6 mois",
+          "en": "In 3 to 6 months"
+        },
+        {
+          "fr": "Entre 6 mois et un an",
+          "en": "In 6 months to a year"
+        },
+        {
+          "fr": "1 an et plus",
+          "en": "1 year or more"
+        }
+      ],
+      "send": {
+        "fr": "Envoyer ma demande",
+        "en": "Send my request"
+      }
+    }
+  },
+  "propertyAlert": {
+    "title": {
+      "fr": "Alerte immobilière",
+      "en": "Property alert"
+    },
+    "intro": {
+      "fr": "Après l'envoi : je vous réponds sous 24 heures ouvrables pour confirmer vos critères, puis je vous envoie les propriétés qui y correspondent.",
+      "en": "After you send it: I reply within one business day to confirm your criteria, then send you the properties that match them."
+    },
+    "emailSubject": {
+      "fr": "Inscription à l'alerte immobilière",
+      "en": "Property alert sign-up"
+    },
+    "emailSubjectRental": {
+      "fr": "Recherche de logement à louer",
+      "en": "Looking for a rental"
+    },
+    "intent": {
+      "heading": {
+        "fr": "Vous cherchez à acheter ou à louer?",
+        "en": "Are you looking to buy or to rent?"
+      },
+      "label": {
+        "fr": "Achat ou location",
+        "en": "Buy or rent"
+      },
+      "buy": {
+        "fr": "Acheter",
+        "en": "Buy"
+      },
+      "rent": {
+        "fr": "Louer",
+        "en": "Rent"
+      }
+    },
+    "contact": {
+      "heading": {
+        "fr": "Vos coordonnées",
+        "en": "Your contact information"
+      }
+    },
+    "locations": {
+      "headingBuy": {
+        "fr": "Où désirez-vous acheter?",
+        "en": "Where do you want to buy?"
+      },
+      "headingRent": {
+        "fr": "Où désirez-vous louer?",
+        "en": "Where do you want to rent?"
+      },
+      "hint": {
+        "fr": "Choisissez une ou plusieurs régions et villes.",
+        "en": "Choose one or more regions and cities."
+      },
+      "tabsLabel": {
+        "fr": "Régions",
+        "en": "Regions"
+      },
+      "regions": [
+        {
+          "tab": {
+            "fr": "Montréal (île)",
+            "en": "Montreal (Island)"
+          },
+          "name": {
+            "fr": "Montréal (île)",
+            "en": "Montreal (Island)"
+          },
+          "cities": [
+            "Ahuntsic-Cartierville",
+            "Côte-des-Neiges/Notre-Dame-de-Grâce",
+            "Le Sud-Ouest",
+            "Mercier/Hochelaga-Maisonneuve",
+            "Pierrefonds-Roxboro",
+            "Rivière-des-Prairies/Pointe-aux-Trembles",
+            "Verdun/Île-des-Soeurs",
+            "Ville-Marie"
+          ]
+        },
+        {
+          "tab": {
+            "fr": "Rive-Sud",
+            "en": "South Shore"
+          },
+          "name": {
+            "fr": "Montréal (Rive-Sud)",
+            "en": "Montreal (South Shore)"
+          },
+          "cities": [
+            "Beloeil",
+            "Boucherville",
+            "Brossard",
+            "Candiac",
+            "Carignan",
+            "Chambly",
+            "Châteauguay",
+            "Le Vieux-Longueuil",
+            "Longueuil",
+            "Mont-Saint-Hilaire",
+            "Otterburn Park",
+            "Richelieu",
+            "Saint-Amable",
+            "Saint-Bruno-de-Montarville",
+            "Saint-Hubert",
+            "Saint-Lambert",
+            "Saint-Mathias-sur-Richelieu",
+            "Saint-Mathieu-de-Beloeil",
+            "Sainte-Catherine",
+            "Sainte-Julie",
+            "Varennes",
+            "Verchères"
+          ]
+        },
+        {
+          "tab": {
+            "fr": "Rive-Nord",
+            "en": "North Shore"
+          },
+          "name": {
+            "fr": "Montréal (Rive-Nord)",
+            "en": "Montreal (North Shore)"
+          },
+          "cities": [
+            "Le Gardeur",
+            "Mirabel",
+            "Saint-Sulpice"
+          ]
+        },
+        {
+          "tab": {
+            "fr": "Montérégie",
+            "en": "Montérégie"
+          },
+          "name": {
+            "fr": "Montérégie",
+            "en": "Montérégie"
+          },
+          "cities": [
+            "Contrecoeur",
+            "Marieville",
+            "Otterburn Park",
+            "Roxton",
+            "Roxton Falls",
+            "Saint-Amable",
+            "Saint-Antoine-sur-Richelieu",
+            "Saint-Basile-le-Grand",
+            "Saint-Hubert",
+            "Saint-Hyacinthe",
+            "Saint-Jean-sur-Richelieu",
+            "Saint-Lambert",
+            "Saint-Roch-de-Richelieu",
+            "Sorel-Tracy"
+          ]
+        },
+        {
+          "tab": {
+            "fr": "Lanaudière",
+            "en": "Lanaudière"
+          },
+          "name": {
+            "fr": "Lanaudière",
+            "en": "Lanaudière"
+          },
+          "cities": [
+            "Lavaltrie",
+            "Le Gardeur",
+            "Saint-Jean-de-Matha",
+            "Saint-Sulpice"
+          ]
+        }
+      ]
+    },
+    "propertyType": {
+      "heading": {
+        "fr": "Quel type de propriété recherchez-vous?",
+        "en": "What type of property are you looking for?"
+      },
+      "tabsLabel": {
+        "fr": "Catégories",
+        "en": "Categories"
+      },
+      "categories": [
+        {
+          "name": {
+            "fr": "Résidentiel",
+            "en": "Residential"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Bungalow",
+                "en": "Bungalow"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Bungalow semi-détaché",
+                "en": "Semi-detached bungalow"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Condo",
+                "en": "Condo"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Copropriété indivisée",
+                "en": "Undivided co-ownership"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Cottage",
+                "en": "Cottage"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Cottage semi-détaché",
+                "en": "Semi-detached cottage"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Duplex",
+                "en": "Duplex"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Immeuble à revenus",
+                "en": "Revenue property"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Maison de ville",
+                "en": "Townhouse"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Quadruplex et plus",
+                "en": "Quadruplex and up"
+              },
+              "icon": "building-2"
+            },
+            {
+              "label": {
+                "fr": "Paliers multiples",
+                "en": "Split-level"
+              },
+              "icon": "house"
+            },
+            {
+              "label": {
+                "fr": "Triplex",
+                "en": "Triplex"
+              },
+              "icon": "building-2"
+            }
+          ]
+        },
+        {
+          "name": {
+            "fr": "Commercial",
+            "en": "Commercial"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Immeuble commercial",
+                "en": "Commercial building"
+              },
+              "icon": "store"
+            },
+            {
+              "label": {
+                "fr": "Vente d'entreprise",
+                "en": "Business for sale"
+              },
+              "icon": "store"
+            }
+          ]
+        },
+        {
+          "name": {
+            "fr": "Terrain et ferme",
+            "en": "Land and farm"
+          },
+          "types": [
+            {
+              "label": {
+                "fr": "Terrain",
+                "en": "Land"
+              },
+              "icon": "trees"
+            }
+          ]
+        }
+      ],
+      "other": {
+        "fr": "Autre?",
+        "en": "Other?"
+      }
+    },
+    "budget": {
+      "heading": {
+        "fr": "Quel est votre budget?",
+        "en": "What is your budget?"
+      },
+      "label": {
+        "fr": "Budget",
+        "en": "Budget"
+      },
+      "minimumBuy": {
+        "fr": "Minimum ($)",
+        "en": "Minimum ($)"
+      },
+      "minimumRent": {
+        "fr": "Loyer minimum ($ par mois)",
+        "en": "Minimum rent ($ per month)"
+      },
+      "maximumBuy": {
+        "fr": "Maximum ($)",
+        "en": "Maximum ($)"
+      },
+      "maximumRent": {
+        "fr": "Loyer maximum ($ par mois)",
+        "en": "Maximum rent ($ per month)"
+      },
+      "maximumTooLow": {
+        "fr": "Le budget maximum doit être égal ou supérieur au budget minimum.",
+        "en": "The maximum budget must be equal to or higher than the minimum budget."
+      },
+      "send": {
+        "fr": "Envoyer la demande",
+        "en": "Send the request"
+      }
+    }
+  },
+  "propertyInfo": {
+    "title": {
+      "fr": "Plus d'infos sur cette propriété",
+      "en": "More info about this property"
+    },
+    "emailSubject": {
+      "fr": "Demande d'information sur une propriété",
+      "en": "Information request about a property"
+    },
+    "emailSubjectStart": {
+      "fr": "Demande d'information",
+      "en": "Information request"
+    },
+    "name": {
+      "fr": "Nom",
+      "en": "Name"
+    },
+    "message": {
+      "fr": "Message (facultatif)",
+      "en": "Message (optional)"
+    }
+  }
+}

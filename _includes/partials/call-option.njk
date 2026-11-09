@@ -1,6 +1,6 @@
 {%- if agent.phone %}
 <div class="call-option">
-  <a class="contact-option" href="tel:+1{{ agent.phone | replace(' ', '') }}"><span class="contact-option__icon">{% include "icons/phone.svg" %}</span><span>{{ t.contactOptions.call }}</span><span class="contact-option__number">{{ agent.phone }}</span></a>
-  <button class="call-option__copy" type="button" data-copy="{{ agent.phone }}" data-copied="{{ t.contactOptions.copied }}" hidden><span class="contact-option__icon">{% include "icons/copy.svg" %}</span><span aria-live="polite">{{ t.contactOptions.copy }}</span></button>
+  <a class="contact-option" href="tel:+1{{ agent.phone | replace(' ', '') }}"><span class="contact-option__icon">{% include "icons/phone.svg" %}</span><span>{{ t.contact.options.call }}</span><span class="contact-option__number">{{ agent.phone }}</span></a>
+  <button class="call-option__copy" type="button" data-copy="{{ agent.phone }}" data-copied="{{ t.contact.options.copied }}" hidden><span class="contact-option__icon">{% include "icons/copy.svg" %}</span><span aria-live="polite">{{ t.contact.options.copy }}</span></button>
 </div>
 {%- endif %}

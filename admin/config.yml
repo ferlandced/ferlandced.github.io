@@ -17,33 +17,204 @@ logo:
 site_url: https://matteougolini.net/ced/
 display_url: https://matteougolini.net/ced/
 
+# Editors see French labels. Every text has a French and an English version, side by side,
+# stored in the file of the page or part where it appears (lib/content.ts, COPY_FILES).
+# Keys are fixed here, so editors can change the wording but not the structure.
 collections:
-  # Home page images (read by index.njk as `home`). Text lives in _data/i18n.json.
-  - name: home
-    label: Home page
+  # One file per page (content/pages/). URLs are fixed in _data/site.json (pages).
+  - name: pages
+    label: "Pages"
+    description: "Une fiche par page du site. Chaque texte a une version française et une version anglaise."
     files:
-      - name: hero
-        label: Hero
-        file: content/home.json
+      - name: home
+        label: "Accueil"
+        file: content/pages/home.json
+        format: json
+        description: "Les sections de la page d'accueil, de haut en bas."
+        fields:
+          - name: hero
+            label: "1. Bandeau du haut"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: photo, label: "Photo du courtier", widget: image, hint: "Photo détourée (fond transparent), en hauteur, au moins 1200 px de haut. Aussi utilisée dans la section À propos." }
+              - { name: photoAlt, label: "Description de la photo du courtier", widget: string, required: false, hint: "Pour les lecteurs d'écran." }
+              - { name: signature, label: "Signature", widget: image, hint: "Marque du courtier (maison + signature). SVG de préférence, rogné au plus près du dessin." }
+              - { name: background, label: "Image de fond", widget: image, required: false, hint: "Plein écran derrière le bandeau, sur tous les appareils. Paysage, au moins 1920 px de large, droits d'utilisation confirmés." }
+              - { name: backgroundAlt, label: "Description de l'image de fond", widget: string, required: false, hint: "Laissez vide si l'image est décorative." }
+              - { name: tagline, label: "Slogan", widget: object, collapsed: false, hint: "**mots** en gras, _mots_ plus petits et légers, retour à la ligne là où le texte doit passer à la ligne (même coupure sur téléphone et ordinateur).", fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: button, label: "Bouton : ouvre les options de contact", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: about
+            label: "2. À propos"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "Titre de la section", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: storyPart1, label: "Histoire, partie 1 (la photo de paramédic apparaît)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: storyPart2, label: "Histoire, partie 2 (la photo du courtier revient, puis le lien et les coordonnées)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: storyLink, label: "Lien vers la page Mon histoire", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: cellLabel, label: "Texte devant le numéro de cellulaire", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: paramedicPhoto, label: "Photo de paramédic", widget: image, required: false, hint: "Remplace la photo du courtier pendant la partie 1 de l'histoire. Même taille et même cadrage que la photo du courtier (fond transparent), pour que les deux se superposent." }
+              - { name: phoneBackdrop, label: "Fond derrière la photo (téléphones)", widget: image, required: false, hint: "Téléphones seulement : la scène derrière la photo du courtier. En hauteur, 9:16. Vide : pas de fond." }
+          - name: services
+            label: "3. Services"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "Titre de la section", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: search
+                label: "Chercher une propriété (achat ou location)"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Paysage, environ 1600 px de large, coupée en diagonale sur le site. Droits d'utilisation confirmés." }
+                  - { name: imageAlt, label: "Description de l'image", widget: string, required: false, hint: "Laissez vide si l'image est décorative." }
+                  - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: text, label: "Texte", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+                  - { name: buyLink, label: "Lien vers la page Acheter", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: rentLink, label: "Lien vers la page Louer", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: button, label: "Bouton : ouvre l'alerte immobilière (le formulaire demande achat ou location)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: sell
+                label: "Vendre"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Paysage, environ 1600 px de large, coupée en diagonale sur le site. Droits d'utilisation confirmés." }
+                  - { name: imageAlt, label: "Description de l'image", widget: string, required: false, hint: "Laissez vide si l'image est décorative." }
+                  - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: text, label: "Texte", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+                  - { name: sellLink, label: "Lien vers la page Vendre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: button, label: "Bouton : ouvre le formulaire d'estimation", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: properties
+            label: "4. Mes propriétés"
+            widget: object
+            collapsed: true
+            hint: "Les propriétés elles-mêmes viennent du site de REMAX. Les textes des cartes sont dans la page Propriétés."
+            fields:
+              - { name: heading, label: "Titre de la section", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: allButton, label: "Bouton vers la page de toutes les propriétés (affiché à partir de 7 propriétés)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+      - name: contact
+        label: "Contact"
+        file: content/pages/contact.json
+        format: json
+        description: "La page Contact et la fenêtre « Me contacter » de l'accueil : la même liste d'options."
+        fields:
+          - { name: title, label: "Titre de la page et de la fenêtre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: photo, label: "Photo", widget: image, required: false, hint: "Photo du courtier sur la page Contact. En hauteur, 9:16. Vide : un panneau gris uni." }
+          - { name: photoAlt, label: "Description de la photo", widget: string, required: false }
+          - { name: closeButton, label: "Bouton X qui ferme la fenêtre, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: options
+            label: "Options de contact"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: call, label: "Option : appeler", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: copy, label: "Bouton qui copie le numéro (ordinateur)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: copied, label: "Message une fois le numéro copié", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: write, label: "Option : écrire", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: estimate, label: "Option : estimation", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: alert, label: "Option : alerte immobilière", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: findRental, label: "Option : trouver un logement", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: postRental, label: "Option : mettre en location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+      - name: properties
+        label: "Propriétés"
+        file: content/pages/properties.json
+        format: json
+        description: "La page de toutes les propriétés et les cartes de propriété (aussi sur l'accueil)."
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: empty, label: "Texte quand il n'y a aucune propriété", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: cards
+            label: "Cartes de propriété"
+            widget: object
+            collapsed: false
+            fields:
+              - { name: number, label: "Libellé du numéro d'inscription", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: bedrooms, label: "Chambres, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: bathrooms, label: "Salles de bain, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: powderRooms, label: "Salles d'eau, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: area, label: "Superficie habitable, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: status
+                label: "Étiquette de statut"
+                widget: object
+                collapsed: false
+                fields:
+                  - { name: new, label: "Nouvelle inscription", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: sold, label: "Vendue", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: moreInfo, label: "Bouton : demander plus d'infos", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: newTab, label: "Ajouté au lien de la propriété : il s'ouvre dans un nouvel onglet", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+      - name: about
+        label: "Mon histoire"
+        file: content/pages/about.json
         format: json
         fields:
-          - { name: signature, label: "Signature", widget: image, hint: "Agent mark (house + signature). SVG preferred, trimmed tight to the drawing." }
-          - { name: hero_photo, label: "Agent photo", widget: image, hint: "Clipped photo with a transparent background, portrait, at least 1200 px tall. Also used in the About section." }
-          - { name: hero_photo_alt, label: "Agent photo description", widget: string, required: false }
-          - { name: paramedic_photo, label: "Paramedic photo", widget: image, required: false, hint: "About section: replaces the agent photo while the story talks about his paramedic years. Same size and framing as the agent photo (transparent background, same crop), so the two line up." }
-          - { name: side_image, label: "Hero image", widget: image, required: false, hint: "Full-screen background of the hero on every device. Landscape, at least 1920 px wide, usage rights confirmed." }
-          - { name: side_image_alt, label: "Hero image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
-          - { name: service_search_image, label: "Services: looking for a property image", widget: image, required: false, hint: "Landscape, about 1600 px wide, cut along the slash on the site. Usage rights confirmed." }
-          - { name: service_search_image_alt, label: "Services: looking image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
-          - { name: service_sell_image, label: "Services: selling image", widget: image, required: false, hint: "Landscape, about 1600 px wide, cut along the slash on the site. Usage rights confirmed." }
-          - { name: service_sell_image_alt, label: "Services: selling image description", widget: string, required: false, hint: "Leave empty if the image is decorative." }
-          - { name: about_backdrop, label: "About backdrop", widget: image, required: false, hint: "Phones only: the scene behind the agent photo in the About section. Portrait, 9:16. Empty shows no background." }
-          - { name: contact_photo, label: "Contact page photo", widget: image, required: false, hint: "Agent picture on the Contact page. Portrait, 9:16. Empty shows a plain gray panel." }
-          - { name: contact_photo_alt, label: "Contact page photo description", widget: string, required: false }
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
+      - name: buy
+        label: "Acheter"
+        file: content/pages/buy.json
+        format: json
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
+      - name: sell
+        label: "Vendre"
+        file: content/pages/sell.json
+        format: json
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
+      - name: rent
+        label: "Louer"
+        file: content/pages/rent.json
+        format: json
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
+      - name: privacy
+        label: "Politique de confidentialité"
+        file: content/pages/privacy.json
+        format: json
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
+          - name: draftBanner
+            label: "Bandeau d'ébauche (en haut et en bas, tant que la révision est en attente)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre du bandeau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: text, label: "Texte du bandeau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: updatedLabel, label: "Texte devant la date de mise à jour", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: updated, label: "Date de mise à jour", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
+      - name: terms
+        label: "Conditions d'utilisation"
+        file: content/pages/terms.json
+        format: json
+        fields:
+          - { name: title, label: "Titre de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: description, label: "Description pour les moteurs de recherche (une phrase)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
+          - name: draftBanner
+            label: "Bandeau d'ébauche (en haut et en bas, tant que la révision est en attente)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre du bandeau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: text, label: "Texte du bandeau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+          - { name: updatedLabel, label: "Texte devant la date de mise à jour", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: updated, label: "Date de mise à jour", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - { name: body, label: "Texte de la page", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: markdown }, { name: en, label: "English", widget: markdown }] }
 
-  # Header menu (read by header.njk as `menu`). Each item: a French and English label and URL.
+  # Header menu and the header's other texts (content/menu.json).
   - name: menu
-    label: Menu
+    label: "Menu"
     files:
       - name: menu
         label: "Menu du haut"
@@ -58,13 +229,7 @@ collections:
             hint: "Glissez les liens pour changer leur ordre. Au-delà de 4 ou 5 liens, le menu devient trop large sur ordinateur."
             summary: "{{fields.label.fr}}"
             fields:
-              - name: label
-                label: "Texte du lien"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+              - { name: label, label: "Texte du lien", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
               - name: url
                 label: "Adresse du lien"
                 widget: object
@@ -73,788 +238,372 @@ collections:
                 fields:
                   - { name: fr, label: "Français", widget: string, pattern: ['^/(?![/\\])[^\s\\]*$|^https://(www\.)?remax\.(ca|com)/[^\s\\]*$', 'Une adresse du site (/fr/...) ou du site de REMAX (https://www.remax.ca/...)'] }
                   - { name: en, label: "English", widget: string, pattern: ['^/(?![/\\])[^\s\\]*$|^https://(www\.)?remax\.(ca|com)/[^\s\\]*$', 'An address on this site (/en/...) or the REMAX website (https://www.remax.ca/...)'] }
-
-  # Site copy (read by eleventy.config.js as `i18n`). Each text has a French and an English
-  # version. Keys are fixed here, so editors can change the wording but not the structure.
-  # Labels are the French description of where each text appears.
-  - name: copy
-    label: Textes du site
-    files:
-      - name: i18n
-        label: Textes (français et anglais)
-        file: content/i18n.json
-        format: json
-        fields:
           - name: nav
-            label: "Menu"
+            label: "Bouton du menu (lu par les lecteurs d'écran)"
             widget: object
             collapsed: true
             fields:
-              - name: label
-                label: "Nom du menu principal, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: home
-                label: "Nom de la page d'accueil, lu par les lecteurs d'écran sur le logo"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: open
-                label: "Bouton du menu mobile (fermé), lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: close
-                label: "Bouton du menu mobile (ouvert), lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+              - { name: label, label: "Nom du menu principal", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: home, label: "Nom de la page d'accueil, sur le logo", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: open, label: "Bouton du menu mobile (fermé)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: close, label: "Bouton du menu mobile (ouvert)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
           - name: langSwitch
-            label: "Sélecteur de langue"
+            label: "Changement de langue"
             widget: object
             collapsed: true
+            hint: "Le nom de l'autre langue, affiché dans le haut de page."
             fields:
-              - name: label
-                label: "Nom du sélecteur de langue, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: fr
-                label: "Nom de la langue française dans le sélecteur"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: en
-                label: "Nom de la langue anglaise dans le sélecteur"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-          - name: hero
-            label: "Bandeau d'accueil"
-            widget: object
-            collapsed: true
-            fields:
-              - name: tagline
-                label: "Slogan au centre du bandeau"
-                hint: "**mots** en gras, _mots_ plus petits et légers, retour à la ligne là où le texte doit passer à la ligne (même coupure sur téléphone et ordinateur)."
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: cta
-                label: "Bouton du bandeau : ouvre les options de contact"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-          - name: contactOptions
-            label: "Options de contact (fenêtre et page Contact)"
-            widget: object
-            collapsed: true
-            fields:
-              - name: title
-                label: "Titre de la fenêtre et de la page Contact"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: call
-                label: "Option : appeler"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: copy
-                label: "Bouton qui copie le numéro (ordinateur)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: copied
-                label: "Message une fois le numéro copié"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: write
-                label: "Option : écrire"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: estimate
-                label: "Option : estimation"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: alert
-                label: "Option : alerte immobilière"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: findRental
-                label: "Option : trouver un logement"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: postRental
-                label: "Option : mettre en location"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+              - { name: fr, label: "Nom du français", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: en, label: "Nom de l'anglais", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
           - name: contactIcons
-            label: "Icônes de contact"
+            label: "Icônes de contact (lues par les lecteurs d'écran)"
             widget: object
             collapsed: true
             fields:
-              - name: label
-                label: "Nom de la rangée d'icônes, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: phone
-                label: "Icône téléphone, lue avant le numéro"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: email
-                label: "Icône courriel, lue avant l'adresse"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: newTab
-                label: "Ajouté après Instagram et Facebook : le lien s'ouvre dans un nouvel onglet"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-          - name: about
-            label: "À propos"
-            widget: object
-            collapsed: true
-            fields:
-              - name: heading
-                label: "Titre de la section À propos"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: cellLabel
-                label: "Étiquette devant le numéro de cellulaire"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: more
-                label: "Bouton qui mène à la page Mon histoire"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-          - name: services
-            label: "Services"
-            widget: object
-            collapsed: true
-            fields:
-              - name: heading
-                label: "Titre de la section Services"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: search
-                label: "Chercher une propriété (achat ou location)"
-                widget: object
-                collapsed: false
-                fields:
-                  - name: title
-                    label: "Titre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: text
-                    label: "Texte"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-                  - name: moreBuy
-                    label: "Lien vers la page Acheter"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: moreRent
-                    label: "Lien vers la page Louer"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: action
-                    label: "Bouton : ouvre l'alerte immobilière (le formulaire demande achat ou location)"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-              - name: sell
-                label: "Vendre"
-                widget: object
-                collapsed: false
-                fields:
-                  - name: title
-                    label: "Titre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: text
-                    label: "Texte"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-                  - name: more
-                    label: "Lien vers la page Vendre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: action
-                    label: "Bouton : ouvre le formulaire d'évaluation"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-          - name: properties
-            label: "Propriétés"
-            widget: object
-            collapsed: true
-            fields:
-              - name: moreInfo
-                label: "Lien sous chaque propriété : demander plus d'infos"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: infoSubject
-                label: "Début de l'objet du courriel reçu pour une propriété"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: heading
-                label: "Titre de la section des propriétés"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: all
-                label: "Bouton vers la page de toutes les propriétés (affiché à partir de 7 propriétés)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: number
-                label: "Libellé du numéro d'inscription sur une carte"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: bedrooms
-                label: "Chambres, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: bathrooms
-                label: "Salles de bain, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: powderRooms
-                label: "Salles d'eau, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: area
-                label: "Superficie habitable, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: status
-                label: "Étiquette de statut sur une carte"
-                widget: object
-                collapsed: true
-                fields:
-                  - name: new
-                    label: "Nouvelle inscription"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: sold
-                    label: "Vendue"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-          - name: forms
-            label: "Pages des formulaires"
-            widget: object
-            collapsed: true
-            fields:
-              - name: close
-                label: "Bouton X qui ferme le formulaire, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: estimation
-                label: "Estimation"
-                widget: object
-                collapsed: false
-                fields:
-                  - name: title
-                    label: "Titre de la page d'estimation"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: next
-                    label: "Sous le titre du formulaire d'estimation : la suite et le délai de réponse"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-              - name: propertyAlert
-                label: "Alerte immobilière"
-                widget: object
-                collapsed: false
-                fields:
-                  - name: title
-                    label: "Titre de la page d'alerte immobilière"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: next
-                    label: "Sous le titre du formulaire d'alerte immobilière : la suite et le délai de réponse"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-              - name: writeMe
-                label: "Formulaire Écrivez-moi"
-                widget: object
-                collapsed: true
-                fields:
-                  - name: title
-                    label: "Titre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-                  - name: next
-                    label: "Texte sous le titre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: text }
-                      - { name: en, label: "English", widget: text }
-              - name: propertyInfo
-                label: "Fenêtre Plus d'infos sur une propriété"
-                widget: object
-                collapsed: true
-                fields:
-                  - name: title
-                    label: "Titre"
-                    widget: object
-                    collapsed: false
-                    fields:
-                      - { name: fr, label: "Français", widget: string }
-                      - { name: en, label: "English", widget: string }
-          - name: office
-            label: "Pied de page"
-            widget: object
-            collapsed: true
-            fields:
-              - name: licence
-                label: "Permis : texte d'identification (affiché seulement si le numéro de permis est rempli dans le profil)"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: licenceNumber
-                label: "Permis : texte devant le numéro"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: licenceRegister
-                label: "Permis : lien vers le registre de l'OACIQ"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: type
-                label: "Type d'entreprise sous le nom du bureau"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: phoneLabel
-                label: "Étiquette devant le numéro du bureau"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
+              - { name: label, label: "Nom de la rangée d'icônes", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phone, label: "Icône téléphone, lue avant le numéro", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: email, label: "Icône courriel, lue avant l'adresse", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: newTab, label: "Ajouté après Instagram et Facebook : le lien s'ouvre dans un nouvel onglet", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
 
-              - name: legalLabel
-                label: "Nom des liens juridiques, lu par les lecteurs d'écran"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: privacy
-                label: "Lien vers la politique de confidentialité"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: terms
-                label: "Lien vers les conditions d'utilisation"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-          - name: legal
-            label: "Pages juridiques"
-            widget: object
-            collapsed: true
-            fields:
-              - name: pending
-                label: "Bandeau en haut et en bas d'une ébauche : titre"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-              - name: pendingText
-                label: "Bandeau d'une ébauche : texte"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: text }
-                  - { name: en, label: "English", widget: text }
-              - name: updated
-                label: "Texte devant la date de mise à jour"
-                widget: object
-                collapsed: false
-                fields:
-                  - { name: fr, label: "Français", widget: string }
-                  - { name: en, label: "English", widget: string }
-  # Content pages (read by page.njk). One file per page, French and English in each.
-  # URLs are fixed in _data/site.json (pages).
-  - name: pages
-    label: Pages
+  # Footer texts (content/footer.json). The office name, address and phone are fixed in _data/site.json.
+  - name: footer
+    label: "Pied de page"
     files:
-      - name: about
-        label: "Mon histoire"
-        file: content/pages/about.json
+      - name: footer
+        label: "Pied de page"
+        file: content/footer.json
         format: json
+        description: "Le nom, l'adresse et le téléphone du bureau REMAX sont fixes (règles de la marque). Les coordonnées du courtier sont dans le Profil du courtier."
         fields:
-          - name: title
-            label: "Titre de la page"
+          - name: office
+            label: "Bureau"
             widget: object
             collapsed: false
             fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
+              - { name: type, label: "Type d'entreprise sous le nom du bureau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phoneLabel, label: "Texte devant le numéro du bureau", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: licence
+            label: "Permis de l'OACIQ"
+            widget: object
+            collapsed: false
+            hint: "Affiché seulement si le numéro de permis est rempli dans le Profil du courtier."
+            fields:
+              - { name: text, label: "Texte d'identification", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: numberLabel, label: "Texte devant le numéro", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: registerLink, label: "Lien vers le registre de l'OACIQ", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: legalLinks
+            label: "Liens juridiques"
             widget: object
             collapsed: false
             fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
-      - name: buy
-        label: "Acheter"
-        file: content/pages/buy.json
-        format: json
-        fields:
-          - name: title
-            label: "Titre de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
-      - name: sell
-        label: "Vendre"
-        file: content/pages/sell.json
-        format: json
-        fields:
-          - name: title
-            label: "Titre de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
-      - name: rent
-        label: "Louer"
-        file: content/pages/rent.json
-        format: json
-        fields:
-          - name: title
-            label: "Titre de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
-      - name: privacy
-        label: "Politique de confidentialité"
-        file: content/pages/privacy.json
-        format: json
-        fields:
-          - name: title
-            label: "Titre de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
-          - name: updated
-            label: "Date de mise à jour"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
-      - name: terms
-        label: "Conditions d'utilisation"
-        file: content/pages/terms.json
-        format: json
-        fields:
-          - name: title
-            label: "Titre de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: description
-            label: "Description pour les moteurs de recherche (une phrase)"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - { name: reviewPending, label: "En attente de révision juridique (affiche le bandeau en haut et en bas)", widget: boolean, default: true }
-          - name: updated
-            label: "Date de mise à jour"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: string }
-              - { name: en, label: "English", widget: string }
-          - name: body
-            label: "Texte de la page"
-            widget: object
-            collapsed: false
-            fields:
-              - { name: fr, label: "Français", widget: markdown }
-              - { name: en, label: "English", widget: markdown }
+              - { name: label, label: "Nom des liens juridiques, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: privacy, label: "Lien vers la politique de confidentialité", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: terms, label: "Lien vers les conditions d'utilisation", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
 
-  # a) Agent profile. Placeholder fields; adjust to the real site.
+  # Every text of the forms (content/forms.json): shared texts, then one box per form.
+  - name: forms
+    label: "Formulaires"
+    files:
+      - name: forms
+        label: "Formulaires"
+        file: content/forms.json
+        format: json
+        description: "Les textes communs servent dans tous les formulaires. Chaque formulaire a ensuite ses propres textes, étape par étape."
+        fields:
+          - name: common
+            label: "Textes communs à tous les formulaires"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: close, label: "Bouton X qui ferme le formulaire, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: cancel, label: "Bouton Annuler", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: back, label: "Bouton Précédent", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: next, label: "Bouton Suivant", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: skip, label: "Bouton qui passe les étapes facultatives et envoie", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: send, label: "Bouton Envoyer", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: stepWord, label: "Indicateur d'étape : le mot avant le numéro (Étape 2 sur 5)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: stepOf, label: "Indicateur d'étape : le mot entre les deux numéros (Étape 2 sur 5)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: firstName, label: "Champ Prénom", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: lastName, label: "Champ Nom", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: eitherHint, label: "Note au-dessus du téléphone et du courriel", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phone, label: "Champ Téléphone", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phonePlaceholder, label: "Exemple de numéro, en gris dans le champ", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phoneHint, label: "Aide sous le champ Téléphone", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: phoneOrEmailMissing, label: "Erreur : ni téléphone ni courriel", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: extension, label: "Champ Poste", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: extensionPlaceholder, label: "Exemple, en gris dans le champ Poste", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: email, label: "Champ Courriel", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: consent, label: "Case à cocher : consentement", widget: object, collapsed: false, hint: "Les mots entre crochets [ ] deviennent le lien vers la politique de confidentialité. Gardez les crochets.", fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: error, label: "Message si l'envoi échoue", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: success, label: "Message une fois le formulaire envoyé", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: senderName, label: "Nom de l'expéditeur des courriels reçus", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: writeMe
+            label: "Écrivez-moi"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: intro, label: "Texte sous le titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: message, label: "Champ Message", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: emailSubject, label: "Objet du courriel reçu", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: estimation
+            label: "Estimation de ma propriété"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: intro, label: "Texte sous le titre : la suite et le délai de réponse", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: emailSubject, label: "Objet du courriel reçu", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: emailSubjectRental, label: "Objet du courriel reçu, pour une mise en location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: address
+                label: "Étape 1 : adresse et coordonnées"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: address, label: "Champ Adresse", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: contactHeading, label: "Sous-titre des coordonnées", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: propertyType
+                label: "Étape 2 : type de propriété"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: tabsLabel, label: "Nom des onglets, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: categories
+                    label: "Catégories et types de propriété"
+                    label_singular: "Catégorie"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.name.fr}}"
+                    hint: "Une catégorie par onglet. Le visiteur choisit un seul type."
+                    fields:
+                      - { name: name, label: "Nom de la catégorie (onglet et titre)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                      - name: types
+                        label: "Types de propriété"
+                        label_singular: "Type"
+                        widget: list
+                        collapsed: true
+                        summary: "{{fields.label.fr}}"
+                        fields:
+                          - { name: label, label: "Nom du type", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                          - { name: icon, label: "Icône", widget: select, default: house, options: [{ label: "Maison", value: house }, { label: "Immeuble", value: building-2 }, { label: "Commerce", value: store }, { label: "Terrain", value: trees }] }
+              - name: property
+                label: "Étape 3 : la propriété"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: yearBuilt, label: "Champ Année de construction", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: livingArea, label: "Champ Superficie habitable", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: lotSize, label: "Champ Superficie du terrain", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: features
+                label: "Étape 4 : caractéristiques"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: bedrooms, label: "Chambres à coucher (choix de 0 à 5+)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: bathrooms, label: "Salles de bain (choix de 0 à 3+)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: outdoorParking, label: "Stationnements extérieurs (choix de 0 à 3+)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: garages, label: "Garages (choix de 0 à 3+)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: basement, label: "Sous-sol", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: basementOptions
+                    label: "Choix pour le sous-sol"
+                    label_singular: "Choix"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.fr}}"
+                    hint: "Glissez les choix pour changer leur ordre."
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - { name: pool, label: "Piscine", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: poolOptions
+                    label: "Choix pour la piscine"
+                    label_singular: "Choix"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.fr}}"
+                    hint: "Glissez les choix pour changer leur ordre."
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+              - name: project
+                label: "Étape 5 : le projet"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: choose, label: "Premier choix des listes déroulantes (aucun choix)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: saleReason, label: "Champ Raison de la vente", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: renovations, label: "Champ Rénovations", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+                  - { name: purpose, label: "Liste : motif de la demande", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: purposeOptions
+                    label: "Choix du motif de la demande"
+                    label_singular: "Choix"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.fr}}"
+                    hint: "Glissez les choix pour changer leur ordre."
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - { name: moving, label: "Liste : date du déménagement", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: movingOptions
+                    label: "Choix de la date du déménagement"
+                    label_singular: "Choix"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.fr}}"
+                    hint: "Glissez les choix pour changer leur ordre."
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - { name: appraisal, label: "Question : évaluation agréée", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+                  - { name: appraisalYes, label: "Réponse Oui", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: appraisalNo, label: "Réponse Non", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: appraisalOlder, label: "Réponse Oui, il y a plus de 5 ans", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: listing, label: "Liste : date de la mise en vente", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: listingOptions
+                    label: "Choix de la date de la mise en vente"
+                    label_singular: "Choix"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.fr}}"
+                    hint: "Glissez les choix pour changer leur ordre."
+                    fields:
+                      - { name: fr, label: "Français", widget: string }
+                      - { name: en, label: "English", widget: string }
+                  - { name: send, label: "Bouton Envoyer de la dernière étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: propertyAlert
+            label: "Alerte immobilière"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: intro, label: "Texte sous le titre : la suite et le délai de réponse", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
+              - { name: emailSubject, label: "Objet du courriel reçu", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: emailSubjectRental, label: "Objet du courriel reçu, pour une recherche de location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: intent
+                label: "Étape 1 : acheter ou louer"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: label, label: "Nom du choix, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: buy, label: "Choix Acheter", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: rent, label: "Choix Louer", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: contact
+                label: "Étape 2 : coordonnées"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: locations
+                label: "Étape 3 : régions et villes"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: headingBuy, label: "Titre de l'étape, pour un achat", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: headingRent, label: "Titre de l'étape, pour une location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: hint, label: "Aide sous le titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: tabsLabel, label: "Nom des onglets, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: regions
+                    label: "Régions et villes"
+                    label_singular: "Région"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.name.fr}}"
+                    hint: "Une région par onglet. Une ville présente dans deux régions n'est envoyée qu'une fois."
+                    fields:
+                      - { name: tab, label: "Nom court (onglet)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                      - { name: name, label: "Nom complet (titre de la région)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                      - name: cities
+                        label: "Villes"
+                        label_singular: "Ville"
+                        widget: list
+                        collapsed: true
+                        hint: "Le même nom en français et en anglais. Glissez les villes pour changer leur ordre."
+                        field: { name: city, label: "Ville", widget: string }
+              - name: propertyType
+                label: "Étape 4 : type de propriété"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: tabsLabel, label: "Nom des onglets, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - name: categories
+                    label: "Catégories et types de propriété"
+                    label_singular: "Catégorie"
+                    widget: list
+                    collapsed: true
+                    summary: "{{fields.name.fr}}"
+                    hint: "Une catégorie par onglet. Le visiteur peut choisir plusieurs types."
+                    fields:
+                      - { name: name, label: "Nom de la catégorie (onglet et titre)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                      - name: types
+                        label: "Types de propriété"
+                        label_singular: "Type"
+                        widget: list
+                        collapsed: true
+                        summary: "{{fields.label.fr}}"
+                        fields:
+                          - { name: label, label: "Nom du type", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                          - { name: icon, label: "Icône", widget: select, default: house, options: [{ label: "Maison", value: house }, { label: "Immeuble", value: building-2 }, { label: "Commerce", value: store }, { label: "Terrain", value: trees }] }
+                  - { name: other, label: "Champ Autre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - name: budget
+                label: "Étape 5 : budget"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: heading, label: "Titre de l'étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: label, label: "Nom du budget, lu par les lecteurs d'écran", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: minimumBuy, label: "Champ minimum, pour un achat", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: minimumRent, label: "Champ minimum, pour une location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: maximumBuy, label: "Champ maximum, pour un achat", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: maximumRent, label: "Champ maximum, pour une location", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: maximumTooLow, label: "Erreur : maximum plus petit que le minimum", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+                  - { name: send, label: "Bouton Envoyer de la dernière étape", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+          - name: propertyInfo
+            label: "Plus d'infos sur une propriété (fenêtre des cartes de propriété)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: emailSubject, label: "Objet du courriel reçu (sans JavaScript)", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: emailSubjectStart, label: "Début de l'objet du courriel reçu, suivi du numéro et du type de la propriété", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: name, label: "Champ Nom", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: message, label: "Champ Message", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+
+  # The agent's details (content/agent.json): one place, shown in the header, About, footer and forms.
   - name: agent
-    label: Agent profile
+    label: "Profil du courtier"
     files:
       - name: profile
-        label: Profile
+        label: "Profil du courtier"
         file: content/agent.json
         format: json
+        description: "Les coordonnées du courtier, affichées à plusieurs endroits du site : modifiez-les ici une seule fois."
         fields:
-          - { name: name, label: Name, widget: string }
-          # Bilingual fields: French and English versions, picked by page language.
-          - name: title
-            label: Title
-            widget: object
-            fields:
-              - { name: fr, label: "Titre (français)", widget: string }
-              - { name: en, label: "Title (English)", widget: string }
+          - { name: name, label: "Nom", widget: string }
+          - { name: title, label: "Titre professionnel", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
           # OACIQ licence: the footer shows it on every page once the number is filled in.
-          - { name: licence, label: "OACIQ licence number", widget: string, required: false }
-          - { name: licenceRegisterUrl, label: "OACIQ register link", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Must be an oaciq.com link'] }
-          # About section on the home page: two parts, each played by a short scroll through About.
-          - name: story_paramedic
-            label: "Story, part 1 (the paramedic photo appears)"
-            widget: object
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - name: story_today
-            label: "Story, part 2 (the agent photo comes back, then the link and contact)"
-            widget: object
-            fields:
-              - { name: fr, label: "Français", widget: text }
-              - { name: en, label: "English", widget: text }
-          - { name: phone, label: Phone, widget: string, required: false }
-          - { name: email, label: Email, widget: string, required: false, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Must be an email address'] }
+          - { name: licence, label: "Numéro de permis de l'OACIQ", widget: string, required: false, hint: "Affiché dans le pied de page dès qu'il est rempli." }
+          - { name: licenceRegisterUrl, label: "Lien vers le registre de l'OACIQ", widget: string, required: false, pattern: ['^$|^https://(www\.)?oaciq\.com/', 'Doit être un lien oaciq.com'] }
+          - { name: phone, label: "Cellulaire", widget: string, required: false }
+          - { name: email, label: "Courriel", widget: string, required: false, pattern: ['^[^@\s]+@[^@\s]+\.[^@\s]+$', 'Doit être une adresse courriel'] }
           # Social profiles: an icon shows on the site only when the link is filled in.
           - name: social
-            label: Social links
+            label: "Réseaux sociaux"
             widget: object
             required: false
+            hint: "Une icône s'affiche seulement quand le lien est rempli."
             fields:
-              - { name: instagram, label: Instagram, widget: string, required: false, pattern: ['^$|^https://(www\.)?instagram\.com/', 'Must be an instagram.com link'] }
-              - { name: facebook, label: Facebook, widget: string, required: false, pattern: ['^$|^https://(www\.)?facebook\.com/', 'Must be a facebook.com link'] }
-          - { name: languages, label: Languages, widget: list, required: false }
-          - { name: photo, label: Photo, widget: image, required: false }
+              - { name: instagram, label: Instagram, widget: string, required: false, pattern: ['^$|^https://(www\.)?instagram\.com/', 'Doit être un lien instagram.com'] }
+              - { name: facebook, label: Facebook, widget: string, required: false, pattern: ['^$|^https://(www\.)?facebook\.com/', 'Doit être un lien facebook.com'] }
+          - { name: languages, label: "Langues parlées", widget: list, required: false }
+          - { name: photo, label: "Photo (de secours)", widget: image, required: false, hint: "Utilisée seulement si la photo du bandeau de l'accueil est vide." }
 
   # b) Listings. Placeholder fields; adjust to the real site.
   - name: listings

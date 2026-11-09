@@ -4,11 +4,11 @@ import { stripTypeScriptTypes } from "node:module";
 import { HtmlBasePlugin, RenderPlugin } from "@11ty/eleventy";
 import type UserConfig from "@11ty/eleventy/UserConfig";
 import {
+  copyFor,
   isLang,
-  pick,
+  readCopy,
   readJson,
   type ContentPage,
-  type Copy,
   type Lang,
   type Site,
 } from "./lib/content.ts";
@@ -58,36 +58,15 @@ export default function (eleventyConfig: UserConfig) {
     eleventyConfig.watchIgnores?.add(glob);
   });
 
-  // CMS-managed single files (Decap "file" collections).
+  // CMS-managed single files (Decap "file" collections). The agent's details, shared by every page.
   eleventyConfig.addGlobalData("agent", () => readJson("content/agent.json"));
-  eleventyConfig.addGlobalData("home", () => readJson("content/home.json"));
-  // Header menu: a label and a URL per language for each item.
-  eleventyConfig.addGlobalData("menu", () => readJson("content/menu.json"));
-  // Site copy: content/i18n.json holds {fr, en} pairs at every leaf. Templates read it per
-  // language as i18n[lang], e.g. i18n.fr.nav.open. Office identity is merged from site.json.
+  // The text of each page and shared part (lib/content.ts, COPY_FILES), with one language picked:
+  // i18n.fr.home.hero.tagline, i18n.en.forms.common.send.
   eleventyConfig.addGlobalData("i18n", () => {
-    const copy = readJson("content/i18n.json") as Copy;
+    const copy = readCopy();
     const site = readJson("_data/site.json") as Site;
-    const office = site.office;
     return Object.fromEntries(
-      site.languages.filter(isLang).map((lang) => {
-        const strings = pick(copy, lang);
-        return [
-          lang,
-          {
-            ...strings,
-            office: {
-              ...strings.office,
-              name: office.name,
-              nameSuffix: office.nameSuffix,
-              address: office.address,
-              phone: office.phone,
-              independence: office.independence[lang],
-              independenceLang: office.independenceLang[lang],
-            },
-          },
-        ];
-      }),
+      site.languages.filter(isLang).map((lang) => [lang, copyFor(copy, lang)]),
     );
   });
   // Content pages (About, services, legal): content/pages/<key>.json, listed in site.contentPages.
@@ -140,6 +119,15 @@ export default function (eleventyConfig: UserConfig) {
       .replaceAll(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>")
       .replaceAll(/_(.+?)_/gs, '<span class="text-light">$1</span>')
       .replaceAll(/\s*\r?\n\s*/g, " <br>"),
+  );
+  // A CMS sentence with one [link]: escapes the text, then the words in brackets link to url.
+  eleventyConfig.addFilter("bracketLink", (text: string | null | undefined, url: string) =>
+    (text ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replace(/\[(.+?)\]/s, `<a href="${url}">$1</a>`),
   );
 
   return {

@@ -21,7 +21,7 @@ declare global {
 }
 
 const expectOptions = async (area: Locator, lang: Lang) => {
-  const copy = copyFor(lang).contactOptions;
+  const copy = copyFor(lang).contact.options;
   const call = area.locator('a[href^="tel:"]');
   await expect(call).toHaveAttribute("href", `tel:+1${agent.phone.replaceAll(" ", "")}`);
   await expect(call).toContainText(copy.call);
@@ -47,7 +47,7 @@ for (const lang of languages) {
     page,
   }) => {
     await page.goto(site.pages.contact[lang].slice(1));
-    await expect(page.locator("h1")).toHaveText(copyFor(lang).contactOptions.title);
+    await expect(page.locator("h1")).toHaveText(copyFor(lang).contact.title);
     await expect(page.locator(".contact-page__photo")).toBeVisible();
     await expectOptions(page.locator("main"), lang);
   });
@@ -116,9 +116,9 @@ test("copy button: desktop only, copies the number and confirms", async ({ page,
       return Promise.resolve();
     };
   });
-  await expect(copy).toHaveText(copyFor("fr").contactOptions.copy);
+  await expect(copy).toHaveText(copyFor("fr").contact.options.copy);
   await copy.click();
-  await expect(copy).toHaveText(copyFor("fr").contactOptions.copied);
+  await expect(copy).toHaveText(copyFor("fr").contact.options.copied);
   expect(await page.evaluate(() => window.copied)).toEqual([agent.phone]);
 });
 

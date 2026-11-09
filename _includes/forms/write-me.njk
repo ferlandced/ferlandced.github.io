@@ -1,0 +1,24 @@
+{%- import "forms/fields.njk" as fields with context -%}
+{%- set form = t.forms.writeMe -%}
+<form class="form form--contact" data-wizard action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+  <input type="hidden" name="form_type" value="contact">
+  <input type="hidden" name="subject" value="{{ form.emailSubject }}">
+  {{ fields.hiddenEnd() }}
+
+  <section class="form-step" data-step>
+    {{ fields.nameRow("ct") }}
+    {{ fields.phoneAndEmail("ct") }}
+    <div class="form-field">
+      <label for="ct-message"><span data-icon="message-square" aria-hidden="true"></span> {{ form.message }}</label>
+      <textarea id="ct-message" name="message" required></textarea>
+    </div>
+    {{ fields.consent("ct") }}
+    <div class="form-actions">
+      {{ fields.cancel() }}
+      <button type="submit">{{ t.forms.common.send }}</button>
+    </div>
+  </section>
+
+  {{ fields.outcome() }}
+</form>

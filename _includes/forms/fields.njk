@@ -1,0 +1,97 @@
+{#- Pieces shared by the forms. Import with context: they read t (this language's text) and site. -#}
+
+{% macro hiddenEnd() -%}
+  <input type="hidden" name="from_name" value="{{ t.forms.common.senderName }}">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+{%- endmacro %}
+
+{% macro progress() -%}
+  <p class="form-progress" data-progress hidden>{{ t.forms.common.stepWord }} <span data-current></span> {{ t.forms.common.stepOf }} <span data-total></span></p>
+{%- endmacro %}
+
+{% macro nameRow(prefix) -%}
+    <div class="form-row">
+      <div class="form-field">
+        <label for="{{ prefix }}-first-name"><span data-icon="user" aria-hidden="true"></span> {{ t.forms.common.firstName }}</label>
+        <input id="{{ prefix }}-first-name" name="first_name" type="text" autocomplete="given-name" required>
+      </div>
+      <div class="form-field">
+        <label for="{{ prefix }}-last-name"><span data-icon="user" aria-hidden="true"></span> {{ t.forms.common.lastName }}</label>
+        <input id="{{ prefix }}-last-name" name="last_name" type="text" autocomplete="family-name" required>
+      </div>
+    </div>
+{%- endmacro %}
+
+{#- Phone or email: at least one is required (data-one-of, js/forms.ts) -#}
+{% macro phoneAndEmail(prefix) -%}
+  {%- set common = t.forms.common %}
+    <p class="form-hint form-hint--group" id="{{ prefix }}-either">{{ common.eitherHint }}</p>
+    <div class="form-row form-row--phone">
+      <div class="form-field">
+        <label for="{{ prefix }}-phone"><span data-icon="phone" aria-hidden="true"></span> {{ common.phone }}</label>
+        <input id="{{ prefix }}-phone" name="phone" type="tel" autocomplete="tel" placeholder="{{ common.phonePlaceholder }}" pattern="(?=(?:\D*\d){10,15}\D*$)\+?[\d \(\)\-]+" data-allow="[\d \(\)\+\-]" aria-describedby="{{ prefix }}-either {{ prefix }}-phone-hint" data-one-of="contact" data-one-of-message="{{ common.phoneOrEmailMissing }}">
+        <p class="form-hint" id="{{ prefix }}-phone-hint">{{ common.phoneHint }}</p>
+      </div>
+      <div class="form-field">
+        <label for="{{ prefix }}-phone-ext">{{ common.extension }}</label>
+        <input id="{{ prefix }}-phone-ext" name="phone_ext" type="text" inputmode="numeric" autocomplete="tel-extension" placeholder="{{ common.extensionPlaceholder }}">
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="{{ prefix }}-email"><span data-icon="mail" aria-hidden="true"></span> {{ common.email }}</label>
+      <input id="{{ prefix }}-email" name="email" type="email" autocomplete="email" aria-describedby="{{ prefix }}-either" data-one-of="contact">
+    </div>
+{%- endmacro %}
+
+{#- The words in [brackets] link to the privacy policy -#}
+{% macro consent(prefix) -%}
+    <label class="form-consent" for="{{ prefix }}-consent"><input id="{{ prefix }}-consent" type="checkbox" name="consent" value="yes" required> <span>{{ t.forms.common.consent | bracketLink(site.pages.privacy[lang]) | safe }}</span></label>
+{%- endmacro %}
+
+{% macro cancel() -%}
+      <a class="form-cancel" href="/{{ lang }}/" data-close>{{ t.forms.common.cancel }}</a>
+{%- endmacro %}
+
+{% macro back() -%}
+      <button type="button" data-back><span data-icon="arrow-left" aria-hidden="true"></span> {{ t.forms.common.back }}</button>
+{%- endmacro %}
+
+{% macro skip() -%}
+      <button type="submit" class="form-skip">{{ t.forms.common.skip }}</button>
+{%- endmacro %}
+
+{% macro next() -%}
+      <button type="button" data-next>{{ t.forms.common.next }} <span data-icon="arrow-right" aria-hidden="true"></span></button>
+{%- endmacro %}
+
+{#- An optional step's buttons: back, skip and send, next -#}
+{% macro middleActions() -%}
+    <div class="form-actions">
+      {{ back() }}
+      {{ skip() }}
+      {{ next() }}
+    </div>
+{%- endmacro %}
+
+{% macro outcome() -%}
+  <div class="form-error" data-error hidden role="alert"><span data-icon="circle-alert" aria-hidden="true"></span> {{ t.forms.common.error }}</div>
+  <section class="form-success" data-success hidden tabindex="-1"><span data-icon="circle-check" aria-hidden="true"></span> {{ t.forms.common.success }}</section>
+{%- endmacro %}
+
+{#- Property types in tabs, one panel per category (estimation: one choice; alert: several).
+    Ids come from the French names, so they are the same in both languages. -#}
+{% macro propertyTypeTabs(prefix, section, frenchSection, inputType, inputName) -%}
+    <div class="form-tabs" role="tablist" aria-label="{{ section.tabsLabel }}" data-tabs hidden>
+      {%- for category in section.categories %}{% set categoryId = frenchSection.categories[loop.index0].name | slugify %}
+      <button type="button" role="tab" id="{{ prefix }}-tabtype-{{ categoryId }}" aria-controls="{{ prefix }}-cat-{{ categoryId }}">{{ category.name }}</button>
+      {%- endfor %}
+    </div>
+    {%- for category in section.categories %}{% set frenchCategory = frenchSection.categories[loop.index0] %}{% set categoryId = frenchCategory.name | slugify %}
+    <fieldset class="form-tiles" id="{{ prefix }}-cat-{{ categoryId }}" role="tabpanel" aria-labelledby="{{ prefix }}-tabtype-{{ categoryId }}">
+      <legend>{{ category.name }}</legend>
+      {%- for type in category.types %}{% set typeId = prefix ~ "-type-" ~ (frenchCategory.types[loop.index0].label | slugify) %}
+      <label for="{{ typeId }}"><input id="{{ typeId }}" type="{{ inputType }}" name="{{ inputName }}" value="{{ type.label }}"> <span data-icon="{{ type.icon }}" aria-hidden="true"></span> {{ type.label }}</label>
+      {%- endfor %}
+    </fieldset>
+    {%- endfor %}
+{%- endmacro %}

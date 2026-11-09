@@ -40,5 +40,51 @@
         "en": "/en/contact/"
       }
     }
-  ]
+  ],
+  "nav": {
+    "label": {
+      "fr": "Menu principal",
+      "en": "Main menu"
+    },
+    "home": {
+      "fr": "Accueil",
+      "en": "Home"
+    },
+    "open": {
+      "fr": "Ouvrir le menu",
+      "en": "Open menu"
+    },
+    "close": {
+      "fr": "Fermer le menu",
+      "en": "Close menu"
+    }
+  },
+  "langSwitch": {
+    "fr": {
+      "fr": "Français",
+      "en": "Français"
+    },
+    "en": {
+      "fr": "English",
+      "en": "English"
+    }
+  },
+  "contactIcons": {
+    "label": {
+      "fr": "Coordonnées",
+      "en": "Contact links"
+    },
+    "phone": {
+      "fr": "Téléphone",
+      "en": "Phone"
+    },
+    "email": {
+      "fr": "Courriel",
+      "en": "Email"
+    },
+    "newTab": {
+      "fr": "(nouvel onglet)",
+      "en": "(opens in a new tab)"
+    }
+  }
 }

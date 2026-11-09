@@ -1,23 +1,23 @@
 <header class="site-header" data-nav-root>
-  <a class="brand" href="/{{ lang }}/" aria-label="{{ t.office.name }}, {{ t.nav.home }}">
+  <a class="brand" href="/{{ lang }}/" aria-label="{{ site.office.name }}, {{ t.menu.nav.home }}">
     <img class="brand__logo" src="/images/REMAX_logo_RGB_dark.svg" alt="" width="1200" height="600">
     {# Cream logo: phones, over the home page photo (before scrolling past it) #}
     <img class="brand__logo brand__logo--light" src="/images/REMAX_logo_RGB_light.svg" alt="" width="1200" height="600">
-    <span class="brand__office" aria-hidden="true">{{ t.office.nameSuffix }}</span>
+    <span class="brand__office" aria-hidden="true">{{ site.office.nameSuffix }}</span>
   </a>
-  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-label-open="{{ t.nav.open }}" data-label-close="{{ t.nav.close }}">
-    <span class="visually-hidden">{{ t.nav.open }}</span>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-label-open="{{ t.menu.nav.open }}" data-label-close="{{ t.menu.nav.close }}">
+    <span class="visually-hidden">{{ t.menu.nav.open }}</span>
     <span class="nav-toggle__bars" aria-hidden="true"></span>
   </button>
-  <nav class="site-nav" id="site-nav" aria-label="{{ t.nav.label }}">
+  <nav class="site-nav" id="site-nav" aria-label="{{ t.menu.nav.label }}">
     {# Menu items are edited in the CMS (content/menu.json): a label and a URL per language; incomplete items are skipped #}
-    {% for item in menu.items %}{% if item.url[lang] and item.label[lang] %}
-    <a href="{{ item.url[lang] }}">{{ item.label[lang] }}</a>{% endif %}{% endfor %}
+    {% for item in t.menu.items %}{% if item.url and item.label %}
+    <a href="{{ item.url }}">{{ item.label }}</a>{% endif %}{% endfor %}
     {# Phone menu: the contact icons sit at the bottom of the burger panel #}
     {% set iconsClass = "contact-icons--menu" %}{% include "partials/contact-icons.njk" %}
     {# Phone menu: the language switch lives here instead of the header #}
     {%- for l in site.languages %}{% if l != lang %}
-    <a class="site-nav__lang" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}">{{ t.langSwitch[l] }}</a>
+    <a class="site-nav__lang" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}">{{ t.menu.langSwitch[l] }}</a>
     {%- endif %}{% endfor %}
   </nav>
   {# Phones: tapping the burger grows the slash's corner into the menu, over the header #}
@@ -27,7 +27,7 @@
     {% set iconsClass = "contact-icons--header" %}{% include "partials/contact-icons.njk" %}
     {# Shows only the other language: the same page when it is in site.pages, otherwise that language's home. #}
     {%- for l in site.languages %}{% if l != lang %}
-    <a class="lang-switch" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.langSwitch[l] }}"><span class="visually-hidden">{{ t.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
+    <a class="lang-switch" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}" title="{{ t.menu.langSwitch[l] }}"><span class="visually-hidden">{{ t.menu.langSwitch[l] }}</span><span aria-hidden="true">{{ l | upper }}</span></a>
     {%- endif %}{% endfor %}
   </div>
 </header>

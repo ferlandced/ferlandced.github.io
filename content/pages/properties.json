@@ -1,0 +1,50 @@
+{
+  "title": {
+    "fr": "Propriétés",
+    "en": "Properties"
+  },
+  "empty": {
+    "fr": "Aucune propriété pour le moment.",
+    "en": "No properties listed yet."
+  },
+  "cards": {
+    "number": {
+      "fr": "ULS :",
+      "en": "MLS:"
+    },
+    "bedrooms": {
+      "fr": "Chambres :",
+      "en": "Bedrooms:"
+    },
+    "bathrooms": {
+      "fr": "Salles de bain :",
+      "en": "Bathrooms:"
+    },
+    "powderRooms": {
+      "fr": "Salles d'eau :",
+      "en": "Powder rooms:"
+    },
+    "area": {
+      "fr": "Superficie habitable :",
+      "en": "Living area:"
+    },
+    "status": {
+      "new": {
+        "fr": "Nouveauté",
+        "en": "New"
+      },
+      "sold": {
+        "fr": "Vendu",
+        "en": "Sold"
+      }
+    },
+    "moreInfo": {
+      "fr": "Plus d'infos sur la propriété",
+      "en": "More about this property"
+    },
+    "newTab": {
+      "fr": "(nouvel onglet)",
+      "en": "(opens in a new tab)"
+    }
+  }
+}
