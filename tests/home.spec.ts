@@ -883,7 +883,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     expect(await overlay(), "scrolled back, it goes down again").toEqual({ share: 0.61, base: 0 });
   });
 
-  test("each photo change starts as its part's first line is in, then plays on its own clock, one at a time, both ways", async ({
+  test("each photo change starts as its part's first line is in, then plays on its own clock, one at a time", async ({
     page,
     isMobile,
   }) => {
@@ -923,20 +923,28 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     await scrollToStep(page, 2);
     await expect(stage(page), "part 2's photo").toHaveAttribute("data-story", "agent");
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
+  });
 
-    await page.clock.runFor(900);
-    await scrollToStep(page, 1.02);
-    await expect(stage(page), "scrolled back to the start of part 2").toHaveAttribute(
-      "data-story",
-      "paramedic",
-    );
-
+  test("once the agent is back, scrolling up never brings the paramedic again", async ({
+    page,
+  }) => {
+    const picture = await pictureOf(page);
+    await scrollToStep(page, -1);
+    await scrollToStep(page, 0.5);
     await page.clock.runFor(PARAMEDIC_HELD_MS);
-    await scrollToStep(page, 0.05);
-    await expect(stage(page), "scrolled back to the start of part 1").toHaveAttribute(
-      "data-story",
-      "start",
-    );
+    await scrollToStep(page, 1.9);
+    await page.clock.runFor(900);
+    await expect(stage(page)).toHaveAttribute("data-story", "agent");
+
+    for (const position of [1.02, 0.5, -1, 0.5, 1.9]) {
+      await scrollToStep(page, position);
+      await page.clock.runFor(PARAMEDIC_HELD_MS);
+      await expect(stage(page), `at ${position}, still the agent`).toHaveAttribute(
+        "data-story",
+        "agent",
+      );
+    }
+    await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
   test("the paramedic stays at least 2 seconds once in, even if the scroll moves on at once", async ({

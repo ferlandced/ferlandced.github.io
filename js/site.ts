@@ -241,11 +241,13 @@
 
     // The photo goes one change at a time towards the one for where the scroll is, the paramedic
     // held for his minimum time. Out of sight (e.g. opened at #services), it goes there at once.
+    // Once the agent is back he stays: scrolling up never brings the paramedic again.
     let wantedPhoto = 0;
     let shownPhoto = -1;
     let photoTimer: ReturnType<typeof setTimeout> | undefined;
     const changePhoto = () => {
-      if (photoTimer !== undefined || shownPhoto === wantedPhoto) {
+      const agentBack = photos[shownPhoto] === "agent";
+      if (photoTimer !== undefined || shownPhoto === wantedPhoto || agentBack) {
         return;
       }
       if (shownPhoto < 0 || !onScreen()) {
