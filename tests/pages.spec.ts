@@ -17,7 +17,7 @@ import {
 
 test.describe("every page", () => {
   for (const sitePage of pages) {
-    test(`${sitePage.name} (${sitePage.path})`, async ({ page, external }, testInfo) => {
+    test(`${sitePage.name} (${sitePage.path})`, async ({ page, request, external }, testInfo) => {
       const response = await page.goto(sitePage.path);
       expect(response?.status()).toBe(200);
       const copy = copyFor(sitePage.lang);
@@ -35,6 +35,13 @@ test.describe("every page", () => {
         "content",
         sitePage.name.startsWith("home-") ? site.themeColor.home : site.themeColor.page,
       );
+      for (const relationship of ["icon", "apple-touch-icon"]) {
+        const href = present(
+          await page.locator(`link[rel="${relationship}"]`).getAttribute("href"),
+          `the ${relationship} link`,
+        );
+        expect((await request.get(href)).status(), `${relationship} ${href}`).toBe(200);
+      }
 
       // hreflang and language switch point to the same page in the other language
       if (sitePage.alternates) {

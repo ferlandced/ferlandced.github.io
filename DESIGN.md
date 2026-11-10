@@ -96,6 +96,9 @@ Where each colour may go:
   logo over the home page photo on phones.
 - Agent personal mark (house + signature): not a REMAX mark. Must not contain
   "MAX", a slash, or the Balloon.
+- Favicon: the agent mark, Black on transparent (Cream when the browser is
+  dark), with its lines thickened to read at 16px. Touch icon: Black mark on
+  Cream.
 
 ## Graphic elements
 

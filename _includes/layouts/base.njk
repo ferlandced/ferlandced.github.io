@@ -10,6 +10,8 @@
   <meta name="theme-color" content="{{ site.themeColor[bodyClass] }}">
   <title>{% if title %}{{ title }} · {% endif %}{{ agent.name }}</title>
   <meta name="description" content="{{ description or agent.title[lang] }}">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   {% if translated %}{% for l in site.languages %}<link rel="alternate" hreflang="{{ l }}-CA" href="{{ altUrls[l] or '/' ~ l ~ '/' }}">
