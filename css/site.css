@@ -828,7 +828,6 @@ body:not(.home) .contact-icons--header {
   --red-width: 10px; /* Primary Red line: fixed on every screen */
   --name-size: clamp(2rem, 3.7vw, 3.3rem);
   --signature-width: clamp(88px, min(10vw, 16svh), 142px);
-  --motion-end: calc(var(--hero-height) * 0.9); /* the hero has faded out by 90% of its scroll */
 
   /* hero photo top: cropped at the bottom when taller */
   --agent-top: max(0px, var(--hero-height) - var(--photo-height));
@@ -836,13 +835,11 @@ body:not(.home) .contact-icons--header {
   --about-top: var(--about-padding);
 }
 
-/* White under the image, so the hero fades to the page's white as the agent leaves */
 .hero {
   position: relative;
   overflow: hidden;
   height: calc(var(--hero-height) + var(--top-runway));
   padding-top: var(--top-runway);
-  background: var(--brand-surface);
 }
 
 .hero__side {
@@ -1287,14 +1284,6 @@ body:not(.home) .contact-icons--header {
   gap: 4px;
   color: var(--brand-muted);
   text-align: left;
-}
-
-/* The triggers that play the story (js/site.ts): from where each one starts to the end of About.
-   Unpinned, they all start just before About arrives, so the parts play one after the other. */
-.about__trigger {
-  position: absolute;
-  inset: -70svh 0 0;
-  pointer-events: none;
 }
 
 /* Phones (Figma: iPhone 18 Pro 1-4): the agent fills the space under the title, down to where the
@@ -1994,47 +1983,16 @@ html:not(.js) button.card__more {
   border-radius: var(--brand-radius);
 }
 
-/* Reveal (js/site.js sets data-reveal): blocks fade in and rise 30px, staggered by --reveal-delay.
-   The color and box-shadow entries keep the links' and cards' own hover transitions. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-reveal] {
-    opacity: 0;
-    translate: 0 30px;
-    transition:
-      opacity 0.9s ease-out,
-      translate 0.7s ease-out,
-      color 0.2s,
-      box-shadow 0.2s;
-  }
-
-  [data-reveal="in"],
-  [data-reveal]:focus-within {
-    opacity: 1;
-    translate: 0 0;
-  }
-
-  [data-reveal="in"] {
-    transition-delay: var(--reveal-delay, 0s), var(--reveal-delay, 0s), 0s, 0s;
-  }
-}
-
 /* ==========================================================================
-   About story (js/site.ts sets data-story on .stage: start, paramedic, agent, done).
-   About holds on screen for a few short scroll steps. Each step starts the next photo change, which
-   plays on its own clock:
-     part 1  as About pins, with the title (which fades in place): the paramedic photo wipes in
-             from the right and covers the agent
-     part 2  one short scroll later: the agent wipes back in from the left, then the link and contact
-   Pinned (phones and desktop): the text follows the scroll (data-story-scroll, below); on phones the
-   overlay too. Short screens, not pinned: each part's text plays on the same clock as its photo.
+   About story (js/site.ts, with GSAP: it animates the text, the photo change and the phone overlay,
+   and sets data-story on .stage: start, paramedic, agent, done). Here only the layout it needs.
    Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
    ========================================================================== */
 
 /* The pin sits after a runway (::before) and sticks by its bottom edge: it holds on screen while
    the runway scrolls by, four steps (one to part 2, one more to part 3, then two to read). On
-   phones, once the text
-   grows taller than the screen, the newest lines stay in view and the first ones move up. Short
-   screens (phones in landscape) are not pinned; their triggers keep the unpinned place. */
+   phones, once the text grows taller than the screen, the newest lines stay in view and the first
+   ones move up. Short screens (phones in landscape) are not pinned. */
 @media (height >= 600px) {
   .stage[data-story] .about::before {
     content: "";
@@ -2046,18 +2004,6 @@ html:not(.js) button.card__more {
     position: sticky;
     bottom: 0;
   }
-
-  .stage[data-story] .about__trigger {
-    top: 0;
-  }
-
-  .stage[data-story] .about__trigger[data-story-trigger="2"] {
-    top: var(--story-scroll-step);
-  }
-
-  .stage[data-story] .about__trigger[data-story-trigger="3"] {
-    top: calc(2 * var(--story-scroll-step));
-  }
 }
 
 @media (width >= 768px) and (height >= 600px) {
@@ -2067,205 +2013,82 @@ html:not(.js) button.card__more {
   }
 }
 
-/* Set for a moment while the story starts (js/site.ts) */
-.stage[data-story-instant] *,
-.stage[data-story-instant] *::before,
-.stage[data-story-instant] *::after {
-  transition: none !important;
-}
-
-/* The title only fades in, in place */
-.stage[data-story] .about__title[data-reveal] {
-  translate: 0 0;
-}
-
-/* Photo change. Explicit translate values throughout, never "none" (see the iOS note below). */
-.stage[data-story] .agent-photos--swap .agent-photos__layer,
-.stage[data-story] .agent-photos--swap .agent-photos__layer > img {
-  transition: translate 0.9s ease-in-out;
-}
-
+/* The paramedic photo and the agent again, stacked on the agent while the story plays */
 .stage[data-story] .agent-photos--swap .agent-photos__layer--paramedic,
 .stage[data-story] .agent-photos--swap .agent-photos__layer--return {
   display: flex;
 }
 
-.stage[data-story] .agent-photos--swap .agent-photos__layer--agent,
-.stage[data-story] .agent-photos--swap .agent-photos__layer--agent > img {
-  translate: 0 0;
+/* A block reached with the keyboard shows in full, whatever the scroll (over GSAP's inline styles) */
+.stage[data-story] .about__step:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-.stage[data-story] .agent-photos--swap .agent-photos__layer--paramedic,
-.stage[data-story] .agent-photos--swap .agent-photos__layer--return > img {
-  translate: 100% 0;
-}
-
-.stage[data-story] .agent-photos--swap .agent-photos__layer--paramedic > img,
-.stage[data-story] .agent-photos--swap .agent-photos__layer--return {
-  translate: -100% 0;
-}
-
-.stage[data-story]:not([data-story="start"]) .agent-photos--swap .agent-photos__layer--agent {
-  translate: -100% 0;
-}
-
-.stage[data-story]:not([data-story="start"]) .agent-photos--swap .agent-photos__layer--agent > img {
-  translate: 100% 0;
-}
-
-.stage[data-story="paramedic"] .agent-photos--swap .agent-photos__layer--paramedic,
-.stage[data-story="paramedic"] .agent-photos--swap .agent-photos__layer--paramedic > img,
-.stage:is([data-story="agent"], [data-story="done"])
-  .agent-photos--swap
-  .agent-photos__layer--return,
-.stage:is([data-story="agent"], [data-story="done"])
-  .agent-photos--swap
-  .agent-photos__layer--return
-  > img {
-  translate: 0 0;
-}
-
-/* Pinned: the text follows the scroll. js/site.ts sets data-story-scroll on .stage and
-   --story-progress on each block, from 0 to 1. Each block fades in as it rises; the title only fades. */
-.stage[data-story-scroll] .about__step {
-  opacity: var(--story-progress, 1);
-}
-
-.stage[data-story-scroll] .about__stack .about__step {
-  translate: 0 calc((1 - var(--story-progress, 1)) * 30px);
-}
-
-/* Fully in, or reached with the keyboard */
-.stage[data-story-scroll] .about__step:is([data-story-shown], :focus-within) {
-  opacity: 1;
-  translate: 0 0;
-}
-
-/* Desktop: the blocks keep their place; a short transition smooths a mouse wheel's steps */
-@media (width >= 768px) {
-  .stage[data-story-scroll] .about__step {
-    transition:
-      opacity 0.2s linear,
-      translate 0.2s linear;
-  }
-}
-
-/* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text also takes its height as it comes
-   in, pushing the ones above it up. js/site.ts also sets the overlay's three shares on .stage, from
-   0 to 1: none at first; with part 1 over his lower 61%; with part 2 over all of him; with the link
-   and contact the white base comes in under it. */
-@media (width <= 767.98px) {
-  .stage[data-story-scroll] .about__stack .about__step {
-    height: calc(var(--story-progress, 1) * var(--step-height));
+/* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text takes its height as it comes in,
+   pushing the ones above it up, so it is clipped while it grows. The overlay's three shares (from 0
+   to 1, set by js/site.ts): none at first; with part 1 over his lower 61%; with part 2 over all of
+   him; with the link and contact the white base comes in under it. */
+@media (width <= 767.98px) and (height >= 600px) {
+  .stage[data-story] .about__stack .about__step {
     overflow: clip;
   }
 
   /* Fully in, or reached with the keyboard: its own height, unclipped */
-  .stage[data-story-scroll] .about__step:is([data-story-shown], :focus-within) {
-    height: auto;
+  .stage[data-story] .about__stack .about__step:is([data-story-shown], :focus-within) {
+    height: auto !important;
     overflow: visible;
   }
 
-  .stage[data-story-scroll] .about__media::before {
+  .stage[data-story] .about__media::before {
     opacity: var(--overlay-base, 1);
   }
 
-  .stage[data-story-scroll] .about__media::after {
+  .stage[data-story] .about__media::after {
     height: calc(61% * var(--overlay-first, 1) + (39% + 12px) * var(--overlay-second, 1));
   }
 }
 
 /* ==========================================================================
-   Motion. Scroll-driven animations (Chrome, Edge, Safari 26+), CSS only, desktop: the hero fades
-   in place while About scrolls over it, and the agent holds still from the hero into About.
-   Browsers without scroll timelines, and reduced-motion users, get the static layout above.
-   Only opacity and translate animate.
+   Desktop: the agent stays still while the hero scrolls up and About rises under him. A pinned copy
+   holds his hero position until the end of About, then scrolls up with it; the hero photo and the
+   About card stay invisible and only hold his place. The copy sits between the hero's image (0) and
+   its slash (4), as the hero photo does. Reduced motion: the hero photo and the About card show.
    ========================================================================== */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) and (width >= 768px) {
-    /* The slashes, the image and its scrim fade in place to the page's white */
-    .hero__band,
-    .hero__side,
-    .hero::before {
-      animation: fade-out linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 var(--motion-end);
-    }
-
-    /* The name block fades and lifts, gone before About's text reaches it */
-    .hero__id {
-      animation: id-out linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 calc(var(--hero-height) * 0.35);
-    }
-
-    /* The agent stays still: a pinned copy holds his hero position until the end of About, then
-       scrolls up with it. The hero photo and the About card stay invisible and only hold his place. */
-    .stage {
-      position: relative;
-    }
-
-    /* The hero holds still and fades in place while About scrolls over it (About is see-through,
-       the hero fades to the same white). z-index keeps the hero's layers under About. */
-    .hero {
-      position: sticky;
-      top: 0;
-      z-index: 0;
-    }
-
-    .about {
-      background: none;
-    }
-
-    .stage__track {
-      display: block;
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    .stage__pin {
-      position: sticky;
-      top: 0;
-      height: var(--hero-height);
-      overflow: clip;
-    }
-
-    .stage__agent {
-      position: absolute;
-      top: var(--agent-top);
-      left: calc(50% + var(--photo-x));
-      width: var(--photo-width);
-      height: var(--photo-height);
-    }
-
-    .hero__photo,
-    .about__card {
-      visibility: hidden;
-    }
-  }
-}
-
-@keyframes fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-/* visibility: hidden at the end takes the invisible links out of the tab order */
-@keyframes id-out {
-  from {
-    translate: 0 0;
+@media (prefers-reduced-motion: no-preference) and (width >= 768px) {
+  .stage {
+    position: relative;
   }
 
-  to {
-    opacity: 0;
-    translate: 0 -80px;
+  .stage__track {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .stage__pin {
+    position: sticky;
+    top: 0;
+    height: var(--hero-height);
+    overflow: clip;
+  }
+
+  .stage__agent {
+    position: absolute;
+    top: var(--agent-top);
+    left: calc(50% + var(--photo-x));
+    width: var(--photo-width);
+    height: var(--photo-height);
+  }
+
+  .hero__photo,
+  .about__card {
     visibility: hidden;
   }
 }
 
-/* Every keyframe and photo-change state states its translate as a value, never "none" or left
+/* Every keyframe (page-circle-follow) states its translate as a value, never "none" or left
    implicit: iOS 26 Safari runs these animations off the main thread and crashes blending "none"
    with a value. */

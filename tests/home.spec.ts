@@ -321,12 +321,10 @@ test.describe("desktop hero", () => {
     });
   }
 
-  test("the agent stays still from the hero into About, on its right", async ({ page }) => {
+  test("the hero scrolls up as it is, About covers it in white, the agent stays still on its right", async ({
+    page,
+  }) => {
     await page.goto("fr/");
-    test.skip(
-      !(await page.evaluate(() => CSS.supports("animation-timeline: view()"))),
-      "needs scroll-driven animations",
-    );
     const heroHeight = await page
       .locator(".hero")
       .evaluate((element: HTMLElement) => element.offsetHeight);
@@ -346,11 +344,33 @@ test.describe("desktop hero", () => {
         expect(actual[key], `${what}: ${key}`).toBeCloseTo(expected[key], 0);
       }
     };
+    const heroLayers = [
+      { selector: ".hero__side", pseudo: null },
+      { selector: ".hero__band", pseudo: null },
+      { selector: ".hero", pseudo: "::before" },
+      { selector: ".hero__id", pseudo: null },
+    ];
     const [start] = await at(0);
+    const heroAtStart = await boxOf(".hero");
     for (const y of [heroHeight / 4, heroHeight / 2, heroHeight]) {
       const [agent] = await at(y);
       same(agent, start, `agent at ${y}px of scroll`);
+      const hero = await boxOf(".hero");
+      expect(hero.y, `hero at ${y}px of scroll: it scrolls with the page`).toBeCloseTo(
+        heroAtStart.y - y,
+        0,
+      );
+      for (const { selector, pseudo } of heroLayers) {
+        const opacity = await page
+          .locator(selector)
+          .evaluate(
+            (element, pseudoElement) => getComputedStyle(element, pseudoElement).opacity,
+            pseudo,
+          );
+        expect(opacity, `${selector}${pseudo ?? ""} at ${y}px of scroll: no fade`).toBe("1");
+      }
     }
+    await expect(page.locator("#about")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     const [agent, place, text] = await at(heroHeight);
     same(place, agent, "his place in About");
     expect(text.x + text.width, "About text ends before the agent").toBeLessThanOrEqual(agent.x);
@@ -508,40 +528,60 @@ test("buttons show no focus ring, links keep theirs (exception in CLAUDE.md)", a
   await expect(more).toHaveCSS("outline-style", "solid");
 });
 
-const delayOf = (locator: Locator) =>
-  locator.evaluateAll((elements: HTMLElement[]) =>
-    elements.map((element) => parseFloat(element.style.getPropertyValue("--reveal-delay"))),
+const opacitiesOf = (locator: Locator) =>
+  locator.evaluateAll((elements) =>
+    elements.map((element) => Number(getComputedStyle(element).opacity)),
   );
+
+/** Scrolls instantly, then runs the paused page clock (pauseClock, below) for that long. */
+const scrollOnClock = async (page: Page, y: number, ms: number) => {
+  await page.evaluate((top: number) => {
+    window.scrollTo({ top, behavior: "instant" });
+  }, Math.round(y));
+  await page.waitForTimeout(100);
+  await page.clock.runFor(ms);
+};
 
 test("Services: each block's title, text, links and button fade in one after the other, and stay", async ({
   page,
 }) => {
+  await pauseClock(page);
   await page.goto("fr/");
   const blocks = page.locator(".service__content");
+  await scrollOnClock(page, 0, 1000);
+  for (const opacity of await opacitiesOf(blocks.locator(":scope > *"))) {
+    expect(opacity, "nothing shows before its block arrives").toBe(0);
+  }
   for (const index of [0, 1]) {
     const block = blocks.nth(index);
-    const title = block.locator(".service__title");
     const { top, vh } = await block.evaluate((element) => ({
       top: element.getBoundingClientRect().top + scrollY,
       vh: innerHeight,
     }));
-    await scrollToY(page, top - vh * 1.5);
-    await expect(title, "nothing shows before the block arrives").toHaveAttribute(
-      "data-reveal",
-      "",
+    const parts = block.locator(":scope > *");
+    await scrollOnClock(page, top - vh * 0.3, 400);
+    const early = await opacitiesOf(parts);
+    expect(present(early[0], "the title"), "the title is coming in").toBeGreaterThan(0);
+    expect(present(early.at(-1), "the last part"), "the last part waits").toBeLessThan(
+      present(early[0], "the title"),
     );
-    await scrollToY(page, top - vh * 0.3);
-    await expect(block.locator(".service__action")).toHaveAttribute("data-reveal", "in");
-    const delays = await delayOf(block.locator(":scope > *"));
-    for (const [position, delay] of delays.entries()) {
+    for (const [position, opacity] of early.entries()) {
       if (position > 0) {
-        expect(delay, `part ${position + 1} comes after part ${position}`).toBeGreaterThan(
-          present(delays[position - 1], "the previous delay"),
-        );
+        expect(
+          opacity,
+          `part ${position + 1} is never ahead of part ${position}`,
+        ).toBeLessThanOrEqual(present(early[position - 1], "the previous part"));
       }
     }
-    await scrollToY(page, top + vh * 2);
-    await expect(title, "blocks stay once shown").toHaveAttribute("data-reveal", "in");
+    await page.clock.runFor(3000);
+    for (const opacity of await opacitiesOf(parts)) {
+      expect(opacity, "all in").toBe(1);
+    }
+  }
+  const pageEnd = await page.evaluate(() => document.documentElement.scrollHeight);
+  await scrollOnClock(page, pageEnd, 1000);
+  for (const opacity of await opacitiesOf(blocks.locator(":scope > *"))) {
+    expect(opacity, "blocks stay once shown").toBe(1);
   }
 });
 
@@ -549,11 +589,8 @@ test("a link to a section lands with its blocks shown, and the sections above it
   page,
 }) => {
   await page.goto("fr/#properties");
-  await expect(page.locator("#properties-heading")).toHaveAttribute("data-reveal", "in");
-  await expect(page.locator("#services .service__action").last()).toHaveAttribute(
-    "data-reveal",
-    "in",
-  );
+  await expect(page.locator("#properties-heading")).toHaveCSS("opacity", "1");
+  await expect(page.locator("#services .service__action").last()).toHaveCSS("opacity", "1");
 });
 
 test.describe("reduced motion", () => {
@@ -561,7 +598,12 @@ test.describe("reduced motion", () => {
 
   test("the text shows without the reveal", async ({ page }) => {
     await page.goto("fr/");
-    await expect(page.locator("[data-reveal]")).toHaveCount(0);
+    const blocks = page.locator(
+      ".service__content > *, #services-heading, #properties-heading, .properties .card",
+    );
+    for (const opacity of await opacitiesOf(blocks)) {
+      expect(opacity).toBe(1);
+    }
   });
 });
 
@@ -578,17 +620,24 @@ test("reduced motion: the agent photo shows in About without the travelling copy
   await expect(page.locator(".about__card .agent-photos__layer--agent img")).toBeVisible();
 });
 
+/** Whether an element sits in its own place: no transform, or GSAP's resting translate(0, 0). */
+const inPlace = (locator: Locator) =>
+  locator.evaluate((element) =>
+    ["none", "matrix(1, 0, 0, 1, 0, 0)"].includes(getComputedStyle(element).transform),
+  );
+
 /** Waits until a block of About has finished fading and rising in (the step around it moves). */
 const settled = async (step: Locator) => {
   await expect(step).toHaveCSS("opacity", "1");
-  await expect(step).toHaveCSS("translate", "0px");
+  await expect.poll(() => inPlace(step)).toBe(true);
 };
 
 /** The step around About's contact lines, the last block to appear. */
 const contactStep = (page: Page) =>
   page.locator(".about__step", { has: page.locator(".about__contact") });
 
-/** Fake timers that only move with clock.runFor(). CSS transitions still run in real time. */
+/** Fake timers that only move with clock.runFor(). GSAP runs on this clock too (its tweens, its
+    delayed calls, ScrollTrigger's updates), so every animation waits for runFor. */
 const pauseClock = async (page: Page) => {
   await page.clock.install({ time: new Date("2026-01-01T09:00:00") });
   await page.clock.pauseAt(new Date("2026-01-01T09:00:01"));
@@ -614,8 +663,11 @@ const layerOffsets = (page: Page, container: string) =>
 const paramedicOnly = { agent: -1, paramedic: 0, back: -1 };
 const agentBack = { agent: -1, paramedic: 1, back: 0 };
 
-/** The paramedic photo: its wipe (0.9 s), then at least 1 s fully shown before the agent returns. */
-const PARAMEDIC_HELD_MS = 900 + 1000;
+/** One photo change, the wipe. */
+const PHOTO_CHANGE_MS = 900;
+
+/** The paramedic photo: its wipe, then at least 1 s fully shown before the agent returns. */
+const PARAMEDIC_HELD_MS = PHOTO_CHANGE_MS + 1000;
 
 test("opened at a later section, About is shown in full at once", async ({ page }) => {
   await page.goto("fr/#services");
@@ -647,9 +699,9 @@ test.describe("About story: the text follows the scroll, the photo changes on it
   const pictureOf = async (page: Page) =>
     (await page.locator(".stage__agent").isVisible()) ? ".stage__agent" : ".about__card";
 
-  /** How far a block has come in with the scroll, from 0 to 1 (its opacity once it settles). */
-  const shown = async (locator: Locator) =>
-    Number(await locator.evaluate((element) => element.style.getPropertyValue("--story-progress")));
+  /** How far a block has come in with the scroll, from 0 to 1: its opacity. */
+  const shown = (locator: Locator) =>
+    locator.evaluate((element) => Number(getComputedStyle(element).opacity));
 
   const noSideScroll = async (page: Page) => {
     expect(
@@ -724,29 +776,18 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     );
   };
 
-  /** Where About starts and the scroll of one step of the story (between the two triggers). */
+  /** Where About starts and the scroll of one step of the story (a quarter of About's runway). */
   const storyScroll = (page: Page) =>
-    page.locator(".about").evaluate((about) => {
-      const triggerTop = (part: number) =>
-        about.querySelector<HTMLElement>(`[data-story-trigger="${part}"]`)?.offsetTop ?? 0;
-      return {
-        top: about.getBoundingClientRect().top + scrollY,
-        step: triggerTop(2) - triggerTop(1),
-      };
-    });
+    page.locator(".about").evaluate((about) => ({
+      top: about.getBoundingClientRect().top + scrollY,
+      step: Number.parseFloat(getComputedStyle(about, "::before").height) / 4,
+    }));
 
   /** Scrolls to a point of the story, in steps from where About pins (0) to where it moves on (4),
       then lets one animation frame run on the paused clock. */
   const scrollToStep = async (page: Page, position: number) => {
     const { top, step } = await storyScroll(page);
-    await page.evaluate(
-      (y: number) => {
-        window.scrollTo({ top: y, behavior: "instant" });
-      },
-      Math.round(top + position * step),
-    );
-    await page.waitForTimeout(100);
-    await page.clock.runFor(50);
+    await scrollOnClock(page, top + position * step, 50);
   };
 
   const opacity = (locator: Locator) =>
@@ -778,7 +819,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
 
     await scrollToStep(page, -0.25);
     expect(await shown(title), "the title, half way in").toBeCloseTo(0.5, 1);
-    await expect(title, "it fades, it does not rise").toHaveCSS("translate", "none");
+    expect(await inPlace(title), "it fades, it does not rise").toBe(true);
 
     await scrollToStep(page, 0.4);
     expect(await shown(title)).toBe(1);
@@ -840,6 +881,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     }
     await page.clock.runFor(PARAMEDIC_HELD_MS);
     await expect(stage(page), "then part 2's").toHaveAttribute("data-story", "agent");
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
@@ -917,11 +959,13 @@ test.describe("About story: the text follows the scroll, the photo changes on it
       "data-story",
       "paramedic",
     );
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
 
     await page.clock.runFor(PARAMEDIC_HELD_MS);
     await scrollToStep(page, 2);
     await expect(stage(page), "part 2's photo").toHaveAttribute("data-story", "agent");
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
@@ -951,29 +995,31 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     page,
   }) => {
     const picture = await pictureOf(page);
+    /** The paramedic comes in with the scroll to 0.3; that step and the next run 50 ms each. */
+    const toJustBeforeTheEnd = PARAMEDIC_HELD_MS - 2 * 50 - 100;
     await scrollToStep(page, -1);
     await scrollToStep(page, 0.3);
     await expect(stage(page)).toHaveAttribute("data-story", "paramedic");
-    await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
 
     await scrollToStep(page, -1);
-    await page.clock.runFor(PARAMEDIC_HELD_MS - 100);
+    await page.clock.runFor(toJustBeforeTheEnd);
     await expect(stage(page), "scrolled back at once: he stays").toHaveAttribute(
       "data-story",
       "paramedic",
     );
-    await page.clock.runFor(100);
+    await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
+    await page.clock.runFor(200);
     await expect(stage(page), "then the agent returns").toHaveAttribute("data-story", "start");
 
-    await page.clock.runFor(900);
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await scrollToStep(page, 0.3);
     await scrollToStep(page, 2);
-    await page.clock.runFor(PARAMEDIC_HELD_MS - 100);
+    await page.clock.runFor(toJustBeforeTheEnd);
     await expect(stage(page), "scrolled on at once: he stays").toHaveAttribute(
       "data-story",
       "paramedic",
     );
-    await page.clock.runFor(100);
+    await page.clock.runFor(200);
     await expect(stage(page)).toHaveAttribute("data-story", "agent");
   });
 
@@ -982,9 +1028,11 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     await scrollToStep(page, -1);
     await scrollToStep(page, 2);
     await expect(stage(page), "part 1's photo first").toHaveAttribute("data-story", "paramedic");
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
-    await page.clock.runFor(PARAMEDIC_HELD_MS);
+    await page.clock.runFor(PARAMEDIC_HELD_MS - PHOTO_CHANGE_MS);
     await expect(stage(page), "then part 2's").toHaveAttribute("data-story", "agent");
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
@@ -1019,6 +1067,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
       ".about__stack :is(.about__line, .about__actions a, .about__contact li, .about__contact a)";
 
     await scrollToStep(page, 0.9);
+    await page.clock.runFor(PHOTO_CHANGE_MS);
     await expect.poll(() => layerOffsets(page, picture)).toEqual(paramedicOnly);
     for (const ratio of await worstContrast(page, text)) {
       expect(ratio, "part 1 over the paramedic").toBeGreaterThanOrEqual(4.5);
@@ -1056,10 +1105,10 @@ test.describe("About story: the text follows the scroll, the photo changes on it
   }) => {
     test.skip(isMobile, "desktop layout");
     const title = page.locator(".about__title");
-    await scrollToStep(page, 0);
+    await scrollToStep(page, 0.05);
     await settled(title);
     const start = present(await title.boundingBox(), "the title");
-    await scrollToStep(page, 3);
+    await scrollToStep(page, 3.1);
     await settled(contactStep(page));
     const end = present(await title.boundingBox(), "the title at the end");
     expect(end.y, "the text never pushes it up").toBeCloseTo(start.y, 0);

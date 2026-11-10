@@ -23,7 +23,7 @@ translated: true
 {%- endmacro -%}
 <main>
   {# The stage holds the hero and About. On desktop, with motion allowed, the agent photo in
-     .stage__track stays still while the hero fades and About rises under him. #}
+     .stage__track stays still while the hero scrolls up and About rises under him. #}
   <div class="stage">
     <section class="hero" aria-labelledby="hero-name">
       {# The image uses the CMS description; empty keeps it silent. Stripes are decorative. #}
@@ -79,7 +79,6 @@ translated: true
           </div>
         </div>
       </div>
-      {% for index in [1, 2, 3] %}<span class="about__trigger" data-story-trigger="{{ index }}"></span>{% endfor %}
     </section>
   </div>
 

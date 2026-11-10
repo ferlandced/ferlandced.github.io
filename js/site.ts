@@ -56,407 +56,332 @@
   });
 })();
 
-// Home page blocks fade in and rise into place as their section arrives, on a timer like Apple's
-// product pages, and then stay. Blocks side by side (a row of cards) appear together, and each row
-// starts a step after the previous one. About has its own sequence (About story, below).
-// Without JS or with reduced motion everything just shows (see [data-reveal] in site.css).
+// Home page scroll effects: GSAP and ScrollTrigger, which only the home page loads (before this
+// script). Without them, without JS or with reduced motion, everything shows in place.
+const hasScrollEffects = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined";
+if (hasScrollEffects) {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ScrollTrigger measures the page as it loads, which can cancel the browser's jump to a
+  // #section: once measured, the page goes there.
+  const landOnSection = () => {
+    ScrollTrigger.removeEventListener("refresh", landOnSection);
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    target?.scrollIntoView({ behavior: "instant" });
+  };
+  if (location.hash) {
+    ScrollTrigger.addEventListener("refresh", landOnSection);
+  }
+}
+
+// Home page blocks fade in and rise into place as their section arrives, and then stay. Blocks that
+// arrive together play one after the other. About has its own sequence (About story, below).
 (() => {
-  const STEP_MS = 150;
+  if (!hasScrollEffects) {
+    return;
+  }
   const stacks = ".service__content";
   const singles =
     "#services-heading, #properties-heading, .properties .card, .properties .container > p";
-
-  const groups = [...document.querySelectorAll<HTMLElement>(`${stacks}, ${singles}`)];
+  const groups = gsap.utils.toArray<HTMLElement>(`${stacks}, ${singles}`);
   if (!groups.length) {
     return;
   }
-  if (!("IntersectionObserver" in window)) {
-    return;
-  }
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return;
-  }
+  const itemsOf = (group: Element): HTMLElement[] =>
+    group.matches(stacks)
+      ? gsap.utils.toArray<HTMLElement>(group.children)
+      : [group as HTMLElement];
+  const items = groups.flatMap(itemsOf);
 
-  const itemsOf = (group: Element): HTMLElement[] => {
-    if (group.matches(stacks)) {
-      return [...group.children].filter((child) => child instanceof HTMLElement);
-    }
-    return group instanceof HTMLElement ? [group] : [];
-  };
+  gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+    gsap.set(items, { opacity: 0, y: 30 });
+    ScrollTrigger.batch(groups, {
+      start: "top 70%",
+      once: true,
+      onEnter: (arriving) => {
+        const blocks = arriving.flatMap(itemsOf);
+        const passed = blocks.filter((block) => block.getBoundingClientRect().bottom < 0);
+        gsap.set(passed, { opacity: 1, y: 0 });
+        gsap.to(
+          blocks.filter((block) => !passed.includes(block)),
+          { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.15, overwrite: true },
+        );
+      },
+    });
 
-  for (const group of groups) {
-    for (const item of itemsOf(group)) {
-      item.setAttribute("data-reveal", "");
-    }
-  }
-
-  const show = (item: HTMLElement, delayMs: number) => {
-    item.style.setProperty("--reveal-delay", `${Math.round(delayMs)}ms`);
-    item.dataset.reveal = "in";
-  };
-
-  const sameRow = (first: IntersectionObserverEntry, second: IntersectionObserverEntry) =>
-    Math.abs(first.boundingClientRect.top - second.boundingClientRect.top) < 4;
-
-  // Start time of the last block scheduled, so a row that arrives just after another waits its turn
-  let lastStart = -Infinity;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const arriving: IntersectionObserverEntry[] = [];
-      for (const entry of entries) {
-        const alreadyPassed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
-        if (alreadyPassed) {
-          itemsOf(entry.target).forEach((item) => {
-            show(item, 0);
-          });
-          observer.unobserve(entry.target);
-        } else if (entry.isIntersecting) {
-          arriving.push(entry);
-        }
-      }
-      arriving.sort(
-        (first, second) => first.boundingClientRect.top - second.boundingClientRect.top,
+    // A block reached with the keyboard shows at once
+    const showFocused = (event: FocusEvent) => {
+      const block = items.find(
+        (item) => event.target instanceof Node && item.contains(event.target),
       );
-
-      const rows: IntersectionObserverEntry[][] = [];
-      for (const entry of arriving) {
-        const row = rows.at(-1);
-        const rowStart = row?.[0];
-        if (row && rowStart && sameRow(rowStart, entry)) {
-          row.push(entry);
-        } else {
-          rows.push([entry]);
-        }
+      if (block) {
+        gsap.to(block, { opacity: 1, y: 0, duration: 0.2, overwrite: true });
       }
-
-      const now = performance.now();
-      for (const row of rows) {
-        const start = Math.max(now, lastStart + STEP_MS);
-        let longest = 1;
-        for (const { target } of row) {
-          const items = itemsOf(target);
-          items.forEach((item, index) => {
-            show(item, start - now + index * STEP_MS);
-          });
-          longest = Math.max(longest, items.length);
-          observer.unobserve(target);
-        }
-        lastStart = start + (longest - 1) * STEP_MS;
-      }
-    },
-    { rootMargin: "0px 0px -30% 0px" },
-  );
-
-  groups.forEach((group) => {
-    observer.observe(group);
+    };
+    document.addEventListener("focusin", showFocused);
+    return () => {
+      document.removeEventListener("focusin", showFocused);
+    };
   });
 })();
 
-// About story. About holds on screen while the visitor scrolls a few short steps (css/site.css,
-// About story). The photo always changes on a timer: reaching a part starts its wipe, which then
-// plays on its own, one change at a time. Part 1 brings the paramedic, who then stays at least
-// PARAMEDIC_SHOWN_MS; part 2 brings the agent back; part 3, a step later, the link and contact.
-// Pinned (phones and desktop): the text follows the scroll itself, forwards and back, so it is there
-// however fast the visitor scrolls; on phones the blur overlay too. The photo follows where the
-// scroll is. Short screens, not pinned: each part's text plays on a timer with its photo, one after
-// the other. The state lives on .stage, which also holds the desktop's pinned copy of the photo. Without JS or with reduced motion, all of it shows.
+// About story. About holds on screen (sticky, css/site.css, About story) while the visitor scrolls
+// four short steps. Screens 600px tall or more: the text follows the scroll, forwards and back; on
+// phones each block also grows line by line and the overlay rises with it. Shorter screens: About
+// is not held and its parts play one after the other once it arrives.
+// The photo changes on its own clock either way, one change at a time: part 1 brings the paramedic,
+// who then stays at least PARAMEDIC_HELD_S; part 2 brings the agent back, who then stays.
+// The state lives on .stage (data-story: start, paramedic, agent, done), which also holds the
+// desktop's pinned copy of the photo.
 (() => {
-  const FIRST_PART_DELAY_MS = 150; // part 1 right after the title
-  const PHOTO_CHANGE_MS = 900; // the wipe's transition in site.css
-  const PARAMEDIC_SHOWN_MS = 1000; // once in, he stays at least this long before the agent returns
-  const STEP_MS = 400;
-  const LAST_PART = 3;
-  // The pinned layouts in css/site.css (About story)
-  const PINNED = "(height >= 600px)";
-  const PINNED_PHONE = `(width <= 767.98px) and ${PINNED}`;
-
   const stage = document.querySelector<HTMLElement>(".stage");
   const about = stage?.querySelector<HTMLElement>(".about");
-  if (!stage || !about) {
-    return;
-  }
-  if (!("IntersectionObserver" in window && "ResizeObserver" in window)) {
-    return;
-  }
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (!hasScrollEffects || !stage || !about) {
     return;
   }
 
-  const steps = [...about.querySelectorAll<HTMLElement>(".about__step")];
-  const triggers = [...about.querySelectorAll<HTMLElement>("[data-story-trigger]")];
+  const PHOTO_CHANGE_S = 0.9;
+  const PARAMEDIC_HELD_S = 1;
+  const FIRST_PART_DELAY_S = 0.15;
+  const STEP_S = 0.4;
+  const photos = ["start", "paramedic", "agent"];
+
+  const steps = gsap.utils.toArray<HTMLElement>(".about__step", about);
+  const title = steps.find((step) => !step.dataset.storyPart);
   const stepsOfPart = (part: number) =>
     steps.filter((step) => step.dataset.storyPart === String(part));
-  const title = steps.find((step) => !step.dataset.storyPart);
+  const [firstText] = stepsOfPart(1);
+  const [secondText] = stepsOfPart(2);
+  const [link, contact] = stepsOfPart(3);
 
-  // Applies a state at once, without transitions from the one before (e.g. the no-JS one, seen
-  // after a reload in the middle of the page)
-  const applyInstantly = (apply: () => void) => {
-    stage.toggleAttribute("data-story-instant", true);
-    apply();
-    stage.getBoundingClientRect(); // applies the styles before transitions come back
-    stage.toggleAttribute("data-story-instant", false);
+  const onScreen = () => {
+    const bounds = about.getBoundingClientRect();
+    return bounds.bottom > 0 && bounds.top < innerHeight;
   };
 
-  const show = (step: HTMLElement, delayMs: number) => {
-    step.style.setProperty("--reveal-delay", `${delayMs}ms`);
-    step.dataset.reveal = "in";
+  // The photo change. Each layer clips its photo, so moving the layer one way and its photo the
+  // other way sweeps a straight edge across a still picture. Labels: the three photos.
+  // Returns want(index): the photo the story has reached. The photo goes there one change at a
+  // time; out of sight it goes there at once; once the agent is back he stays.
+  const createPhotoChanges = () => {
+    const layers = (name: string) =>
+      gsap.utils.toArray<HTMLElement>(`.agent-photos--swap .agent-photos__layer--${name}`, stage);
+    const images = (name: string) =>
+      gsap.utils.toArray<HTMLElement>(
+        `.agent-photos--swap .agent-photos__layer--${name} > img`,
+        stage,
+      );
+    gsap.set([...layers("agent"), ...images("agent")], { xPercent: 0 });
+    gsap.set([...layers("paramedic"), ...images("return")], { xPercent: 100 });
+    gsap.set([...images("paramedic"), ...layers("return")], { xPercent: -100 });
+
+    const wipe = { duration: PHOTO_CHANGE_S, ease: "power1.inOut" };
+    const timeline = gsap
+      .timeline({ paused: true })
+      .addLabel("start")
+      .to(layers("agent"), { xPercent: -100, ...wipe }, "start")
+      .to(images("agent"), { xPercent: 100, ...wipe }, "start")
+      .to([...layers("paramedic"), ...images("paramedic")], { xPercent: 0, ...wipe }, "start")
+      .addLabel("paramedic")
+      .to([...layers("return"), ...images("return")], { xPercent: 0, ...wipe }, "paramedic")
+      .to(layers("paramedic"), { xPercent: 100, ...wipe }, "paramedic")
+      .to(images("paramedic"), { xPercent: -100, ...wipe }, "paramedic")
+      .addLabel("agent");
+
+    let wanted = 0;
+    let shown = -1;
+    let changing = false;
+    const settle = () => {
+      const agentBack = photos[shown] === "agent";
+      if (changing || shown === wanted || agentBack) {
+        return;
+      }
+      if (shown < 0 || !onScreen()) {
+        shown = wanted;
+        stage.dataset.story = photos[shown];
+        timeline.seek(photos[shown] ?? "start");
+        return;
+      }
+      shown += Math.sign(wanted - shown);
+      const photo = photos[shown] ?? "start";
+      stage.dataset.story = photo;
+      timeline.tweenTo(photo);
+      changing = true;
+      const holdS = photo === "paramedic" ? PARAMEDIC_HELD_S : 0;
+      gsap.delayedCall(PHOTO_CHANGE_S + holdS, () => {
+        changing = false;
+        settle();
+      });
+    };
+
+    return (index: number) => {
+      wanted = index;
+      settle();
+    };
   };
 
-  const showAll = () => {
-    stage.toggleAttribute("data-story-scroll", false);
-    stage.dataset.story = "done";
-    for (const step of steps) {
-      show(step, 0);
+  // Screens 600px tall or more. Positions are in steps of scroll from where About pins (0) to
+  // where it moves on (4); one step is a quarter of About's runway (css/site.css, About story).
+  // The title comes in as About settles, each paragraph over most of its step, then, after a pause
+  // to read, the link and the contact. Each part's photo change starts as its text starts to show
+  // (on phones, once its first line is in), so the photo matches what is being read.
+  const followScroll = (growsLineByLine: boolean, want: (index: number) => void) => {
+    const FIRST = -0.5;
+    const LAST = 4;
+    const stepSize = () => Number.parseFloat(getComputedStyle(about, "::before").height) / 4;
+
+    const story = gsap.timeline({ defaults: { ease: "none" } });
+    // On phones a block grows clipped; fully in, it takes its own height, unclipped (css/site.css)
+    const growing: { step: HTMLElement; to: number }[] = [];
+    const comeIn = (step: HTMLElement | undefined, from: number, to: number, rises = true) => {
+      if (!step) {
+        return;
+      }
+      const grows = growsLineByLine && rises;
+      if (grows) {
+        growing.push({ step, to });
+      }
+      const start = { opacity: 0, y: rises ? 30 : 0, ...(grows && { height: 0 }) };
+      const end = { opacity: 1, y: 0, ...(grows && { height: "auto" }) };
+      story.fromTo(step, start, { ...end, duration: to - from }, from - FIRST);
+    };
+    comeIn(title, -0.5, 0, false);
+    const parts = [
+      { step: firstText, from: 0, to: 0.8 },
+      { step: secondText, from: 1, to: 1.8 },
+    ];
+    for (const { step, from, to } of parts) {
+      comeIn(step, from, to);
     }
-  };
-
-  const progress = (position: number, from: number, to: number) =>
-    Math.min(1, Math.max(0, (position - from) / (to - from)));
-
-  // Where the scroll is, in steps from where About pins (0). One step is the scroll between the
-  // first two triggers.
-  const stepSize = () => (triggers[1]?.offsetTop ?? 0) - (triggers[0]?.offsetTop ?? 0);
-  const position = () => -about.getBoundingClientRect().top / Math.max(1, stepSize());
-
-  // Pinned layouts. Where each block plays, in steps of scroll from where About pins (0) to where it
-  // moves on (4): the title as About settles, each paragraph over most of its step, then, after a
-  // pause to read, the link and the contact. On phones the overlay rises with each paragraph; its
-  // white base comes in with the link and contact.
-  // Each value goes from 0 to 1 (css/site.css, About story). Each part's photo change starts as its
-  // text starts to show (on phones, once its first line is in), so the photo matches what is being
-  // read. Returns a function that stops it.
-  const followScroll = () => {
-    const [firstText] = stepsOfPart(1);
-    const [secondText] = stepsOfPart(2);
-    const [link, contact] = stepsOfPart(3);
-    const firstPart = { step: firstText, from: 0, to: 0.8 };
-    const secondPart = { step: secondText, from: 1, to: 1.8 };
-    const blocks = [
-      { step: title, from: -0.5, to: 0 },
-      firstPart,
-      secondPart,
-      { step: link, from: 2.4, to: 2.7 },
-      { step: contact, from: 2.7, to: 3 },
-    ];
-    const overlay = [
-      { property: "--overlay-first", from: 0, to: 0.8 },
-      { property: "--overlay-second", from: 1, to: 1.8 },
-      { property: "--overlay-base", from: 2.4, to: 3 },
-    ];
-    const photos = ["start", "paramedic", "agent"];
-
-    // On phones a block grows from the top, so its first line is in once it is one line tall: that
-    // share of its full height, measured below. Until measured, the whole text. On desktop the
-    // whole block fades in at once.
-    const growsLineByLine = matchMedia(PINNED_PHONE).matches;
-    const firstLineShares = new Map<Element, number>();
-    const firstLineIn = ({ step, from, to }: typeof firstPart) => {
-      if (!growsLineByLine) {
-        return from;
-      }
-      const text = step?.firstElementChild;
-      const share = (text && firstLineShares.get(text)) ?? 1;
-      return from + share * (to - from);
-    };
-
-    const onScreen = () => {
-      const bounds = about.getBoundingClientRect();
-      return bounds.bottom > 0 && bounds.top < innerHeight;
-    };
-
-    // The photo goes one change at a time towards the one for where the scroll is, the paramedic
-    // held for his minimum time. Out of sight (e.g. opened at #services), it goes there at once.
-    // Once the agent is back he stays: scrolling up never brings the paramedic again.
-    let wantedPhoto = 0;
-    let shownPhoto = -1;
-    let photoTimer: ReturnType<typeof setTimeout> | undefined;
-    const changePhoto = () => {
-      const agentBack = photos[shownPhoto] === "agent";
-      if (photoTimer !== undefined || shownPhoto === wantedPhoto || agentBack) {
-        return;
-      }
-      if (shownPhoto < 0 || !onScreen()) {
-        shownPhoto = wantedPhoto;
-        applyInstantly(() => {
-          stage.dataset.story = photos[shownPhoto];
-        });
-        return;
-      }
-      shownPhoto += Math.sign(wantedPhoto - shownPhoto);
-      stage.dataset.story = photos[shownPhoto];
-      const holdMs = photos[shownPhoto] === "paramedic" ? PARAMEDIC_SHOWN_MS : 0;
-      photoTimer = setTimeout(() => {
-        photoTimer = undefined;
-        changePhoto();
-      }, PHOTO_CHANGE_MS + holdMs);
-    };
-
-    const update = () => {
-      const now = position();
-      for (const { step, from, to } of blocks) {
-        const shown = progress(now, from, to);
-        step?.style.setProperty("--story-progress", String(shown));
-        step?.toggleAttribute("data-story-shown", shown === 1);
-      }
+    comeIn(link, 2.4, 2.7);
+    comeIn(contact, 2.7, 3);
+    if (growsLineByLine) {
+      const overlay = [
+        { property: "--overlay-first", from: 0, to: 0.8 },
+        { property: "--overlay-second", from: 1, to: 1.8 },
+        { property: "--overlay-base", from: 2.4, to: 3 },
+      ];
       for (const { property, from, to } of overlay) {
-        stage.style.setProperty(property, String(progress(now, from, to)));
+        story.fromTo(
+          stage,
+          { [property]: 0 },
+          { [property]: 1, duration: to - from },
+          from - FIRST,
+        );
       }
-      wantedPhoto = [firstPart, secondPart].filter((part) => now >= firstLineIn(part)).length;
-      changePhoto();
-    };
-
-    let frame = 0;
-    const requestUpdate = () => {
-      frame ||= requestAnimationFrame(() => {
-        frame = 0;
-        update();
-      });
-    };
-
-    // Each block of text takes its height as it comes in, so its full height is measured
-    const heights = new ResizeObserver((entries) => {
-      for (const { target, borderBoxSize } of entries) {
-        const height = borderBoxSize[0]?.blockSize ?? target.getBoundingClientRect().height;
-        target.parentElement?.style.setProperty("--step-height", `${height}px`);
-        const lineHeight = Number.parseFloat(getComputedStyle(target).lineHeight);
-        if (height > 0 && lineHeight > 0) {
-          firstLineShares.set(target, Math.min(1, lineHeight / height));
-        }
-      }
-      requestUpdate();
-    });
-    for (const step of about.querySelectorAll(".about__stack .about__step > *")) {
-      heights.observe(step);
     }
+    story.set({}, {}, LAST - FIRST);
 
-    stage.toggleAttribute("data-story-scroll", true);
-    update();
-    const listening = new AbortController();
-    addEventListener("scroll", requestUpdate, { passive: true, signal: listening.signal });
-    addEventListener("resize", requestUpdate, { signal: listening.signal });
-
-    return () => {
-      listening.abort();
-      heights.disconnect();
-      cancelAnimationFrame(frame);
-      clearTimeout(photoTimer);
+    // On phones a part's first line is in once that share of its full height shows
+    const firstLineShares = new Map<HTMLElement, number>();
+    const measureFirstLines = () => {
+      for (const { step } of parts) {
+        const text = step?.firstElementChild;
+        if (step && text instanceof HTMLElement) {
+          const lineHeight = Number.parseFloat(getComputedStyle(text).lineHeight);
+          firstLineShares.set(step, Math.min(1, lineHeight / Math.max(1, text.offsetHeight)));
+        }
+      }
     };
+    const firstLineIn = ({ step, from, to }: (typeof parts)[number]) =>
+      growsLineByLine && step ? from + (firstLineShares.get(step) ?? 1) * (to - from) : from;
+
+    ScrollTrigger.create({
+      trigger: about,
+      start: () => `top top+=${-FIRST * stepSize()}`,
+      end: () => `+=${(LAST - FIRST) * stepSize()}`,
+      scrub: true,
+      animation: story,
+      invalidateOnRefresh: true,
+      onRefresh: measureFirstLines,
+      onUpdate: (self) => {
+        const position = FIRST + self.progress * (LAST - FIRST);
+        for (const { step, to } of growing) {
+          step.toggleAttribute("data-story-shown", position >= to);
+        }
+        want(parts.filter((part) => part.step && position >= firstLineIn(part)).length);
+      },
+    });
   };
 
-  // Short screens, not pinned. Returns a function that stops it.
-  const playOnTimers = () => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const later = (callback: () => void, delayMs: number) => {
-      timers.push(setTimeout(callback, delayMs));
-    };
-
-    applyInstantly(() => {
-      stage.dataset.story = "start";
-      for (const step of steps) {
-        step.setAttribute("data-reveal", "");
+  // Shorter screens: once About is near, its parts play one after the other, each with its photo.
+  // Already past it (e.g. opened at #services): everything shows at once.
+  const playOnArrival = (want: (index: number) => void) => {
+    const story = gsap.timeline({ paused: true, defaults: { duration: 0.8, ease: "power2.out" } });
+    const comeIn = (step: HTMLElement | undefined, at: number, rises = true) => {
+      if (step) {
+        story.fromTo(step, { opacity: 0, y: rises ? 30 : 0 }, { opacity: 1, y: 0 }, at);
       }
+    };
+    const secondAt = FIRST_PART_DELAY_S + PHOTO_CHANGE_S + PARAMEDIC_HELD_S;
+    const lastAt = secondAt + PHOTO_CHANGE_S + STEP_S;
+    comeIn(title, 0, false);
+    story.call(want, [1], FIRST_PART_DELAY_S);
+    comeIn(firstText, FIRST_PART_DELAY_S);
+    story.call(want, [2], secondAt);
+    comeIn(secondText, secondAt);
+    comeIn(link, lastAt);
+    comeIn(contact, lastAt + STEP_S);
+    story.call(() => {
+      stage.dataset.story = "done";
     });
 
-    // Part 1: its text and the paramedic. Part 2: its text and the agent back. Part 3, once his
-    // photo has settled: the link and contact, one after the other.
-    const playPart = (part: number) => {
-      const blocks = stepsOfPart(part);
-      if (part < LAST_PART) {
-        stage.dataset.story = part === 1 ? "paramedic" : "agent";
-      } else {
-        stage.dataset.story = "done";
-      }
-      blocks.forEach((step, index) => {
-        show(step, index * STEP_MS);
-      });
-    };
-
-    let partsStarted = 0;
-    let nextFreeAt = 0;
-    const playUpTo = (lastPart: number) => {
-      if (title) {
-        show(title, 0);
-      }
-      while (partsStarted < lastPart) {
-        partsStarted += 1;
-        const part = partsStarted;
-        const now = performance.now();
-        const earliest = part === 1 ? now + FIRST_PART_DELAY_MS : now;
-        const start = Math.max(earliest, nextFreeAt);
-        nextFreeAt = start + PHOTO_CHANGE_MS + (part === 1 ? PARAMEDIC_SHOWN_MS : STEP_MS);
-        later(() => {
-          playPart(part);
-        }, start - now);
-      }
-    };
-
-    // A trigger fires when it reaches the top of the screen: the first one as About pins, bringing
-    // the title and part 1. Each one runs to the end of About, so it cannot be scrolled past between
-    // two checks. Already above on load (e.g. opened at #services): everything shows at once.
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const part = Number(entry.target.getAttribute("data-story-trigger"));
-          if (entry.isIntersecting) {
-            playUpTo(part);
-            observer.unobserve(entry.target);
-          } else if (entry.boundingClientRect.top < 0 && partsStarted === 0) {
-            partsStarted = LAST_PART;
-            showAll();
-            observer.disconnect();
-            return;
-          }
+    ScrollTrigger.create({
+      trigger: about,
+      start: "top 70%",
+      once: true,
+      onEnter: () => {
+        if (about.getBoundingClientRect().bottom < 0) {
+          want(2);
+          story.progress(1);
+        } else {
+          story.play();
         }
       },
-      { rootMargin: "0px 0px -99% 0px" },
-    );
-    triggers.forEach((trigger) => {
-      observer.observe(trigger);
     });
-
-    return () => {
-      observer.disconnect();
-      timers.forEach((timer) => {
-        clearTimeout(timer);
-      });
-    };
   };
 
-  // Crossing between layouts (a phone turned, a window resized) ends the story: all shows
-  const pinnedPhone = matchMedia(PINNED_PHONE);
-  const pinned = matchMedia(PINNED);
-  const stop = pinned.matches ? followScroll() : playOnTimers();
-  const layoutChanged = new AbortController();
-  for (const layout of [pinnedPhone, pinned]) {
-    layout.addEventListener(
-      "change",
-      () => {
-        layoutChanged.abort();
-        stop();
-        showAll();
-      },
-      { signal: layoutChanged.signal },
-    );
-  }
+  gsap.matchMedia().add(
+    {
+      motion: "(prefers-reduced-motion: no-preference)",
+      held: "(height >= 600px)",
+      phone: "(width <= 767.98px)",
+    },
+    (context) => {
+      const { motion, held, phone } = context.conditions ?? {};
+      if (!motion) {
+        return;
+      }
+      const want = createPhotoChanges();
+      want(0);
+      if (held) {
+        followScroll(Boolean(phone), want);
+      } else {
+        playOnArrival(want);
+      }
+      return () => {
+        delete stage.dataset.story;
+      };
+    },
+  );
 })();
 
 // The header is past the hero once About reaches it: from there it is white, with the dark logo and
-// the contact icons. On desktop the hero holds still under About, so this follows About, not the hero.
+// the contact icons.
 (() => {
   const header = document.querySelector<HTMLElement>(".site-header");
   const next = document.querySelector(".hero ~ section");
-  if (!header || !next) {
+  if (!hasScrollEffects || !header || !next) {
     return;
   }
-  const update = () =>
-    header.toggleAttribute(
-      "data-past-hero",
-      next.getBoundingClientRect().top <= header.offsetHeight,
-    );
-  update();
-  addEventListener("scroll", update, { passive: true });
-  addEventListener("resize", update);
+  ScrollTrigger.create({
+    trigger: next,
+    start: () => `top ${header.offsetHeight}px`,
+    end: "max",
+    onToggle: (self) => {
+      header.toggleAttribute("data-past-hero", self.isActive);
+    },
+  });
 })();
 
 // iPhones: the page has a runway at each end (--top-runway, --footer-runway, css/site.css). It opens

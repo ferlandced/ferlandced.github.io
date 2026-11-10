@@ -19,7 +19,9 @@
   <link rel="stylesheet" href="/css/forms.css">
   {# Marks JS support before the first paint, so multi-step forms do not flash as one long form (css/forms.css). #}
   <script>document.documentElement.classList.add("js");</script>
-  <script src="/js/site.js" defer></script>
+  {% if bodyClass == "home" %}<script src="/js/vendor/gsap.min.js" defer></script>
+  <script src="/js/vendor/ScrollTrigger.min.js" defer></script>
+  {% endif %}<script src="/js/site.js" defer></script>
 </head>
 <body class="{{ bodyClass }}">
   {% include "partials/header.njk" %}
