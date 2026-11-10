@@ -89,6 +89,12 @@ export default defineConfig([
   },
 
   {
+    // Videos hold still between actions, so the viewer can see each state
+    files: ["tests/videos/**/*.ts"],
+    rules: { "playwright/no-wait-for-timeout": "off" },
+  },
+
+  {
     // The link checker has to wait until every resource has loaded or failed
     files: ["tests/links.spec.ts"],
     rules: { "playwright/no-networkidle": "off" },

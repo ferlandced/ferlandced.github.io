@@ -55,6 +55,20 @@ locally (`support/fixtures.ts`), so nothing is ever emailed.
 Known gaps are marked `test.fail` with the reason. They pass while the gap exists and fail once it is
 fixed, as a reminder to remove the marker.
 
+## Videos: `videos/`
+
+MP4 videos of the site, to show a change: `tests/videos/*.video.ts`, on their own config
+(`playwright.videos.config.ts`), never part of `npm test`. Each one drives the page (taps, glides,
+pauses) while `videos/support/recorder.ts` takes 2x screenshots back to back; ffmpeg joins them at
+their real timing. Needs ffmpeg (`brew install ffmpeg`, see the main README).
+
+```sh
+npm run videos                            # every video
+npm run videos -- phone-menu              # one video
+```
+
+Output: `videos/<project>/<name>.mp4` (git-ignored). Frames stay in `test-results/`.
+
 ## Outputs (git-ignored)
 
 - `screenshots/<device>/<page>.png`: full-page screenshots of every page, for visual review (not compared;

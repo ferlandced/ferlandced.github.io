@@ -7,6 +7,7 @@
     "build": "eleventy --config=eleventy.config.ts",
     "test": "playwright test",
     "test:report": "playwright show-report",
+    "videos": "playwright test --config=playwright.videos.config.ts",
     "lint": "npm run typecheck && npm run lint:js && npm run lint:css && npm run format:check",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"**/*.css\"",

@@ -1,5 +1,18 @@
 # ced
 
+## Setup
+
+Requires Node.js, and [ffmpeg](https://ffmpeg.org) for the videos (`npm run videos`).
+
+```sh
+brew install ffmpeg                      # macOS; once
+npm install
+npx playwright install chromium webkit   # once, downloads the test browsers
+npm start                                # dev server on http://localhost:8080
+```
+
+Tests and videos: `tests/README.md`.
+
 ## Content
 
 Edited in the CMS (`/admin/`, labels in French). Every text has a French and an English version, side by side,
