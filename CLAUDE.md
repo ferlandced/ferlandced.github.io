@@ -29,7 +29,7 @@ Related docs:
 - Eleventy 3 (`eleventy.config.ts`), Nunjucks templates (`*.njk`, `_includes/`).
 - TypeScript everywhere. Browser scripts in `js/` and `admin/preview.ts`: the build strips their types, so no bundler.
 - CSS: plain CSS in `css/`.
-- Scroll effects (home page: reveals, the About story, the header past the hero): GSAP + ScrollTrigger, copied from `node_modules` into the build (`js/vendor/`) and loaded on the home page only. Holding a section on screen stays CSS `position: sticky`: ScrollTrigger's pin needs a fixed-size element, and the About text grows while held on phones.
+- Scroll effects (home page: reveals, the About story, the header past the hero): GSAP + ScrollTrigger + SplitText (the line-by-line text reveals), copied from `node_modules` into the build (`js/vendor/`) and loaded on the home page only. Each section's animation uses only its own section as trigger and scope, with its timings in one `CONFIG` object, so sections can be added, removed or reordered without touching the others. Reveals play once and never hide content again. Holding a section on screen stays CSS `position: sticky`: ScrollTrigger's pin needs a fixed-size element, and the About text grows while held on phones.
 - Content: `content/` (CMS-edited JSON), `_data/site.json`, loaded through `lib/content.ts`. CMS config: `admin/config.yml`.
 - Tests: Playwright + axe-core in `tests/`.
 - Node 24 (same as CI). Exact dependency versions; `package-lock.json` is committed.
