@@ -8,8 +8,29 @@
   }
   document.documentElement.classList.add("js-nav");
 
+  // Phones: the burger's circle grows just past the menu's farthest corner (css/site.css, Phone menu)
+  const nav = root.querySelector<HTMLElement>(".site-nav");
+  const fitCircleToMenu = () => {
+    if (!nav) {
+      return;
+    }
+    const toggleBox = toggle.getBoundingClientRect();
+    const navBox = nav.getBoundingClientRect();
+    const centreX = toggleBox.left + toggleBox.width / 2;
+    const centreY = toggleBox.top + toggleBox.height / 2;
+    const radius = Math.hypot(centreX - navBox.left, centreY - navBox.top) + 32;
+    document.documentElement.style.setProperty(
+      "--menu-circle-open-radius",
+      `${Math.ceil(radius)}px`,
+    );
+  };
+
+  // Measured once open, when the menu shows all its items
   const setOpen = (open: boolean) => {
     root.toggleAttribute("data-open", open);
+    if (open) {
+      fitCircleToMenu();
+    }
     toggle.setAttribute("aria-expanded", String(open));
     label.textContent = (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? "";
   };
@@ -26,6 +47,11 @@
     if (event.key === "Escape" && root.hasAttribute("data-open")) {
       setOpen(false);
       toggle.focus();
+    }
+  });
+  addEventListener("resize", () => {
+    if (root.hasAttribute("data-open")) {
+      fitCircleToMenu();
     }
   });
 })();

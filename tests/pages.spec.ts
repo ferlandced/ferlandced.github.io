@@ -124,11 +124,10 @@ test("safe-area insets reach the About layout", () => {
   const css = fs.readFileSync("css/site.css", "utf8");
   for (const rule of [
     // The agent clear of a landscape notch; phones: About under the header and the notch, its text
-    // above the menu corner (which sits above the home indicator); desktop: the held text clear of both
+    // above the burger's circle (which sits above the home indicator); desktop: the held text clear of both
     /--photo-x: calc\([^;]*var\(--safe-right\)\)/,
     /--about-top: calc\(var\(--header-height\) \+ var\(--safe-top\)\)/,
-    /--corner-x-closed: calc\([^;]*var\(--safe-bottom\)/,
-    /--about-text-clear: calc\([^;]*var\(--corner-x-closed\)/,
+    /--about-text-clear: calc\([^;]*var\(--menu-circle-size\)[^;]*var\(--safe-bottom\)/,
     /\.about__pin \{[^}]*padding-block: calc\(var\(--header-height\) \+ var\(--safe-top\)\)\s+calc\(24px \+ var\(--safe-bottom\)\)/,
   ]) {
     expect(css).toMatch(rule);

@@ -292,14 +292,13 @@ body:not(.home) .site-header {
 
 /* iOS 26 Safari paints the strip behind the status bar with the background of a fixed element at
    the top edge, white when that background is transparent. It skips one that lets taps through,
-   so over the hero (and over the open menu) the page shows behind the clock; the header's own
-   controls stay tappable. */
-body.home .site-header:is(:not([data-past-hero]), [data-open]) {
+   so over the hero the page shows behind the clock; the header's own controls stay tappable. */
+body.home .site-header:not([data-past-hero]) {
   pointer-events: none;
 }
 
 body.home
-  .site-header:is(:not([data-past-hero]), [data-open])
+  .site-header:not([data-past-hero])
   :is(.brand, .nav-toggle, .site-nav, .site-header__tools) {
   pointer-events: auto;
 }
@@ -557,25 +556,34 @@ body:not(.home) .contact-icons--header {
 }
 
 /* ==========================================================================
-   Phone menu: the hero's slash lives here as a fixed bottom-right corner (red stripe, solid
-   Dark Red to its right). The white burger sits in it. Tapping it slides the slash line up and
-   left, so the Dark Red grows into the menu panel with the links, contact icons and language.
-   --corner-x is where the red stripe meets the bottom of the screen.
+   Phone menu: the white burger sits on a fixed circle, bottom right: Dark Red at 80% over a blur
+   of the page. Over the top of the home hero it sits inside the hero's slash. Tapping it grows the
+   circle just past the menu panel (links, contact icons and language), so the page still shows at
+   the top left, and a Primary Red border grows with it, as wide as the hero's stripe once open.
+   --menu-circle-radius and --menu-circle-border are the circle's radius and border, closed or
+   open. js/site.ts measures the open radius (--menu-circle-open-radius); the fallback covers the
+   screen.
    ========================================================================== */
-@property --corner-x {
-  syntax: "<length-percentage>";
+@property --menu-circle-radius {
+  syntax: "<length>";
   inherits: true;
-  initial-value: 82vw;
+  initial-value: 28px;
 }
 
-.menu-corner,
-.page-corner,
+@property --menu-circle-border {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.menu-circle,
+.page-circle,
 .site-nav__lang,
 .brand__logo--light {
   display: none;
 }
 
-@keyframes page-corner-follow {
+@keyframes page-circle-follow {
   from {
     translate: 0 0;
   }
@@ -586,54 +594,72 @@ body:not(.home) .contact-icons--header {
 }
 
 @media (width <= 767.98px) {
-  /* The red stripe stays 8px clear of the burger's bars: their left end is 46px from the right
-     edge (12px offset, half the 44px button, half the 24px bars), their top 42px above the
-     viewport's bottom (44px with a little slack). */
+  /* The circle's centre, from the viewport's right and bottom edges */
   :root {
-    --corner-stripe-width: 14px;
-    --corner-x-closed: calc(
-      100vw - var(--safe-right) - 46px - 8px - var(--corner-stripe-width) -
-        (44px + var(--safe-bottom)) * tan(var(--slash-angle))
+    --menu-circle-size: 56px;
+    --menu-circle-inset: 12px;
+    --menu-circle-right: calc(
+      var(--menu-circle-inset) + var(--safe-right) + var(--menu-circle-size) / 2
     );
-    --corner-x: var(--corner-x-closed);
+    --menu-circle-bottom: calc(
+      var(--menu-circle-inset) + var(--safe-bottom) + var(--menu-circle-size) / 2
+    );
+    --menu-circle-radius: calc(var(--menu-circle-size) / 2);
+    --menu-circle-border: 0px;
+    --menu-circle-fill: color-mix(in sRGB, var(--color-dark-red) 80%, transparent);
+    --menu-circle-blur: blur(16px);
 
-    transition: --corner-x 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+      --menu-circle-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      --menu-circle-border 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   :root:has(.site-header[data-open]) {
-    --corner-x: -45vw;
+    --menu-circle-radius: var(--menu-circle-open-radius, calc(100vw + 100dvh));
+    --menu-circle-border: 14px;
   }
 
   .site-header {
     transition: background-color 0.3s;
   }
 
-  /* Both corners below draw the same line: through --corner-x at the viewport's bottom, at the
-     slash angle. Each sets --corner-line-x (where the line meets its box's bottom) and
-     --corner-rise (its box's height). The fixed one stops short of the viewport's top and bottom:
-     iOS 26 Safari paints a solid strip behind its bars when a wide fixed element touches them. */
-  .menu-corner {
-    --corner-edge-gap: 6px;
-    --corner-rise: calc(100dvh - 2 * var(--corner-edge-gap));
-    --corner-line-x: calc(var(--corner-x) + var(--corner-edge-gap) * tan(var(--slash-angle)));
+  /* Both layers below draw the same circle, centred on the burger (--circle-centre-y in their own
+     box): the fill inside, the border on its edge. The fixed one stops short of the viewport's top
+     and bottom: iOS 26 Safari paints a solid strip behind its bars when a wide fixed element
+     touches them. */
+  :is(.menu-circle, .page-circle__shape) {
+    --circle-centre: calc(100% - var(--menu-circle-right)) var(--circle-centre-y);
+
+    background: radial-gradient(
+      circle at var(--circle-centre),
+      var(--menu-circle-fill) calc(var(--menu-circle-radius) - var(--menu-circle-border)),
+      var(--color-primary-red) calc(var(--menu-circle-radius) - var(--menu-circle-border))
+    );
+    backdrop-filter: var(--menu-circle-blur);
+    clip-path: circle(var(--menu-circle-radius) at var(--circle-centre));
+  }
+
+  .menu-circle {
+    --circle-edge-gap: 6px;
+    --circle-centre-y: calc(100% - var(--menu-circle-bottom) + var(--circle-edge-gap));
 
     display: block;
     position: fixed;
-    inset: auto 0 var(--corner-edge-gap);
-    height: var(--corner-rise);
+    inset: var(--circle-edge-gap) 0;
     pointer-events: none;
   }
 
   /* iOS 26 Safari cuts fixed elements off at its bottom toolbar, but draws the page under it. So
-     the corner is drawn twice: fixed, over the header (above), and as page content under it, a
-     layer over the whole page whose shape follows the scroll (a scroll-driven animation) and
-     reaches past the viewport's edges, so it carries on under the toolbar and the status bar. */
+     the circle is drawn twice: fixed, over the header (above), and as page content under it, a
+     layer over the whole page whose box follows the scroll (a scroll-driven animation) and
+     reaches past the viewport's edges, so it carries on under the toolbar and the status bar.
+     It only paints past the fixed one's edges, so the 80% fill never doubles up. */
   @supports (animation-timeline: scroll()) {
     body {
       position: relative;
     }
 
-    .page-corner {
+    .page-circle {
       display: block;
       position: absolute;
       inset: 0;
@@ -642,72 +668,39 @@ body:not(.home) .contact-icons--header {
       pointer-events: none;
     }
 
-    .page-corner__shape {
-      --corner-overhang: 160px;
-      --corner-rise: calc(100dvh + 2 * var(--corner-overhang));
-      --corner-line-x: calc(var(--corner-x) - var(--corner-overhang) * tan(var(--slash-angle)));
+    .page-circle__shape {
+      --circle-overhang: 160px;
+      --circle-centre-y: calc(100% - var(--menu-circle-bottom) - var(--circle-overhang));
+      --fixed-circle-edge: calc(var(--circle-overhang) + 6px);
 
       position: absolute;
       inset: 0 0 auto;
-      height: var(--corner-rise);
-      transform: translateY(calc(-1 * var(--corner-overhang)));
-      animation: page-corner-follow linear both;
+      height: calc(100dvh + 2 * var(--circle-overhang));
+      transform: translateY(calc(-1 * var(--circle-overhang)));
+      mask-image: linear-gradient(
+        var(--color-black) var(--fixed-circle-edge),
+        transparent var(--fixed-circle-edge) calc(100% - var(--fixed-circle-edge)),
+        var(--color-black) calc(100% - var(--fixed-circle-edge))
+      );
+      animation: page-circle-follow linear both;
       animation-timeline: scroll(root block);
       animation-range: 0 100000px;
     }
   }
 
-  :is(.menu-corner, .page-corner__shape) > span {
-    position: absolute;
-    inset: 0;
-  }
-
-  .menu-corner__red {
-    background: linear-gradient(var(--color-primary-red) 0 0);
-    clip-path: polygon(
-      calc(var(--corner-line-x) + var(--corner-rise) * tan(var(--slash-angle))) 0,
-      calc(
-          var(--corner-line-x) + var(--corner-stripe-width) + 1px + var(--corner-rise) *
-            tan(var(--slash-angle))
-        )
-        0,
-      calc(var(--corner-line-x) + var(--corner-stripe-width) + 1px) 100%,
-      var(--corner-line-x) 100%
-    );
-  }
-
-  .menu-corner__dark {
-    background: linear-gradient(var(--color-dark-red) 0 0);
-    clip-path: polygon(
-      calc(
-          var(--corner-line-x) + var(--corner-stripe-width) + var(--corner-rise) *
-            tan(var(--slash-angle))
-        )
-        0,
-      calc(
-          var(--corner-line-x) + var(--corner-stripe-width) + var(--corner-rise) *
-            tan(var(--slash-angle)) + 200vw
-        )
-        0,
-      calc(var(--corner-line-x) + var(--corner-stripe-width) + 200vw) 100%,
-      calc(var(--corner-line-x) + var(--corner-stripe-width)) 100%
-    );
-  }
-
-  /* The hero's own stripes are replaced by the corner */
-  .hero__stripe {
-    display: none;
-  }
-
-  /* Burger: white, bottom right, on the Dark Red */
+  /* Burger: white bars, bottom right, on the circle drawn by the layers above */
   .js-nav .nav-toggle {
     position: fixed;
-    right: calc(12px + var(--safe-right));
-    bottom: calc(12px + var(--safe-bottom));
+    right: calc(var(--menu-circle-inset) + var(--safe-right));
+    bottom: calc(var(--menu-circle-inset) + var(--safe-bottom));
     z-index: 1;
+    width: var(--menu-circle-size);
+    height: var(--menu-circle-size);
     margin: 0;
+    border-radius: 50%;
     background: none;
     color: var(--brand-on-dark);
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Language and contact icons live in the menu only; nothing sits above the burger */
@@ -716,18 +709,23 @@ body:not(.home) .contact-icons--header {
     display: none;
   }
 
-  /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the corner has grown */
+  /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the circle has grown */
 
   /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
   .js-nav .site-nav {
+    --menu-panel-bottom: calc(var(--menu-circle-inset) + var(--menu-circle-size) + 12px);
+
     display: flex;
     position: fixed;
-    inset: auto calc(16px + var(--safe-right)) calc(72px + var(--safe-bottom)) auto;
+    inset: auto calc(16px + var(--safe-right)) calc(var(--menu-panel-bottom) + var(--safe-bottom))
+      auto;
     z-index: 1;
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    max-height: calc(100dvh - 72px - 16px - var(--safe-top) - var(--safe-bottom));
+    max-height: calc(
+      100dvh - var(--menu-panel-bottom) - 16px - var(--safe-top) - var(--safe-bottom)
+    );
     overflow-y: auto;
     padding: 0 12px 0 0;
     margin-right: -12px;
@@ -793,11 +791,6 @@ body:not(.home) .contact-icons--header {
 
   body.home .site-header:not([data-past-hero]) .brand__logo--light {
     display: block;
-  }
-
-  /* Menu open on home: the header lets the corner through, so it also shows behind the status bar */
-  body.home .site-header[data-open] {
-    background: transparent;
   }
 }
 
@@ -1066,8 +1059,9 @@ body:not(.home) .contact-icons--header {
 }
 
 /* Phones only: no agent in the hero (he appears directly in About). The side image fills the
-   hero, the name block is centred like on desktop, in white over a dark scrim, and a short slash
-   rises from the bottom centre at the fixed 27.5° with solid Dark Red to its right. */
+   hero, the name block is centred like on desktop, in white over a dark scrim, and a slash rises
+   from the bottom right at the fixed 27.5° with solid Dark Red to its right. It scrolls away with
+   the hero. */
 @media (width <= 767.98px) {
   .stage {
     --hero-height: 100lvh;
@@ -1076,12 +1070,17 @@ body:not(.home) .contact-icons--header {
     display: none;
   }
 
-  /* Band layer: under the text, full hero */
+  /* Band layer: over the scrim, under the text, full hero. At the top of the page the hero's bottom
+     is the viewport's: the red stripe passes 8px clear of the burger's circle, which then sits
+     unseen in the Dark Red. */
   .hero__band {
-    z-index: 0;
+    z-index: 1;
 
-    --slash-left: 50%;
-    --slash-right: calc(var(--slash-left) + 14px);
+    --slash-right: calc(
+      100% - var(--menu-circle-right) - var(--menu-circle-bottom) * tan(var(--slash-angle)) -
+        (var(--menu-circle-size) / 2 + 8px) / cos(var(--slash-angle))
+    );
+    --slash-left: calc(var(--slash-right) - 14px);
   }
 
   .hero__id {
@@ -1299,16 +1298,16 @@ body:not(.home) .contact-icons--header {
 }
 
 /* Phones (Figma: iPhone 18 Pro 1-4): the agent fills the space under the title, down to where the
-   text must stop for the menu corner. The text gathers at his feet and pushes up as it grows. A
+   text must stop for the burger's circle. The text gathers at his feet and pushes up as it grows. A
    white overlay with a background blur rises over him with the story (About story, below). */
 @media (width <= 767.98px) {
   .about {
     /* h2 line plus its gap below */
     --about-title-space: calc(1.8125rem * 1.14 + 8px);
 
-    /* Bottom of the text: where the closed menu corner's line passes 8px right of the text */
+    /* Bottom of the text: 8px above the burger's circle */
     --about-text-clear: calc(
-      (100vw - var(--gutter) + 8px - var(--corner-x-closed)) / tan(var(--slash-angle))
+      var(--menu-circle-inset) + var(--menu-circle-size) + 8px + var(--safe-bottom)
     );
   }
 
@@ -1392,7 +1391,7 @@ body:not(.home) .contact-icons--header {
     padding-bottom: 0;
   }
 
-  /* Tighter than body text, as in the Figma, so both parts fit between the title and the corner */
+  /* Tighter than body text, as in the Figma, so both parts fit between the title and the circle */
   .about__line {
     line-height: 1.45;
   }
@@ -1905,16 +1904,12 @@ html:not(.js) button.card__more {
   padding-block: 40px;
 }
 
-/* Phones: one column, kept left of the fixed red corner (which starts at 82% of the width) */
+/* Phones: one column, its end clear of the burger's circle */
 @media (width <= 767.98px) {
   .site-footer__inner {
     grid-template-columns: 1fr;
     gap: 28px;
-    padding-bottom: 48px;
-  }
-
-  .site-footer__inner > div {
-    max-width: calc(82vw - var(--gutter) - 8px);
+    padding-bottom: calc(var(--menu-circle-inset) + var(--menu-circle-size) + 8px);
   }
 }
 

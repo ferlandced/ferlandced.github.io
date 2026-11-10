@@ -122,18 +122,21 @@ test("phones: no contact icons above the burger; they are in the menu", async ({
   await expect(page.locator(".contact-icons--menu")).toBeVisible();
 });
 
-test("phones: the corner keeps its small size over the hero and past it", async ({
+test("phones: the burger's circle keeps its size over the hero and past it", async ({
   page,
 }, testInfo) => {
   test.skip(!isPhone(testInfo), "phones only");
   await page.goto("fr/");
   const header = page.locator(".site-header");
-  const cornerX = () =>
-    header.evaluate((element) => getComputedStyle(element).getPropertyValue("--corner-x").trim());
-  const overHero = await cornerX();
+  const radius = () =>
+    header.evaluate((element) =>
+      getComputedStyle(element).getPropertyValue("--menu-circle-radius").trim(),
+    );
+  const overHero = await radius();
+  expect(overHero).toBe("28px");
   await page.evaluate(() => {
     window.scrollTo({ top: innerHeight * 2, behavior: "instant" });
   });
   await expect(header).toHaveAttribute("data-past-hero", "");
-  expect(await cornerX()).toBe(overHero);
+  expect(await radius()).toBe(overHero);
 });

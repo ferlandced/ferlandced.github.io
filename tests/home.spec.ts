@@ -988,7 +988,7 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
-  test("the title above the agent, the text at the bottom over him, clear of the menu corner", async ({
+  test("the title above the agent, the text at the bottom over him, clear of the burger", async ({
     page,
     isMobile,
   }) => {
@@ -1002,15 +1002,12 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     expect(card.y, "the agent starts below the title").toBeGreaterThanOrEqual(
       title.y + title.height - 1,
     );
-    const clear = await contact.evaluate((element) => {
-      const box = element.getBoundingClientRect();
-      const cornerX = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--corner-x"),
-      );
-      const slope = Math.tan((27.5 * Math.PI) / 180);
-      return cornerX + (innerHeight - box.bottom) * slope - box.right;
-    });
-    expect(clear, "the text ends left of the corner's line").toBeGreaterThanOrEqual(0);
+    const text = present(await contact.boundingBox(), "the contact lines");
+    const burger = present(await page.locator(".nav-toggle").boundingBox(), "the burger");
+    expect(
+      burger.y - (text.y + text.height),
+      "the text ends above the burger",
+    ).toBeGreaterThanOrEqual(7.5);
     await expect(contact).toBeInViewport({ ratio: 1 });
     await expect(page.locator(".about__pin")).toHaveCSS("position", "sticky");
   });

@@ -105,7 +105,12 @@ Where each colour may go:
   Angle -27.5° (`--slash-angle` in `css/site.css`).
 - Two-colour angled design: Primary Blue / Dark Blue, Primary Red / Dark Red,
   Cream / Black. The hero uses Primary Red (1/4, next to the photo) and Dark Red
-  (3/4); the phone menu corner reuses it.
+  (3/4), on phones too; it scrolls away with the hero.
+- Phone menu: the burger sits on a fixed circle, bottom right: Dark Red at 80%
+  over a blur of the page, unseen in the hero's Dark Red at the top of the home
+  page. Opening the menu grows the circle just past the menu, so the page still
+  shows at the top left, and a Primary Red border grows with it from 0 to the
+  hero stripe's 14px. White on the circle stays at AA (8:1 or more over white).
 - Outlined Balloon shape: background or framing only, single brand colour,
   never as a logo.
 
