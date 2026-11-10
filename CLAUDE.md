@@ -87,6 +87,7 @@ During development, run the smallest relevant test suite first to get fast feedb
 - Very few comments: only for something genuinely surprising. Explain the change in the PR instead.
 - Shell and workflow scripts read step by step: named variables, small named functions, plain if/else, one echo per action. No dense one-liners.
 - Lint rules stay on. Disable one only on a single line, with the reason.
+- Fix warnings like errors: ESLint, Stylelint, TypeScript and the build end with none. Never leave a warning behind.
 - No hardcoded text in templates or scripts: every string comes from the content files (see Bilingual). No hardcoded colours, fonts, sizes or radii: use the tokens (DESIGN.md).
 - Progressive enhancement: pages and forms work without JavaScript; scripts add to working HTML.
 - Semantic HTML first; ARIA only when HTML has no element for it. Every page passes the axe checks in `tests/a11y.spec.ts`.
