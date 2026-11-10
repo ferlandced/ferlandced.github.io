@@ -2,7 +2,7 @@ name: Update listings
 
 on:
   schedule:
-    - cron: "0 8,18,20 * * *"
+    - cron: "30 6,8,10,11,12,13,14,15,16,17,18,19,20,21 * * *"
       timezone: "America/Toronto"
   workflow_dispatch:
 
