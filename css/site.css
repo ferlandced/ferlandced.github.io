@@ -3,9 +3,10 @@
    Only layout variables live here.
 
    Breakpoints: two layouts only.
-     phone          < 768px
-     desktop        >= 768px
-     very large     >= 1400px         (xxl): content capped at --wrap-max, colour bleeds to the edge
+     phone          < 1024px
+     desktop        >= 1024px
+   Sections are full-bleed; their content sits in a centred container, at most --container-max wide
+   with --page-margin on each side (24px on phones, growing to 120px between 1024 and 1440px).
    ========================================================================== */
 
 :root {
@@ -13,34 +14,28 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  --gutter: calc(16px + max(var(--safe-left), var(--safe-right)));
-  --wrap-max: 1320px;
+  --page-margin: calc(var(--space-6) + max(var(--safe-left), var(--safe-right)));
 
-  /* Content is aligned left: it starts at --wrap-left from the screen edge (gutter, plus the logo shift
-     on desktop) and is at most --wrap-max wide. Extra space on wide screens goes to the right. */
-  --wrap-left: calc(var(--gutter) + var(--brand-shift, 0px));
-
-  /* viewport-based twin of .container width, for transforms */
-  --wrap: min(var(--wrap-max), 100vw - var(--wrap-left) - var(--gutter));
+  /* Where the content starts, from the edge of a full-width box (resolved where it is used) */
+  --content-edge: max(var(--page-margin), (100% - var(--container-max)) / 2 + var(--page-margin));
   --header-height: 64px;
   --logo-height: 60px; /* rendered height of the logo file (its canvas has built-in clear space) */
 
-  /* Slash Design: fixed angle, Primary Red 1/4 next to the photo, Dark Red 3/4 */
+  /* Slash Design: fixed angle */
   --slash-angle: 27.5deg;
-  --slash-red-ratio: 0.25;
 
   /* Fine grain (SVG noise, light speckle) laid over a solid colour for a textured surface */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@media (width >= 768px) {
+/* The margin grows in a straight line from 24px at 1024px to 120px at 1440px */
+@media (width >= 1024px) {
   :root {
-    --gutter: calc(24px + max(var(--safe-left), var(--safe-right)));
-    --header-height: 80px;
+    --page-margin: clamp(var(--space-6), 23.077vw - 212.3px, var(--layout-margin));
+    --header-height: 96px;
     --logo-height: 72px;
-    --brand-shift: clamp(24px, 6vw, 120px);
   }
-} /* content sits a bit right of the gutter */
+}
 
 * {
   box-sizing: border-box;
@@ -60,7 +55,7 @@ html {
 }
 
 @supports (-webkit-touch-callout: none) {
-  @media (width <= 767.98px) {
+  @media (width <= 1023.98px) {
     :root {
       --top-runway: 80px;
       --footer-runway: 120px;
@@ -160,10 +155,10 @@ a:hover {
 }
 
 .container {
-  width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
-  margin-left: var(--wrap-left);
-  margin-right: auto;
-  padding-block: 24px;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: var(--space-6) var(--page-margin);
 }
 
 .muted {
@@ -209,20 +204,19 @@ a:hover {
   text-underline-offset: 0.3em;
 }
 
-/* Pill buttons: Figtree Medium 14, sentence case */
+/* Pill buttons (Figma Button set): Label/Button, sentence case, 56px tall */
 .btn--cta,
+.btn--dark,
 .btn--outline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 14px 22px;
-  border-radius: 1000px;
-  font-family: var(--font-heading);
-  font-size: 0.875rem;
-  font-weight: var(--font-medium);
-  line-height: 1.43;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-full);
+  font: var(--text-label-button);
+  letter-spacing: var(--text-label-button-tracking);
   text-transform: none;
   text-align: center;
   transition:
@@ -232,9 +226,6 @@ a:hover {
 
 /* The page's main action: white on Dark Red (13.4:1), Bridge Red on hover (7.5:1) */
 .btn--cta {
-  min-width: 224px;
-  min-height: 56px;
-  padding-inline: 24px;
   background: var(--brand-button);
   color: var(--brand-on-dark);
 }
@@ -246,6 +237,18 @@ a:hover {
 
 .btn--cta:hover {
   background: var(--brand-accent);
+  color: var(--brand-on-dark);
+  text-decoration: none;
+}
+
+/* Black: white text 21:1, Dark Charcoal Gray on hover (15.9:1) */
+.btn--dark {
+  background: var(--color-black);
+  color: var(--brand-on-dark);
+}
+
+.btn--dark:hover {
+  background: var(--color-charcoal);
   color: var(--brand-on-dark);
   text-decoration: none;
 }
@@ -270,7 +273,7 @@ a:hover {
 }
 
 /* ==========================================================================
-   Header: fixed, white. On desktop the logo shrinks as the page scrolls.
+   Header: fixed, full width, its row on the content's edges. White, except over the home hero.
    ========================================================================== */
 .site-header {
   position: fixed;
@@ -280,8 +283,8 @@ a:hover {
   padding-top: var(--safe-top);
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding-inline: var(--wrap-left) var(--gutter);
+  gap: var(--space-6);
+  padding-inline: var(--content-edge);
   background: transparent;
 }
 
@@ -313,6 +316,7 @@ body.home
   align-items: flex-start;
   justify-content: center;
   height: 100%;
+  margin-left: calc(var(--logo-height) * -0.24);
   text-decoration: none;
   color: var(--color-black);
   translate: 0 calc(var(--logo-height) * -0.1);
@@ -336,8 +340,8 @@ body.home
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
-  margin-left: clamp(16px, 3vw, 48px);
+  gap: var(--space-8);
+  margin-left: auto;
 }
 
 .site-nav a:not(.btn) {
@@ -357,7 +361,6 @@ body.home
    White chips keep them readable over the hero picture and scrolled content. */
 .site-header__tools {
   order: 2;
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -367,12 +370,10 @@ body.home
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 14px;
-  border-radius: var(--brand-radius);
-  background: var(--brand-surface);
+  padding: 0 var(--space-3);
   color: var(--brand-ink);
   font-size: 0.875rem;
-  font-weight: var(--font-bold);
+  font-weight: var(--font-medium);
   letter-spacing: 0.06em;
   text-decoration: none;
 }
@@ -430,7 +431,7 @@ body:not(.home) .contact-icons--header {
   display: none;
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .contact-icons--header {
     display: none;
   }
@@ -447,7 +448,6 @@ body:not(.home) .contact-icons--header {
   }
 }
 
-/* White chip, like the language switch, so the icon stays visible over the hero's blue */
 .nav-toggle {
   order: 3;
   display: none;
@@ -506,30 +506,9 @@ body:not(.home) .contact-icons--header {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .js-nav .nav-toggle {
     display: block;
-  }
-
-  .js-nav .site-nav {
-    display: none;
-    position: absolute;
-    inset: 100% 0 auto;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: 8px var(--gutter) 24px;
-    background: var(--brand-surface);
-    box-shadow: 0 12px 24px var(--brand-shadow);
-  }
-
-  .js-nav [data-open] .site-nav {
-    display: flex;
-  }
-
-  .js-nav .site-nav a:not(.btn) {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--brand-placeholder);
   }
 
   /* Without JS the links stay inline, smaller */
@@ -556,259 +535,181 @@ body:not(.home) .contact-icons--header {
 }
 
 /* ==========================================================================
-   Phone menu: the white burger sits on a fixed circle, bottom right: Dark Red at 80% over a blur
-   of the page. Over the top of the home hero it sits inside the hero's slash. Tapping it grows the
-   circle just past the menu panel (links, contact icons and language), so the page still shows at
-   the top left, and a Primary Red border grows with it, as wide as the hero's stripe once open.
-   --menu-circle-radius and --menu-circle-border are the circle's radius and border, closed or
-   open. js/site.ts measures the open radius (--menu-circle-open-radius); the fallback covers the
-   screen.
+   Phone menu: the burger sits on a Dark Red circle, bottom right. Open, the menu covers the screen
+   in Dark Red (white text 13.4:1) and its links rise in one after the other.
    ========================================================================== */
-@property --menu-circle-radius {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 28px;
-}
-
-@property --menu-circle-border {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 0;
-}
-
-.menu-circle,
-.page-circle,
 .site-nav__lang,
 .brand__logo--light {
   display: none;
 }
 
-@keyframes page-circle-follow {
-  from {
-    translate: 0 0;
-  }
-
-  to {
-    translate: 0 100000px;
-  }
-}
-
-@media (width <= 767.98px) {
-  /* The circle's centre, from the viewport's right and bottom edges */
+@media (width <= 1023.98px) {
   :root {
-    --menu-circle-size: 56px;
-    --menu-circle-inset: 12px;
-    --menu-circle-right: calc(
-      var(--menu-circle-inset) + var(--safe-right) + var(--menu-circle-size) / 2
-    );
-    --menu-circle-bottom: calc(
-      var(--menu-circle-inset) + var(--safe-bottom) + var(--menu-circle-size) / 2
-    );
-    --menu-circle-radius: calc(var(--menu-circle-size) / 2);
-    --menu-circle-border: 0px;
-    --menu-circle-fill: color-mix(in sRGB, var(--color-dark-red) 80%, transparent);
-    --menu-circle-blur: blur(16px);
-
-    transition:
-      --menu-circle-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-      --menu-circle-border 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    --burger-size: 44px;
+    --burger-inset: var(--space-6);
   }
 
-  :root:has(.site-header[data-open]) {
-    --menu-circle-radius: var(--menu-circle-open-radius, calc(100vw + 100dvh));
-    --menu-circle-border: 14px;
-  }
-
-  .site-header {
-    transition: background-color 0.3s;
-  }
-
-  /* Both layers below draw the same circle, centred on the burger (--circle-centre-y in their own
-     box): the fill inside, the border on its edge. The fixed one stops short of the viewport's top
-     and bottom: iOS 26 Safari paints a solid strip behind its bars when a wide fixed element
-     touches them. */
-  :is(.menu-circle, .page-circle__shape) {
-    --circle-centre: calc(100% - var(--menu-circle-right)) var(--circle-centre-y);
-
-    background: radial-gradient(
-      circle at var(--circle-centre),
-      var(--menu-circle-fill) calc(var(--menu-circle-radius) - var(--menu-circle-border)),
-      var(--color-primary-red) calc(var(--menu-circle-radius) - var(--menu-circle-border))
-    );
-    backdrop-filter: var(--menu-circle-blur);
-    clip-path: circle(var(--menu-circle-radius) at var(--circle-centre));
-  }
-
-  .menu-circle {
-    --circle-edge-gap: 6px;
-    --circle-centre-y: calc(100% - var(--menu-circle-bottom) + var(--circle-edge-gap));
-
-    display: block;
-    position: fixed;
-    inset: var(--circle-edge-gap) 0;
-    pointer-events: none;
-  }
-
-  /* iOS 26 Safari cuts fixed elements off at its bottom toolbar, but draws the page under it. So
-     the circle is drawn twice: fixed, over the header (above), and as page content under it, a
-     layer over the whole page whose box follows the scroll (a scroll-driven animation) and
-     reaches past the viewport's edges, so it carries on under the toolbar and the status bar.
-     It only paints past the fixed one's edges, so the 80% fill never doubles up. */
-  @supports (animation-timeline: scroll()) {
-    body {
-      position: relative;
-    }
-
-    .page-circle {
-      display: block;
-      position: absolute;
-      inset: 0;
-      z-index: 99;
-      overflow: clip;
-      pointer-events: none;
-    }
-
-    .page-circle__shape {
-      --circle-overhang: 160px;
-      --circle-centre-y: calc(100% - var(--menu-circle-bottom) - var(--circle-overhang));
-      --fixed-circle-edge: calc(var(--circle-overhang) + 6px);
-
-      position: absolute;
-      inset: 0 0 auto;
-      height: calc(100dvh + 2 * var(--circle-overhang));
-      transform: translateY(calc(-1 * var(--circle-overhang)));
-      mask-image: linear-gradient(
-        var(--color-black) var(--fixed-circle-edge),
-        transparent var(--fixed-circle-edge) calc(100% - var(--fixed-circle-edge)),
-        var(--color-black) calc(100% - var(--fixed-circle-edge))
-      );
-      animation: page-circle-follow linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 100000px;
-    }
-  }
-
-  /* Burger: white bars, bottom right, on the circle drawn by the layers above */
   .js-nav .nav-toggle {
     position: fixed;
-    right: calc(var(--menu-circle-inset) + var(--safe-right));
-    bottom: calc(var(--menu-circle-inset) + var(--safe-bottom));
-    z-index: 1;
-    width: var(--menu-circle-size);
-    height: var(--menu-circle-size);
+    right: calc(var(--burger-inset) + var(--safe-right));
+    bottom: max(var(--burger-inset), var(--space-2) + var(--safe-bottom));
+    z-index: 2;
+    width: var(--burger-size);
+    height: var(--burger-size);
     margin: 0;
     border-radius: 50%;
-    background: none;
+    background: var(--color-dark-red);
     color: var(--brand-on-dark);
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Language and contact icons live in the menu only; nothing sits above the burger */
+  /* Language and contact icons live in the menu only */
   .site-header__tools .lang-switch,
   .site-header__tools .contact-icons--header {
     display: none;
   }
 
-  /* Menu panel: links stacked bottom right, in white on Dark Red, shown once the circle has grown */
-
-  /* Capped to the space above the burger and scrollable, so short landscape screens can reach every item */
+  /* Centred, but on short screens it starts at the top and scrolls */
   .js-nav .site-nav {
-    --menu-panel-bottom: calc(var(--menu-circle-inset) + var(--menu-circle-size) + 12px);
-
-    display: flex;
     position: fixed;
-    inset: auto calc(16px + var(--safe-right)) calc(var(--menu-panel-bottom) + var(--safe-bottom))
-      auto;
+    inset: 0;
     z-index: 1;
+    display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    max-height: calc(
-      100dvh - var(--menu-panel-bottom) - 16px - var(--safe-top) - var(--safe-bottom)
-    );
+    justify-content: safe center;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+    padding: calc(var(--space-16) + var(--safe-top)) var(--page-margin)
+      calc(var(--space-16) + var(--safe-bottom));
     overflow-y: auto;
-    padding: 0 12px 0 0;
-    margin-right: -12px;
-    background: none;
+    background: var(--color-dark-red);
     box-shadow: none;
     opacity: 0;
     visibility: hidden;
     transition:
-      opacity 0.2s,
-      visibility 0.2s;
+      opacity 0.3s,
+      visibility 0.3s;
   }
 
   .js-nav [data-open] .site-nav {
     opacity: 1;
     visibility: visible;
-    transition-delay: 0.2s;
+  }
+
+  .js-nav .site-nav > * {
+    opacity: 0;
+    translate: 0 var(--space-6);
+    transition:
+      opacity 0.5s cubic-bezier(0.215, 0.61, 0.355, 1),
+      translate 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .js-nav [data-open] .site-nav > * {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: calc(0.1s + var(--item, 0) * 0.06s);
+  }
+
+  .js-nav [data-open] .site-nav > :is(.contact-icons, .site-nav__lang) {
+    transition-delay: 0.4s;
   }
 
   .js-nav .site-nav a:not(.btn) {
-    padding: 10px 0;
+    padding: var(--space-1) 0;
     border: 0;
     color: var(--brand-on-dark);
-    font-size: 1.125rem;
+    font: var(--text-h2);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .js-nav .site-nav a:not(.btn):hover {
+    color: var(--color-cream);
   }
 
   .js-nav [data-open] .contact-icons--menu {
     display: flex;
-    margin: 8px -12px 0 0;
+    margin-top: var(--space-8);
   }
 
   .contact-icons--menu a {
     color: var(--brand-on-dark);
   }
 
-  .site-nav__lang {
+  .js-nav .site-nav .site-nav__lang {
     display: block;
-    margin-top: 8px;
-    color: var(--brand-on-dark);
-    font-size: 0.875rem;
-    font-weight: var(--font-bold);
-    letter-spacing: 0.06em;
+    font: var(--text-label-button);
+    letter-spacing: var(--text-label-button-tracking);
     text-transform: uppercase;
-    text-decoration: none;
-    padding: 10px 0;
   }
 
-  /* Home, over the photo: transparent header with the cream logo. Past the hero: white, dark logo. */
-  body.home .site-header {
-    background: transparent;
-  }
-
-  body.home .site-header[data-past-hero] {
-    background: var(--brand-surface);
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand {
-    color: var(--color-cream);
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand__logo {
-    display: none;
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand__logo--light {
-    display: block;
+  html:has(.site-header[data-open]) {
+    overflow: hidden;
   }
 }
 
-@media (width <= 767.98px) and (prefers-reduced-motion: reduce) {
-  :root,
-  .site-header {
+@media (width <= 1023.98px) and (prefers-reduced-motion: reduce) {
+  .js-nav .site-nav,
+  .js-nav .site-nav > * {
     transition: none;
   }
 }
 
+/* Home, over the photo: transparent header, cream logo, white links. Past the hero: white, dark logo. */
+body.home .site-header {
+  background: transparent;
+  transition: background-color 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.home .site-header {
+    transition: none;
+  }
+}
+
+body.home .site-header[data-past-hero] {
+  background: var(--brand-surface);
+}
+
+body.home .site-header:not([data-past-hero]) .brand {
+  color: var(--color-cream);
+}
+
+body.home .site-header:not([data-past-hero]) .brand__logo {
+  display: none;
+}
+
+body.home .site-header:not([data-past-hero]) .brand__logo--light {
+  display: block;
+}
+
+@media (width >= 1024px) {
+  body.home .site-header:not([data-past-hero]) :is(.site-nav a, .lang-switch) {
+    color: var(--brand-on-dark);
+  }
+
+  /* Icons take no space until they appear, so the menu sits right next to EN at the top */
+  .contact-icons--header {
+    display: none;
+  }
+
+  [data-past-hero] .contact-icons--header,
+  body:not(.home) .contact-icons--header {
+    display: flex;
+  }
+}
+
 /* ==========================================================================
-   Hero: full-screen image, text on the left. From 768px the agent stands on the right, above the
-   image and under the slash, which bleeds off the right edge below the header.
+   Hero (Figma hero): the panorama full-bleed, the lockup centred. Desktop: the agent on the right,
+   the Primary Red and Dark Red slash on the right edge. A white slant closes the hero at the bottom.
    ========================================================================== */
+
+/* The stage holds the hero and About. Geometry shared by the hero, the travelling photo and About.
+   Horizontal positions are offsets from the page centre. */
 .stage {
-  /* Geometry shared by the hero, the travelling photo and About.
-     Horizontal positions are offsets from the page centre. */
-  --hero-height: clamp(560px, 100svh, 960px);
+  /* the large viewport on phones, so About never shows behind the browser bars */
+  --hero-height: 100lvh;
 
   /* photo top at 15%; with its built-in margin his head starts near 25% */
   --photo-height: calc(var(--hero-height) * 0.85);
@@ -819,48 +720,49 @@ body:not(.home) .contact-icons--header {
   /* agent's left edge */
   --photo-x: calc(50vw - var(--photo-width) - clamp(24px, 6vw, 120px) - var(--safe-right));
 
-  /* Slash: placed from the agent so it always passes just right of his hands. Hands reach about 88% of
-     the photo's width, about 12% of its height above the bottom; the line leans right as it rises.
-     It crosses his right arm, hands stay clear. */
-  --band-x: calc(
-    var(--photo-x) + var(--photo-width) * 0.8 - var(--photo-height) * 0.12 * tan(var(--slash-angle))
-  );
-  --red-width: 10px; /* Primary Red line: fixed on every screen */
-  --name-size: clamp(2rem, 3.7vw, 3.3rem);
-  --signature-width: clamp(88px, min(10vw, 16svh), 142px);
-
   /* hero photo top: cropped at the bottom when taller */
   --agent-top: max(0px, var(--hero-height) - var(--photo-height));
   --about-padding: clamp(48px, 8vw, 96px);
-  --about-top: var(--about-padding);
+
+  /* About starts below the header and the notch */
+  --about-top: calc(var(--header-height) + var(--safe-top));
+  --content-edge-viewport: max(
+    var(--page-margin),
+    (100vw - var(--container-max)) / 2 + var(--page-margin)
+  );
 }
 
+@media (width >= 1024px) {
+  .stage {
+    --hero-height: max(560px, 100svh);
+    --about-top: var(--about-padding);
+  }
+}
+
+/* At least one screen tall; taller when the lockup needs it (short landscape screens) */
 .hero {
   position: relative;
-  overflow: hidden;
-  height: calc(var(--hero-height) + var(--top-runway));
+  overflow: clip;
+  min-height: calc(var(--hero-height) + var(--top-runway));
   padding-top: var(--top-runway);
+  padding-bottom: var(--space-16);
+  color: var(--brand-on-dark);
 }
 
 .hero__side {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background: var(--color-black);
+  background: var(--color-charcoal);
 }
 
 .hero__side img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
 }
 
-/* Scrim between the image and the text, after Figma's hero__before (62% black at the top), kept at
-   44% or more through the text so the white text passes AA (measured: 5:1 or better, see home tests),
-   then fading out at the bottom. One vertical gradient on every screen. */
+/* Scrim over the image: 62% black at the top, 44% or more through the text (white text at AA,
+   measured in the home tests), then fading out at the bottom */
 .hero::before {
   content: "";
   position: absolute;
@@ -874,71 +776,13 @@ body:not(.home) .contact-icons--header {
   );
 }
 
-.hero__inner {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
-  margin-left: var(--wrap-left);
-}
-
-/* The text may overlap the photo's transparent left margin, so it sits above the photo */
-
-/* Sits in the lower part of the hero */
-.hero__id {
+/* Photo layer: under the text and the slash. Phones: no agent in the hero (he appears in About). */
+.hero__figure {
+  display: none;
   position: absolute;
-  z-index: 1;
-  left: 0;
-  bottom: clamp(48px, 14%, 160px);
-  max-width: calc(50% + var(--photo-x) + var(--photo-width) * 0.1);
-}
-
-.hero__signature {
-  width: var(--signature-width);
-  height: auto;
-  margin-bottom: 12px;
-}
-
-/* Figtree throughout: name Medium, role Light, quote Regular with Bold words */
-.hero__name {
-  margin: 0;
-  font-size: var(--name-size);
-  font-weight: var(--font-medium);
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-
-.hero__role {
-  margin: 4px 0 0;
-  font-family: var(--font-heading);
-  font-weight: var(--font-light);
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
-  line-height: 1.33;
-  color: var(--brand-ink);
-}
-
-.hero__tagline {
-  margin: clamp(24px, 6svh, 56px) 0 0;
-  font-family: var(--font-heading);
-  font-size: clamp(1.25rem, 1.8vw, 1.62rem);
-  font-weight: var(--font-regular);
-  line-height: 1.2;
-  text-wrap: balance;
-  color: var(--brand-ink);
-}
-
-.hero__tagline strong {
-  font-weight: var(--font-bold);
-}
-
-/* The quieter middle of the quote (_words_ in the CMS): smaller and Light */
-.hero__tagline .text-light {
-  font-size: 0.8em;
-  font-weight: var(--font-light);
-}
-
-.hero__cta {
-  margin: clamp(20px, 4svh, 32px) 0 0;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .hero__photo,
@@ -950,14 +794,6 @@ body:not(.home) .contact-icons--header {
   object-position: top center;
 }
 
-/* Photo layer: under the text (z 2) and the band (z 4) */
-.hero__figure {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
 /* Taller than the hero: starts at the top, cropped at the bottom. Shorter: stands on the bottom edge. */
 .hero__photo {
   position: absolute;
@@ -965,256 +801,116 @@ body:not(.home) .contact-icons--header {
   left: calc(50% + var(--photo-x));
 }
 
-.hero__band {
-  --band-height: var(--hero-height);
-  --slash-left: calc(50% + var(--band-x)); /* bottom-left x */
+.hero__lockup {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: min(100% - 2 * var(--page-margin), 588px);
+  margin-inline: auto;
+  padding-top: calc(var(--header-height) + var(--safe-top) + var(--space-12));
+  text-align: center;
+}
 
-  /* horizontal lean over the band height */
-  --slash-lean: calc(var(--band-height) * tan(var(--slash-angle)));
-  --slash-right: calc(var(--slash-left) + var(--red-width));
+.hero__signature {
+  width: 142px;
+  height: auto;
+}
 
+.hero__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hero__name {
+  margin: 0;
+  color: inherit;
+  font: var(--text-h2);
+  text-transform: uppercase;
+}
+
+.hero__role {
+  margin: 0;
+  font: var(--text-body-large);
+}
+
+.hero__tagline {
+  margin: 0;
+  font: var(--text-body);
+  font-family: var(--font-heading);
+  text-wrap: balance;
+}
+
+/* The quieter middle of the quote (_words_ in the CMS): smaller and Light */
+.hero__tagline .text-light {
+  font-size: 0.8em;
+  font-weight: var(--font-light);
+}
+
+.hero__cta {
+  margin: 0;
+}
+
+/* The white slant: tall on the left, a point on the right (Figma Rectangle 8, mirrored). Over the
+   photo and its scrim, under the agent, the text and the slash. */
+.hero__edge {
   position: absolute;
-  inset: 0;
-  z-index: 4; /* above the hero photo and its travelling copy */
-  pointer-events: none;
+  inset: auto 0 0;
+  z-index: 1;
+  height: var(--space-8);
+  background: var(--brand-surface);
+  clip-path: polygon(0 0, 100% 96%, 100% 100%, 0 100%);
 }
 
-.hero__stripe {
-  position: absolute;
-  inset: 0;
-}
-
-/* Primary Red stripe: solid, from the band's left edge to where the dark band starts (1px overlap avoids a hairline) */
-.hero__stripe--red {
-  background: var(--color-primary-red);
-  clip-path: polygon(
-    calc(var(--slash-left) + var(--slash-lean)) 0,
-    calc(var(--slash-right) + var(--slash-lean) + 1px) 0,
-    calc(var(--slash-right) + 1px) 100%,
-    var(--slash-left) 100%
-  );
-}
-
-/* Dark Red fills everything to the right of the red stripe, no fade */
-.hero__stripe--dark {
-  background: var(--color-dark-red);
-  clip-path: polygon(
-    calc(var(--slash-right) + var(--slash-lean)) 0,
-    calc(var(--slash-right) + var(--slash-lean) + 100vw) 0,
-    calc(var(--slash-right) + 100vw) 100%,
-    var(--slash-right) 100%
-  );
-}
-
-/* Phones and tablet portrait (wireframe): agent in the top half, a short slash band across the
-   middle, signature block right-aligned at the bottom right. The photo is cut along the band's
-   red stripe, so the agent stays on his side of the slash. */
-@media (width <= 767.98px) {
-  .stage {
-    --hero-height: clamp(560px, 100svh, 900px);
-    --photo-height: min(var(--hero-height) * 0.62, var(--wrap) * 1.25);
-    --photo-x: calc(var(--photo-width) * -0.62);
-    --agent-top: calc(var(--header-height) + 8px);
-    --name-size: 1.75rem;
-    --signature-width: 80px;
-
-    /* Band: vertical span and position. Its centre sits on the page centre. */
-    --band-y1: calc(var(--hero-height) * 0.3);
-    --band-y2: calc(var(--hero-height) * 0.7);
-    --band-lean: calc((var(--band-y2) - var(--band-y1)) * tan(var(--slash-angle)));
-    --band-off: calc((var(--band-lean) + 40px) / -2); /* bottom-left x, from the centre */
-
-    /* red stripe's right edge */
-    --band-roff: calc(var(--band-off) + 40px * var(--slash-red-ratio));
-
-    /* About starts below the header and the notch */
-    --about-top: calc(var(--header-height) + var(--safe-top));
+@media (width >= 1024px) {
+  .hero__lockup {
+    gap: var(--space-8);
+    padding-top: calc(var(--header-height) + var(--space-16));
   }
 
-  /* Cut along the line of the band's red stripe, extended over the whole hero */
-  .hero__figure {
-    clip-path: polygon(
-      0 0,
-      calc(50% + var(--band-roff) + var(--band-y2) * tan(var(--slash-angle))) 0,
-      calc(50% + var(--band-roff) - (var(--hero-height) - var(--band-y2)) * tan(var(--slash-angle)))
-        100%,
-      0 100%
-    );
+  .hero__name {
+    font: var(--text-display);
   }
 
-  .hero__id {
-    left: auto;
-    right: 0;
-    bottom: 24px;
-    max-width: min(100%, 22rem);
-    text-align: right;
-  }
-
-  .hero__signature {
-    margin-left: auto;
-  }
-}
-
-/* Phones only: no agent in the hero (he appears directly in About). The side image fills the
-   hero, the name block is centred like on desktop, in white over a dark scrim, and a slash rises
-   from the bottom right at the fixed 27.5° with solid Dark Red to its right. It scrolls away with
-   the hero. */
-@media (width <= 767.98px) {
-  .stage {
-    --hero-height: 100lvh;
-  } /* the large viewport, so About never shows behind the browser bars */
-  .hero__figure {
-    display: none;
-  }
-
-  /* Band layer: over the scrim, under the text, full hero. At the top of the page the hero's bottom
-     is the viewport's: the red stripe passes 8px clear of the burger's circle, which then sits
-     unseen in the Dark Red. */
-  .hero__band {
-    z-index: 1;
-
-    --slash-right: calc(
-      100% - var(--menu-circle-right) - var(--menu-circle-bottom) * tan(var(--slash-angle)) -
-        (var(--menu-circle-size) / 2 + 8px) / cos(var(--slash-angle))
-    );
-    --slash-left: calc(var(--slash-right) - 14px);
-  }
-
-  .hero__id {
-    inset: 50% 0 auto;
-    transform: translateY(-50%);
-    max-width: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    color: var(--brand-on-dark);
-  }
-
-  .hero__name,
-  .hero__tagline,
   .hero__role {
-    color: var(--brand-on-dark);
+    font: var(--text-h3);
   }
 
-  .hero__signature {
-    margin: 0 0 12px;
-  }
-}
-
-/* From 768px: full-screen image, text on the left in white, agent on the right, a thin Primary Red
-   line with a solid Dark Red triangle to its right, over him. Stacking: image (0), scrim (1), agent
-   and its travelling copy (3), slash (4), text (6). It starts below the header and leaves by the right edge. */
-@media (width >= 768px) {
-  .stage {
-    --hero-height: max(560px, 100svh);
+  .hero__tagline {
+    font-size: 1.62rem;
+    line-height: 1.2;
   }
 
   .hero__figure {
-    z-index: 3;
-  }
-
-  .hero__band {
-    inset: calc(var(--header-height) + var(--safe-top)) 0 0;
-
-    --band-height: calc(var(--hero-height) - var(--header-height) - var(--safe-top));
-  }
-
-  /* The text block is centred on the page (Figma: 14px left of centre). On narrower screens it moves
-     left so it never runs past the agent's left side (his photo has a transparent margin of about 12%). */
-  .hero__inner {
-    z-index: 6;
-    position: absolute;
-    inset: 0;
-    width: auto;
-    margin: 0;
-
-    --text-right: calc(50% + var(--photo-x) + var(--photo-width) * 0.12);
-    --text-width: min(32rem, var(--text-right) - var(--wrap-left));
-    --text-centre: min(50% - 14px, var(--text-right) - var(--text-width) / 2);
-  }
-
-  .hero__id {
-    inset: 46% auto auto var(--text-centre);
-    transform: translate(-50%, -50%); /* not translate: the scroll fade below animates that */
-    width: var(--text-width);
-    max-width: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .hero__signature {
-    margin: 0 0 clamp(8px, 3svh, 24px);
-  }
-
-  .hero__id,
-  .hero__name,
-  .hero__tagline,
-  .hero__role {
-    color: var(--brand-on-dark);
-  }
-
-  /* The logo file has clear space built into its canvas: pull it back so the R sits on the content's left edge */
-  .brand {
-    margin-left: calc(var(--logo-height) * -0.24);
-  }
-
-  /* Header: menu on the right, next to the icons and language; language without its white chip */
-  .site-nav {
-    margin-left: auto;
-  }
-
-  .site-header__tools {
-    margin-left: 0;
-  }
-
-  /* Icons take no space until they appear, so the menu sits right next to EN at the top */
-  .contact-icons--header {
-    display: none;
-  }
-
-  [data-past-hero] .contact-icons--header,
-  body:not(.home) .contact-icons--header {
-    display: flex;
-  }
-
-  .lang-switch {
-    background: none;
-  }
-
-  /* Over the hero: transparent, cream logo, white menu. From About on: white, dark logo. */
-  body.home .site-header {
-    transition: background-color 0.3s;
-  }
-
-  body.home .site-header[data-past-hero] {
-    background: var(--brand-surface);
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand {
-    color: var(--color-cream);
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand__logo {
-    display: none;
-  }
-
-  body.home .site-header:not([data-past-hero]) .brand__logo--light {
     display: block;
   }
 
-  body.home .site-header:not([data-past-hero]) .site-nav a:not(.btn),
-  body.home .site-header:not([data-past-hero]) .lang-switch {
-    color: var(--brand-on-dark);
+  .hero__edge {
+    height: 5vw;
   }
-}
 
-/* Portrait tablet: a slightly smaller agent, so the text keeps room on the left */
-@media (width >= 768px) and (width <= 991.98px) {
-  .stage {
-    --photo-height: calc(var(--hero-height) * 0.7);
+  /* The slash: its bottom-left corner --band-offset from the right edge, leaning right at the fixed
+     angle as it rises; an 11px Primary Red line, then Dark Red to the edge. js/site.ts moves the band
+     out to the right as the hero scrolls away. */
+  .hero__band {
+    --band-offset: 297px;
+
+    position: absolute;
+    inset: var(--space-20) 0 0 calc(100% - var(--band-offset));
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .hero__slash {
+    position: absolute;
+    inset: 0 calc(-1 * var(--band-offset)) 0 0;
+    border-left: 11px solid var(--color-primary-red);
+    background: var(--color-dark-red);
+    transform: skewX(calc(-1 * var(--slash-angle)));
+    transform-origin: bottom left;
   }
 }
 
@@ -1223,11 +919,6 @@ body:not(.home) .contact-icons--header {
    Phones: the title on top, the agent below it, the text over his lower half, right-aligned.
    Everything sits in .about__pin, which holds on screen while the story plays (About story, below).
    ========================================================================== */
-.services,
-.properties {
-  padding-block: clamp(48px, 8vw, 96px);
-}
-
 .about {
   --story-scroll-step: 20svh; /* the short scroll that plays each part (About story, below) */
 
@@ -1289,15 +980,13 @@ body:not(.home) .contact-icons--header {
 /* Phones (Figma: iPhone 18 Pro 1-4): the agent fills the space under the title, down to where the
    text must stop for the burger's circle. The text gathers at his feet and pushes up as it grows. A
    white overlay with a background blur rises over him with the story (About story, below). */
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .about {
     /* h2 line plus its gap below */
     --about-title-space: calc(1.8125rem * 1.14 + 8px);
 
     /* Bottom of the text: 8px above the burger's circle */
-    --about-text-clear: calc(
-      var(--menu-circle-inset) + var(--menu-circle-size) + 8px + var(--safe-bottom)
-    );
+    --about-text-clear: calc(var(--burger-inset) + var(--burger-size) + 8px + var(--safe-bottom));
   }
 
   .about__pin {
@@ -1349,7 +1038,7 @@ body:not(.home) .contact-icons--header {
   .about__media::after {
     content: "";
     position: absolute;
-    inset: auto calc(-1 * var(--gutter)) -2px;
+    inset: auto calc(-1 * var(--page-margin)) -2px;
     z-index: 1;
     height: 94%;
   }
@@ -1391,7 +1080,7 @@ body:not(.home) .contact-icons--header {
 }
 
 /* Short phone screens (landscape): no room for the text over him. The title, the agent, the text. */
-@media (width <= 767.98px) and (height < 600px) {
+@media (width <= 1023.98px) and (height < 600px) {
   .about__media {
     position: relative;
     inset: auto;
@@ -1409,7 +1098,7 @@ body:not(.home) .contact-icons--header {
   }
 }
 
-@media (width >= 768px) {
+@media (width >= 1024px) {
   .about {
     --story-scroll-step: 25svh;
   }
@@ -1433,7 +1122,7 @@ body:not(.home) .contact-icons--header {
   }
 
   .about__body {
-    width: min(43rem, 50vw + var(--photo-x) - var(--wrap-left) - 64px);
+    width: min(43rem, 50vw + var(--photo-x) - var(--content-edge-viewport) - 64px);
     text-align: right;
   }
 }
@@ -1463,170 +1152,333 @@ body:not(.home) .contact-icons--header {
 }
 
 /* ==========================================================================
-   Services: white. Desktop: two rows; one continuous slash at the fixed 27.5° runs through both,
-   crossing the row boundary at the page centre. The looking row has its photo right of the slash,
-   the selling row left of it. A solid Dark Blue band covers the cut. Phones: image, then text.
+   About story (js/site.ts, with GSAP: it animates the text, the photo change and the phone overlay,
+   and sets data-story on .stage: start, paramedic, agent, done). Here only the layout it needs.
+   Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
+   ========================================================================== */
+
+/* The pin sits after a runway (::before) and sticks by its bottom edge: it holds on screen while
+   the runway scrolls by, four steps (one to part 2, one more to part 3, then two to read). On
+   phones, once the text grows taller than the screen, the newest lines stay in view and the first
+   ones move up. Short screens (phones in landscape) are not pinned. */
+@media (height >= 600px) {
+  .stage[data-story] .about::before {
+    content: "";
+    display: block;
+    height: calc(4 * var(--story-scroll-step));
+  }
+
+  .stage[data-story] .about__pin {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+@media (width >= 1024px) and (height >= 600px) {
+  .stage[data-story] .about__pin {
+    height: var(--hero-height);
+    padding-block: calc(var(--header-height) + var(--safe-top)) calc(24px + var(--safe-bottom));
+  }
+}
+
+/* The paramedic photo and the agent again, stacked on the agent while the story plays */
+.stage[data-story] .agent-photos--swap .agent-photos__layer--paramedic,
+.stage[data-story] .agent-photos--swap .agent-photos__layer--return {
+  display: flex;
+}
+
+/* A block reached with the keyboard shows in full, whatever the scroll (over GSAP's inline styles) */
+.stage[data-story] .about__step:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text takes its height as it comes in,
+   pushing the ones above it up, so it is clipped while it grows. The overlay's three shares (from 0
+   to 1, set by js/site.ts): none at first; with part 1 over his lower 61%; with part 2 over all of
+   him; with the link and contact the white base comes in under it. */
+@media (width <= 1023.98px) and (height >= 600px) {
+  .stage[data-story] .about__stack .about__step {
+    overflow: clip;
+  }
+
+  /* Fully in, or reached with the keyboard: its own height, unclipped */
+  .stage[data-story] .about__stack .about__step:is([data-story-shown], :focus-within) {
+    height: auto !important;
+    overflow: visible;
+  }
+
+  .stage[data-story] .about__media::before {
+    opacity: var(--overlay-base, 1);
+  }
+
+  .stage[data-story] .about__media::after {
+    height: calc(61% * var(--overlay-first, 1) + (39% + 12px) * var(--overlay-second, 1));
+  }
+}
+
+/* ==========================================================================
+   Desktop: the agent stays still while the hero scrolls up and About rises under him. A pinned copy
+   holds his hero position until the end of About, then scrolls up with it; the hero photo and the
+   About card stay invisible and only hold his place. The copy sits between the hero's image (0) and
+   its slash (4), as the hero photo does. Reduced motion: the hero photo and the About card show.
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) and (width >= 1024px) {
+  .stage {
+    position: relative;
+  }
+
+  .stage__track {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .stage__pin {
+    position: sticky;
+    top: 0;
+    height: var(--hero-height);
+    overflow: clip;
+  }
+
+  .stage__agent {
+    position: absolute;
+    top: var(--agent-top);
+    left: calc(50% + var(--photo-x));
+    width: var(--photo-width);
+    height: var(--photo-height);
+  }
+
+  .hero__photo,
+  .about__card {
+    visibility: hidden;
+  }
+}
+
+/* ==========================================================================
+   Services (Figma services): a tilted grey surface behind two blocks, buy then sell. Each block has
+   a tilted picture and its text. Desktop: picture and text side by side, the sell block mirrored.
+   Phones: the picture rests at the screen edge, 32px of it showing, the text clear of it.
    ========================================================================== */
 .services {
-  background: var(--brand-surface);
+  --services-tilt: 2.05deg;
+
+  position: relative;
+  overflow-x: clip;
+  padding-block: var(--space-24);
 }
 
-.services__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.services__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding-block: 0;
 }
 
-.service__media img {
+.services::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-neutral-50);
+  transform: skewY(calc(-1 * var(--services-tilt)));
+}
+
+.service {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.service__media {
+  position: absolute;
+  inset-block: 0;
+  left: calc(var(--space-8) - var(--page-margin) - 210px);
+  width: 210px;
+  height: 320px;
+  margin-block: auto;
+}
+
+.service--sell .service__media {
+  left: auto;
+  right: calc(var(--space-8) - var(--page-margin) - 210px);
+}
+
+.service__image {
   width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
+  border-radius: var(--radius-picture);
+  box-shadow: 0 var(--space-6) var(--space-12) var(--brand-shadow-strong);
+  rotate: 4.47deg;
 }
 
-.service__title {
-  margin: 0 0 16px;
-  font-size: clamp(1.5rem, 2.45vw, 2.1875rem);
-  font-weight: var(--font-regular);
-  line-height: 1.15;
+.service--sell .service__image {
+  rotate: -4.47deg;
 }
 
 .service__text {
-  margin: 0 0 clamp(24px, 4vw, 56px);
-}
-
-.service__links {
   display: flex;
   flex-direction: column;
-  margin: 0 0 clamp(24px, 4vw, 64px);
-  line-height: 1.3;
+  align-items: flex-start;
+  gap: var(--space-8);
+  width: 100%;
+  padding-left: calc(var(--space-16) - var(--page-margin));
 }
 
-.service__links a {
-  font-weight: var(--font-regular);
+.service--sell .service__text {
+  align-items: flex-end;
+  padding: 0 calc(var(--space-16) - var(--page-margin)) 0 0;
+  text-align: right;
+}
+
+.service__title {
+  margin: 0;
+  font: var(--text-h3);
+}
+
+.service__body {
+  margin: 0;
+  font: var(--text-body);
 }
 
 .service__action {
   margin: 0;
 }
 
-@media (width <= 767.98px) {
-  .services__list {
-    display: grid;
-    gap: 56px;
+.service__links {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  margin: 0;
+}
+
+.service__links a {
+  font: var(--text-link);
+}
+
+@media (width >= 1024px) {
+  .services {
+    --services-tilt: 3.3deg;
+
+    overflow-x: visible;
+    padding-block: var(--space-32);
   }
 
-  .service__media {
-    margin-bottom: 24px;
-    aspect-ratio: 16 / 9;
-    background: var(--brand-placeholder);
-  }
-
-  .service__media:empty {
+  .services::before {
     display: none;
   }
 
-  .service__content {
-    width: min(var(--wrap-max), 100% - var(--wrap-left) - var(--gutter));
-    margin-left: var(--wrap-left);
-  }
-}
-
-@media (width >= 768px) {
-  .services {
-    position: relative;
+  .services__content {
+    gap: 0;
   }
 
-  /* The heading sits in the white top-left corner of the first row */
-  .services__head {
+  /* One surface across the container, rounded */
+  .services__content::before {
+    content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    margin-top: 0;
-    pointer-events: none;
-  }
-
-  .services__list {
-    --row-height: clamp(440px, 42vw, 640px);
-    --lean: calc(var(--row-height) * tan(var(--slash-angle)));
-    --band: 14px;
+    inset: var(--space-16) 0 var(--space-12);
+    border-radius: var(--radius-picture);
+    background: var(--color-neutral-50);
+    transform: skewY(calc(-1 * var(--services-tilt)));
   }
 
   .service {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: var(--row-height);
+    gap: var(--space-6);
+  }
+
+  .service--sell {
+    flex-direction: row-reverse;
   }
 
   .service__media {
-    position: absolute;
-    inset: 0;
-    background: var(--brand-placeholder);
-  }
-
-  .service::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: var(--color-dark-blue);
-    pointer-events: none;
-  }
-
-  .service__content {
     position: relative;
-    z-index: 2;
-    padding-block: 48px;
+    inset: auto;
+    flex: 0 0 38.6%;
+    height: auto;
+    padding-block: var(--space-12);
   }
 
-  /* Looking: text left, photo right of the slash. The slash runs from 50% + lean at the top to 50% at the bottom.
-     Each photo box covers its side of the slash only, so the picture is not over-cropped. */
-  .service--search .service__media {
-    left: 50%;
-    clip-path: polygon(var(--lean) 0, 100% 0, 100% 100%, 0 100%);
-  }
-
-  .service--search::after {
-    clip-path: polygon(
-      calc(50% + var(--lean) - var(--band) / 2) 0,
-      calc(50% + var(--lean) + var(--band) / 2) 0,
-      calc(50% + var(--band) / 2) 100%,
-      calc(50% - var(--band) / 2) 100%
-    );
-  }
-
-  .service--search .service__content {
-    width: min(33.25rem, 50% - var(--wrap-left) - 48px);
-    margin-left: var(--wrap-left);
-  }
-
-  /* Selling: photo left of the slash (50% at the top to 50% - lean at the bottom), text right-aligned on the right */
   .service--sell .service__media {
-    right: 50%;
-    clip-path: polygon(0 0, 100% 0, calc(100% - var(--lean)) 100%, 0 100%);
+    right: auto;
   }
 
-  .service--sell::after {
-    clip-path: polygon(
-      calc(50% - var(--band) / 2) 0,
-      calc(50% + var(--band) / 2) 0,
-      calc(50% - var(--lean) + var(--band) / 2) 100%,
-      calc(50% - var(--lean) - var(--band) / 2) 100%
-    );
+  .service__image {
+    width: 88%;
+    height: auto;
+    aspect-ratio: 428 / 668;
+    margin-inline: auto;
   }
 
-  .service--sell .service__content {
-    align-self: end;
-    width: min(33.25rem, 50% - var(--gutter) - 48px);
-    margin-right: var(--wrap-left); /* mirrors the first row's left margin */
-    text-align: right;
+  .service__text {
+    flex: 1;
+    gap: var(--space-6);
+    padding: 0;
   }
 
-  .service--sell .service__links {
-    align-items: flex-end;
+  .service--sell .service__text {
+    padding: 0;
+  }
+
+  .service__title {
+    margin-bottom: var(--space-6);
+    font: var(--text-h1);
+  }
+
+  .service__body {
+    font: var(--text-body-large);
+  }
+}
+
+/* ==========================================================================
+   My properties (Figma properties): the title and three cards. Desktop: a row of three. Phones:
+   a rail to swipe, one card at a time.
+   ========================================================================== */
+.properties__container {
+  padding-block: var(--space-16);
+}
+
+.properties__title {
+  margin: 0 0 var(--space-8);
+  font: var(--text-h3);
+}
+
+.properties__cards {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0 calc(-1 * var(--page-margin)) var(--space-8);
+  padding-inline: var(--page-margin);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--page-margin);
+  scrollbar-width: none;
+}
+
+/* Each card */
+.properties__cards > * {
+  flex: 0 0 min(384px, 100%);
+  scroll-snap-align: start;
+}
+
+@media (width >= 1024px) {
+  .properties__container {
+    padding-block: var(--space-32);
+  }
+
+  .properties__title {
+    margin-bottom: var(--space-12);
+    font: var(--text-h1);
+  }
+
+  .properties__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
   }
 }
 
@@ -1683,21 +1535,23 @@ body:not(.home) .contact-icons--header {
 }
 
 /* ==========================================================================
-   My properties: grid on tablet and up, card list on phones.
+   Listing cards (Figma Property card): the photo fading into a Dark Charcoal Gray panel with white
+   text (15.9:1). The title link stretches over the card; "more info" sits above it, at the bottom.
    ========================================================================== */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-  gap: 40px clamp(24px, 3vw, 46px);
-  margin-bottom: 40px;
+  gap: var(--space-6);
+  margin-bottom: var(--space-12);
 }
 
-/* The photo and a Dark Charcoal panel with white text (15.9:1); the "more info" link sits under the panel */
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  background: var(--color-charcoal);
+  color: var(--brand-on-dark);
 }
 
 .card__media,
@@ -1707,7 +1561,6 @@ body:not(.home) .contact-icons--header {
 
 .card__media {
   position: relative;
-  background: var(--color-charcoal);
 }
 
 /* The photo fades into the panel over its lower 70px */
@@ -1733,9 +1586,9 @@ body:not(.home) .contact-icons--header {
   position: absolute;
   z-index: 1;
   pointer-events: none;
-  top: 12px;
-  left: 12px;
-  padding: 2px 12px;
+  top: var(--space-3);
+  left: var(--space-3);
+  padding: 2px var(--space-3);
   background: var(--brand-status);
   color: var(--brand-on-dark);
   font-size: 0.75rem;
@@ -1743,23 +1596,22 @@ body:not(.home) .contact-icons--header {
 }
 
 .card__body {
-  padding: 24px 21px;
-  background: var(--color-charcoal);
-  color: var(--brand-on-dark);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-6) 0;
 }
 
-.card__number {
+.card__number,
+.card__meta {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.2;
+  font: var(--text-body-small);
 }
 
 .card__title {
-  margin: 36px 0 6px;
+  margin: 0 0 calc(var(--space-8) - var(--space-3));
   color: inherit;
-  font-size: 1rem;
-  font-weight: var(--font-bold);
-  line-height: 1.25;
+  font: var(--text-label);
 }
 
 .card__title a,
@@ -1783,34 +1635,25 @@ body:not(.home) .contact-icons--header {
   outline-offset: 2px;
 }
 
-.card__meta {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1.3;
-}
-
 .card__price {
-  margin: 8px 0 0;
-  font-family: var(--font-heading);
-  font-size: 1.1875rem;
-  line-height: 1.25;
-  font-weight: var(--font-bold);
+  margin: 0;
+  font: var(--text-h3);
 }
 
 .card__facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 14px;
-  margin: 12px 0 0;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.75rem;
+  font: var(--text-body-small);
 }
 
 .card__facts li {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
 }
 
 .card__icon {
@@ -1822,32 +1665,28 @@ body:not(.home) .contact-icons--header {
   height: 18px;
 }
 
-/* Above the title link stretched over the card. The button needs JS; without it, the noscript link shows.
-   Looks like a link: phone icon and underlined Dark Red text. */
+/* Above the title link stretched over the card. The button needs JS; without it, the noscript link shows. */
 .card__more {
   position: relative;
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-2);
   min-height: 44px;
-  margin-top: 16px;
+  margin: var(--space-6) var(--space-6) var(--space-6);
   padding: 0;
   border: 0;
   background: none;
-  color: var(--brand-button);
-  font: inherit;
-  font-weight: var(--font-regular);
-  line-height: 1.41;
+  color: var(--brand-on-dark);
+  font: var(--text-link);
   text-align: left;
   cursor: pointer;
 }
 
 .card__more svg {
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  color: var(--brand-ink);
+  width: 20px;
+  height: 20px;
 }
 
 .card__more span {
@@ -1856,7 +1695,7 @@ body:not(.home) .contact-icons--header {
 }
 
 .card__more:hover {
-  color: var(--brand-link-hover);
+  color: var(--color-cream);
 }
 
 html:not(.js) button.card__more {
@@ -1871,6 +1710,7 @@ html:not(.js) button.card__more {
 @media (prefers-reduced-motion: reduce) {
   .btn,
   .btn--cta,
+  .btn--dark,
   .btn--outline {
     transition: none;
   }
@@ -1894,11 +1734,11 @@ html:not(.js) button.card__more {
 }
 
 /* Phones: one column, its end clear of the burger's circle */
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .site-footer__inner {
     grid-template-columns: 1fr;
     gap: 28px;
-    padding-bottom: calc(var(--menu-circle-inset) + var(--menu-circle-size) + 8px);
+    padding-bottom: calc(var(--burger-inset) + var(--burger-size) + var(--space-2));
   }
 }
 
@@ -1982,113 +1822,3 @@ html:not(.js) button.card__more {
   object-fit: cover;
   border-radius: var(--brand-radius);
 }
-
-/* ==========================================================================
-   About story (js/site.ts, with GSAP: it animates the text, the photo change and the phone overlay,
-   and sets data-story on .stage: start, paramedic, agent, done). Here only the layout it needs.
-   Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
-   ========================================================================== */
-
-/* The pin sits after a runway (::before) and sticks by its bottom edge: it holds on screen while
-   the runway scrolls by, four steps (one to part 2, one more to part 3, then two to read). On
-   phones, once the text grows taller than the screen, the newest lines stay in view and the first
-   ones move up. Short screens (phones in landscape) are not pinned. */
-@media (height >= 600px) {
-  .stage[data-story] .about::before {
-    content: "";
-    display: block;
-    height: calc(4 * var(--story-scroll-step));
-  }
-
-  .stage[data-story] .about__pin {
-    position: sticky;
-    bottom: 0;
-  }
-}
-
-@media (width >= 768px) and (height >= 600px) {
-  .stage[data-story] .about__pin {
-    height: var(--hero-height);
-    padding-block: calc(var(--header-height) + var(--safe-top)) calc(24px + var(--safe-bottom));
-  }
-}
-
-/* The paramedic photo and the agent again, stacked on the agent while the story plays */
-.stage[data-story] .agent-photos--swap .agent-photos__layer--paramedic,
-.stage[data-story] .agent-photos--swap .agent-photos__layer--return {
-  display: flex;
-}
-
-/* A block reached with the keyboard shows in full, whatever the scroll (over GSAP's inline styles) */
-.stage[data-story] .about__step:focus-within {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-/* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text takes its height as it comes in,
-   pushing the ones above it up, so it is clipped while it grows. The overlay's three shares (from 0
-   to 1, set by js/site.ts): none at first; with part 1 over his lower 61%; with part 2 over all of
-   him; with the link and contact the white base comes in under it. */
-@media (width <= 767.98px) and (height >= 600px) {
-  .stage[data-story] .about__stack .about__step {
-    overflow: clip;
-  }
-
-  /* Fully in, or reached with the keyboard: its own height, unclipped */
-  .stage[data-story] .about__stack .about__step:is([data-story-shown], :focus-within) {
-    height: auto !important;
-    overflow: visible;
-  }
-
-  .stage[data-story] .about__media::before {
-    opacity: var(--overlay-base, 1);
-  }
-
-  .stage[data-story] .about__media::after {
-    height: calc(61% * var(--overlay-first, 1) + (39% + 12px) * var(--overlay-second, 1));
-  }
-}
-
-/* ==========================================================================
-   Desktop: the agent stays still while the hero scrolls up and About rises under him. A pinned copy
-   holds his hero position until the end of About, then scrolls up with it; the hero photo and the
-   About card stay invisible and only hold his place. The copy sits between the hero's image (0) and
-   its slash (4), as the hero photo does. Reduced motion: the hero photo and the About card show.
-   ========================================================================== */
-@media (prefers-reduced-motion: no-preference) and (width >= 768px) {
-  .stage {
-    position: relative;
-  }
-
-  .stage__track {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  .stage__pin {
-    position: sticky;
-    top: 0;
-    height: var(--hero-height);
-    overflow: clip;
-  }
-
-  .stage__agent {
-    position: absolute;
-    top: var(--agent-top);
-    left: calc(50% + var(--photo-x));
-    width: var(--photo-width);
-    height: var(--photo-height);
-  }
-
-  .hero__photo,
-  .about__card {
-    visibility: hidden;
-  }
-}
-
-/* Every keyframe (page-circle-follow) states its translate as a value, never "none" or left
-   implicit: iOS 26 Safari runs these animations off the main thread and crashes blending "none"
-   with a value. */

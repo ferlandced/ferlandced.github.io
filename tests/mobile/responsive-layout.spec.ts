@@ -95,8 +95,13 @@ test("burger and open menu stay inside the safe area", async ({ page, safeAreaIn
   await expectInside(page.locator(".nav-toggle"), rect, "the burger");
   await page.locator(".nav-toggle").click();
   await expect(page.locator(".site-nav")).toBeVisible();
-  // The menu scrolls on short landscape screens, so its scroll box is what must fit
-  await expectInside(page.locator(".site-nav"), rect, "the menu");
+  // The menu covers the screen; what it holds stays clear of the notch and the home indicator
+  for (const [index, item] of (await page.locator(".site-nav > :visible").all()).entries()) {
+    await item.evaluate((element) => {
+      element.scrollIntoView({ block: "center", behavior: "instant" });
+    });
+    await expectInside(item, rect, `menu item ${index + 1}`);
+  }
 });
 
 test("dialogs: close button and the form's buttons stay inside the safe area", async ({
@@ -180,204 +185,34 @@ test.describe("iOS runways", () => {
   });
 });
 
-/** How far the page circle's box reaches past the viewport's top and bottom, in px. */
-const pageCircleOverhang = (page: Page) =>
-  page.evaluate(() => {
-    const shape = document.querySelector(".page-circle__shape");
-    if (!shape) {
-      throw new Error("Expected the page circle");
-    }
-    const box = shape.getBoundingClientRect();
-    return [Math.round(-box.top), Math.round(box.bottom - innerHeight)];
-  });
-
-test("the page circle follows the scroll and reaches past the viewport's edges", async ({
-  page,
-}) => {
-  for (const path of ["fr/", contactPage]) {
-    await page.goto(path);
-    await expect(page.locator(".page-circle")).toBeVisible();
-    const end = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
-    for (const top of [0, Math.round(end / 2), end]) {
-      await page.evaluate((top) => {
-        window.scrollTo({ top, behavior: "instant" });
-      }, top);
-      await expect
-        .poll(() => pageCircleOverhang(page), { message: `${path} scrolled to ${top}` })
-        .toEqual([160, 160]);
-    }
-  }
-});
-
-test("the fixed circle stays off the viewport's top and bottom edges, closed and open", async ({
-  page,
-}) => {
-  await page.goto(contactPage);
-  const edgeGaps = () =>
-    page.locator(".menu-circle").evaluate((circle) => {
-      const box = circle.getBoundingClientRect();
-      return [Math.round(box.top), Math.round(innerHeight - box.bottom)];
-    });
-  expect(await edgeGaps()).toEqual([6, 6]);
-  await page.locator(".nav-toggle").click();
-  await expect(page.locator(".site-nav")).toBeVisible();
-  expect(await edgeGaps()).toEqual([6, 6]);
-});
-
-test("open, the circle holds the whole menu and leaves the top left of the page", async ({
-  page,
-}) => {
-  for (const path of ["fr/", contactPage]) {
-    await page.goto(path);
-    await page.locator(".nav-toggle").click();
-    await expect(page.locator(".site-nav")).toBeVisible();
-    const reach = await page.evaluate(() => {
-      const toggleBox = document.querySelector(".nav-toggle")?.getBoundingClientRect();
-      const navBox = document.querySelector(".site-nav")?.getBoundingClientRect();
-      if (!toggleBox || !navBox) {
-        throw new Error("Expected the burger and the menu");
-      }
-      const radius = Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--menu-circle-radius"),
-      );
-      const centreX = toggleBox.left + toggleBox.width / 2;
-      const centreY = toggleBox.top + toggleBox.height / 2;
-      return {
-        menuCorner: radius - Math.hypot(centreX - navBox.left, centreY - navBox.top),
-        screenCorner: Math.hypot(centreX, centreY) - radius,
-      };
-    });
-    expect(reach.menuCorner, `${path}: the menu's farthest corner inside`).toBeGreaterThanOrEqual(
-      24,
-    );
-    expect(reach.screenCorner, `${path}: the screen's top left outside`).toBeGreaterThan(0);
-  }
-});
-
-const DARK_RED = [102, 0, 0];
-
-/**
- * The colours on screen at points around the burger's centre: `distance` px away, every 15°.
- * Points off the screen are left out.
- */
-const coloursAroundBurger = async (page: Page, distance: number) => {
-  const burger = present(await page.locator(".nav-toggle").boundingBox(), "the burger");
-  const shot = (await page.screenshot({ scale: "css", animations: "allow" })).toString("base64");
-  return page.evaluate(
-    async ([shot, burger, distance]) => {
-      const image = new Image();
-      image.src = `data:image/png;base64,${shot}`;
-      await image.decode();
-      const canvas = new OffscreenCanvas(image.width, image.height);
-      const context = canvas.getContext("2d");
-      if (!context) {
-        throw new Error("No 2D canvas context");
-      }
-      context.drawImage(image, 0, 0);
-      const { data } = context.getImageData(0, 0, image.width, image.height);
-      const centreX = burger.x + burger.width / 2;
-      const centreY = burger.y + burger.height / 2;
-      const colours: number[][] = [];
-      for (let degrees = 0; degrees < 360; degrees += 15) {
-        const radians = (degrees * Math.PI) / 180;
-        const x = Math.round(centreX + distance * Math.cos(radians));
-        const y = Math.round(centreY + distance * Math.sin(radians));
-        if (x >= 0 && y >= 0 && x < image.width && y < image.height) {
-          const index = (y * image.width + x) * 4;
-          colours.push(Array.from(data.subarray(index, index + 3)));
-        }
-      }
-      return colours;
-    },
-    [shot, burger, distance] as const,
-  );
-};
-
-test("at the top of home the burger's circle sits unseen in the slash's Dark Red", async ({
-  page,
-}) => {
-  await page.goto("fr/");
-  const burger = present(await page.locator(".nav-toggle").boundingBox(), "the burger");
-  // 7px outside the circle: still Dark Red, so the red stripe stays at least that far away
-  const ring = await coloursAroundBurger(page, burger.width / 2 + 7);
-  expect(ring.length, "points on screen").toBeGreaterThan(8);
-  for (const colour of ring) {
-    expect(colour, "Dark Red all around the circle").toEqual(DARK_RED);
-  }
-  // Inside it, between the bars and its edge: the blur under the 80% fill brings at most a trace
-  // of the red stripe (measured: 5 units of red at the edge nearest it), too little to see
-  for (const colour of await coloursAroundBurger(page, burger.width / 2 - 4)) {
-    colour.forEach((channel, index) => {
-      expect(
-        Math.abs(channel - (DARK_RED[index] ?? 0)),
-        "Dark Red inside the circle",
-      ).toBeLessThanOrEqual(6);
-    });
-  }
-});
-
-/** WCAG contrast of white on an sRGB colour. */
-const contrastWithWhite = (colour: number[]) => {
-  const linear = colour.map((channel) => {
-    const value = channel / 255;
-    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-  const [red = 0, green = 0, blue = 0] = linear;
-  return 1.05 / (0.2126 * red + 0.7152 * green + 0.0722 * blue + 0.05);
-};
-
-test("past the hero the slash has scrolled away and the circle keeps the burger visible", async ({
-  page,
-}) => {
-  await page.goto("fr/");
-  await scrollPastHero(page);
-  const band = present(await page.locator(".hero__band").boundingBox(), "the hero's slash");
-  expect(band.y + band.height, "the slash is above the screen").toBeLessThanOrEqual(0);
-  const burger = present(await page.locator(".nav-toggle").boundingBox(), "the burger");
-  // Inside the circle, between the bars and its edge: Dark Red at 80% over the blurred page
-  for (const colour of await coloursAroundBurger(page, burger.width / 2 - 4)) {
-    const [red = 0, green = 0, blue = 0] = colour;
-    expect(red - Math.max(green, blue), "the circle reads as red").toBeGreaterThanOrEqual(60);
-    expect(contrastWithWhite(colour), "the white bars at AA").toBeGreaterThanOrEqual(4.5);
-  }
-  const outside = await coloursAroundBurger(page, burger.width / 2 + 4);
-  expect(
-    outside.some((colour) => colour.join() !== DARK_RED.join()),
-    "the page around it is not",
-  ).toBe(true);
-});
-
-// The page circle is a scroll-driven animation: with animations disabled it would sit at the page's top
-const asOnScreen = { animations: "allow" } as const;
-
 test.describe("screenshots", () => {
   test("home, top", async ({ page }) => {
     await page.goto("fr/");
-    await expect(page).toHaveScreenshot("home-top.png", asOnScreen);
+    await expect(page).toHaveScreenshot("home-top.png");
   });
 
   test("home, past the hero", async ({ page }) => {
     await page.goto("fr/");
     await scrollPastHero(page);
-    await expect(page).toHaveScreenshot("home-past-hero.png", asOnScreen);
+    await expect(page).toHaveScreenshot("home-past-hero.png");
   });
 
   test("menu open", async ({ page }) => {
     await page.goto("fr/");
     await page.locator(".nav-toggle").click();
     await expect(page.locator(".site-nav")).toHaveCSS("opacity", "1");
-    await expect(page).toHaveScreenshot("menu-open.png", asOnScreen);
+    await expect(page).toHaveScreenshot("menu-open.png");
   });
 
   test("form dialog", async ({ page }) => {
     await page.goto("fr/");
     await page.locator(".service__action a").first().click();
     await expect(page.locator("dialog.form-dialog[open]")).toBeVisible();
-    await expect(page).toHaveScreenshot("form-dialog.png", asOnScreen);
+    await expect(page).toHaveScreenshot("form-dialog.png");
   });
 
   test("contact page", async ({ page }) => {
     await page.goto(contactPage);
-    await expect(page).toHaveScreenshot("contact.png", asOnScreen);
+    await expect(page).toHaveScreenshot("contact.png");
   });
 });

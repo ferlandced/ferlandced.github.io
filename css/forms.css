@@ -18,7 +18,7 @@
   --form-padding: 32px;
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   :root {
     --form-padding: 20px;
   }
@@ -43,7 +43,7 @@
   box-shadow: 0 12px 40px var(--brand-shadow);
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .form-page .form-panel {
     margin: 0 calc(-1 * var(--form-padding));
     border: 0;
@@ -108,7 +108,7 @@ html:has(dialog.form-dialog[open]) {
   overflow: hidden;
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   dialog.form-dialog {
     width: 100%;
     height: 100dvh;
@@ -131,7 +131,7 @@ dialog.form-dialog--narrow {
   width: min(480px, 100% - 32px - var(--safe-left) - var(--safe-right));
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   dialog.form-dialog--narrow {
     width: 100%;
   }
@@ -240,7 +240,7 @@ dialog.form-dialog--narrow {
   max-width: 520px;
 }
 
-@media (width >= 768px) {
+@media (width >= 1024px) {
   .contact-page {
     grid-template-columns: auto minmax(0, 1fr);
     column-gap: 48px;
@@ -428,7 +428,7 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   align-items: start;
 } /* phone and extension share a line on every screen */
 
-@media (width >= 768px) {
+@media (width >= 1024px) {
   .form-row {
     grid-template-columns: 1fr 1fr;
   }
@@ -509,7 +509,7 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   min-width: 0;
 }
 
-@media (width >= 768px) {
+@media (width >= 1024px) {
   .form-tiles {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -579,7 +579,7 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   opacity: 1;
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .form-tiles {
     gap: 8px;
   }
@@ -740,7 +740,7 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   margin-right: auto;
 } /* step 1: Annuler on the left of Suivant, as in the mockup */
 
-@media (width >= 768px) {
+@media (width >= 1024px) {
   .form-cancel {
     margin-right: 0;
   }
@@ -772,7 +772,7 @@ form[data-wizard]:not([data-wizard-ready]) .form-step + .form-step {
   color: var(--brand-link-hover);
 }
 
-@media (width <= 767.98px) {
+@media (width <= 1023.98px) {
   .form-actions > * {
     flex: 1 1 auto;
   }

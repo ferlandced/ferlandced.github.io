@@ -126,19 +126,13 @@ test("theme colours come from the brand tokens", () => {
 });
 
 // The header, burger, menu, dialogs and footer are measured under emulated insets in
-// tests/mobile/. The About layout's inset rules are only checked here, in the CSS.
-test("safe-area insets reach the About layout", () => {
+// tests/mobile/. The page margin, which every section's content uses, is only checked here, in the CSS.
+test("safe-area insets reach the page margin on phones", () => {
   const css = fs.readFileSync("css/site.css", "utf8");
-  for (const rule of [
-    // The agent clear of a landscape notch; phones: About under the header and the notch, its text
-    // above the burger's circle (which sits above the home indicator); desktop: the held text clear of both
-    /--photo-x: calc\([^;]*var\(--safe-right\)\)/,
-    /--about-top: calc\(var\(--header-height\) \+ var\(--safe-top\)\)/,
-    /--about-text-clear: calc\([^;]*var\(--menu-circle-size\)[^;]*var\(--safe-bottom\)/,
-    /\.about__pin \{[^}]*padding-block: calc\(var\(--header-height\) \+ var\(--safe-top\)\)\s+calc\(24px \+ var\(--safe-bottom\)\)/,
-  ]) {
-    expect(css).toMatch(rule);
-  }
+  expect(css).toMatch(
+    /--page-margin: calc\(var\(--space-6\) \+ max\(var\(--safe-left\), var\(--safe-right\)\)\)/,
+  );
+  expect(css).toMatch(/\.container \{[^}]*padding: var\(--space-6\) var\(--page-margin\)/);
 });
 
 test("site root redirects to the French home page", async ({ page }) => {

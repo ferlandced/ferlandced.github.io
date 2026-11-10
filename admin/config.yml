@@ -61,13 +61,13 @@ collections:
             widget: object
             collapsed: true
             fields:
-              - { name: heading, label: "Titre de la section", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
+              - { name: heading, label: "Titre de la section", hint: "Pas affiché sur la page : lu seulement par les lecteurs d'écran.", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
               - name: search
                 label: "Chercher une propriété (achat ou location)"
                 widget: object
                 collapsed: false
                 fields:
-                  - { name: image, label: "Image", widget: image, required: false, hint: "Paysage, environ 1600 px de large, coupée en diagonale sur le site. Droits d'utilisation confirmés." }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Affichée en carte verticale inclinée, recadrée au centre : gardez le sujet au milieu. Environ 1600 px de large. Droits d'utilisation confirmés." }
                   - { name: imageAlt, label: "Description de l'image", widget: string, required: false, hint: "Laissez vide si l'image est décorative." }
                   - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
                   - { name: text, label: "Texte", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }
@@ -79,7 +79,7 @@ collections:
                 widget: object
                 collapsed: false
                 fields:
-                  - { name: image, label: "Image", widget: image, required: false, hint: "Paysage, environ 1600 px de large, coupée en diagonale sur le site. Droits d'utilisation confirmés." }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Affichée en carte verticale inclinée, recadrée au centre : gardez le sujet au milieu. Environ 1600 px de large. Droits d'utilisation confirmés." }
                   - { name: imageAlt, label: "Description de l'image", widget: string, required: false, hint: "Laissez vide si l'image est décorative." }
                   - { name: title, label: "Titre", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: string }, { name: en, label: "English", widget: string }] }
                   - { name: text, label: "Texte", widget: object, collapsed: false, fields: [{ name: fr, label: "Français", widget: text }, { name: en, label: "English", widget: text }] }

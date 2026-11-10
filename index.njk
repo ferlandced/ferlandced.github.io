@@ -21,29 +21,28 @@ translated: true
 <span class="agent-photos__layer agent-photos__layer--return"><img src="{{ photo }}" alt="" loading="lazy" decoding="async"></span>
 {%- endif %}
 {%- endmacro -%}
+{#- Sections follow the Figma wireframes (layer names as classes). Each one animates on its own, from
+    its own position (js/site.ts), so sections can be added, removed or reordered. -#}
 <main>
   {# The stage holds the hero and About. On desktop, with motion allowed, the agent photo in
      .stage__track stays still while the hero scrolls up and About rises under him. #}
   <div class="stage">
     <section class="hero" aria-labelledby="hero-name">
-      {# The image uses the CMS description; empty keeps it silent. Stripes are decorative. #}
-      <span class="hero__side">{% if home.hero.background %}<img src="{{ home.hero.background }}" alt="{{ home.hero.backgroundAlt }}" fetchpriority="high" decoding="async">{% endif %}</span>
-      <div class="hero__band">
-        <span class="hero__stripe hero__stripe--red" aria-hidden="true"></span>
-        <span class="hero__stripe hero__stripe--dark" aria-hidden="true"></span>
-      </div>
-      <div class="hero__inner">
-        <div class="hero__id">
-          {% if home.hero.signature %}<img class="hero__signature" src="{{ home.hero.signature }}" alt="" width="143" height="140">{% endif %}
+      {# The image uses the CMS description; empty keeps it silent #}
+      <div class="hero__side">{% if home.hero.background %}<img src="{{ home.hero.background }}" alt="{{ home.hero.backgroundAlt }}" fetchpriority="high" decoding="async">{% endif %}</div>
+      {% if photo %}<div class="hero__figure"><img class="hero__photo" src="{{ photo }}" alt="{{ home.hero.photoAlt }}" width="650" height="1156" fetchpriority="high"></div>{% endif %}
+      <div class="hero__lockup">
+        {% if home.hero.signature %}<img class="hero__signature" src="{{ home.hero.signature }}" alt="" width="143" height="140">{% endif %}
+        <div class="hero__identity">
           <h1 class="hero__name" id="hero-name">{{ agent.name }}</h1>
           <p class="hero__role">{{ agent.title[lang] }}</p>
-          <p class="hero__tagline">{{ home.hero.tagline | inlineMarkup | safe }}</p>
-          {# One action: the contact options, in a dialog with JS, on the Contact page without #}
-          <p class="hero__cta"><a class="btn btn--cta" href="{{ site.pages.contact[lang] }}" data-dialog="dialog-contact">{% include "icons/pen-line.svg" %}{{ home.hero.button }}</a></p>
         </div>
+        <p class="hero__tagline">{{ home.hero.tagline | inlineMarkup | safe }}</p>
+        {# One action: the contact options, in a dialog with JS, on the Contact page without #}
+        <p class="hero__cta"><a class="btn btn--cta" href="{{ site.pages.contact[lang] }}" data-dialog="dialog-contact">{% include "icons/pen-line.svg" %}{{ home.hero.button }}</a></p>
       </div>
-      {# Own layer so it can be cut along the slash on phones and tablets #}
-      {% if photo %}<div class="hero__figure"><img class="hero__photo" src="{{ photo }}" alt="{{ home.hero.photoAlt }}" fetchpriority="high"></div>{% endif %}
+      <div class="hero__band" aria-hidden="true"><div class="hero__slash"></div></div>
+      <div class="hero__edge" aria-hidden="true"></div>
     </section>
 
     {% if photo %}
@@ -82,46 +81,43 @@ translated: true
     </section>
   </div>
 
-  {# Two rows: the image is cut along one continuous slash running through both rows (desktop),
-     stacked image then text on phones. Each button opens its form in a dialog below, or the form page without JS. #}
+  {# Each button opens its form in a dialog below, or the form page without JS #}
   <section id="services" class="services" aria-labelledby="services-heading">
-    <div class="container services__head">
-      <h2 id="services-heading">{{ home.services.heading }}</h2>
-    </div>
-    <ul class="services__list">
+    <h2 class="visually-hidden" id="services-heading">{{ home.services.heading }}</h2>
+    <div class="container services__content">
       {% set services = [
-        { id: "search", form: "propertyAlert",
+        { id: "search", side: "buy", form: "propertyAlert",
           links: [{ label: home.services.search.buyLink, page: "buy" }, { label: home.services.search.rentLink, page: "rent" }] },
-        { id: "sell", form: "estimation",
+        { id: "sell", side: "sell", form: "estimation",
           links: [{ label: home.services.sell.sellLink, page: "sell" }] }
       ] %}
       {% for service in services %}{% set copy = home.services[service.id] %}
-      <li class="service service--{{ service.id }}">
-        <div class="service__media">{% if copy.image %}<img src="{{ copy.image }}" alt="{{ copy.imageAlt }}" loading="lazy" decoding="async">{% endif %}</div>
-        <div class="service__content">
+      <div class="service service--{{ service.side }}" data-service="{{ service.id }}">
+        <div class="service__media">{% if copy.image %}<img class="service__image" src="{{ copy.image }}" alt="{{ copy.imageAlt }}" width="428" height="668" loading="lazy" decoding="async">{% endif %}</div>
+        <div class="service__text">
           <h3 class="service__title">{{ copy.title }}</h3>
-          <p class="service__text">{{ copy.text }}</p>
+          <p class="service__body">{{ copy.text }}</p>
+          <p class="service__action"><a class="btn btn--dark" href="{{ site.pages[service.form][lang] }}" data-dialog="dialog-{{ service.form }}">{{ copy.button }}</a></p>
           <p class="service__links">{% for link in service.links %}<a href="{{ site.pages[link.page][lang] }}">{{ link.label }}</a>{% endfor %}</p>
-          <p class="service__action"><a class="btn btn--outline" href="{{ site.pages[service.form][lang] }}" data-dialog="dialog-{{ service.form }}">{{ copy.button }}</a></p>
         </div>
-      </li>
+      </div>
       {% endfor %}
-    </ul>
+    </div>
   </section>
 
   {% if listings.length %}
   <section id="properties" class="properties" aria-labelledby="properties-heading">
-    <div class="container">
-      <h2 id="properties-heading">{{ home.properties.heading }}</h2>
-      <div class="cards">
-        {% for item in listings | head(6) %}{% include "partials/listing-card.njk" %}{% endfor %}
+    <div class="container properties__container">
+      <h2 class="properties__title" id="properties-heading">{{ home.properties.heading }}</h2>
+      <div class="properties__cards">
+        {% for item in listings | head(3) %}{% include "partials/listing-card.njk" %}{% endfor %}
       </div>
-      {% if listings.length > 6 %}<p class="properties__all"><a class="btn btn--outline" href="/listings/">{{ home.properties.allButton }}</a></p>{% endif %}
+      {% if listings.length > 3 %}<p class="properties__all"><a class="btn btn--outline" href="/listings/">{{ home.properties.allButton }}</a></p>{% endif %}
     </div>
   </section>
   {% endif %}
 
-  {# Form dialogs, opened by the service buttons (see js/site.js). Full screen on phones. #}
+  {# Form dialogs, opened by the service buttons (see js/site.ts). Full screen on phones. #}
   {% for formKey, formFile in { propertyAlert: "property-alert", estimation: "estimation", writeMe: "write-me" } %}
   <dialog class="form-dialog" id="dialog-{{ formKey }}" aria-labelledby="dialog-{{ formKey }}-title">
     {% set titleTag = "h2" %}{% set titleId = "dialog-" ~ formKey ~ "-title" %}

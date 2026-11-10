@@ -1,5 +1,6 @@
-// Home page content: hero, contact links, About and its story, service buttons and info links,
-// the property cards, and the reduced-motion layout.
+// Home page: the content of each section (hero, About, services, property cards), the hero's
+// contrast, and the animations: each reveal plays once, from its own section, and never hides
+// content again; reduced motion and no JS show everything in place.
 import type { Locator, Page } from "@playwright/test";
 import { test, expect, present } from "./support/fixtures.ts";
 import { site, agent, listings, copyFor, url, languages, pageUrl, textAt } from "./support/site.ts";
@@ -20,6 +21,75 @@ const scrollToY = (page: Page, y: number) =>
       }),
     y,
   );
+
+/** Scrolls down the whole page in screen-sized steps, as a visitor would. */
+const scrollThroughPage = async (page: Page) => {
+  const { end, step } = await page.evaluate(() => ({
+    end: document.documentElement.scrollHeight,
+    step: Math.round(innerHeight / 3),
+  }));
+  for (let y = 0; y <= end; y += step) {
+    await scrollToY(page, y);
+  }
+};
+
+/** The sections of the page, in order: their id, or their class without one. */
+const sectionOrder = (page: Page) =>
+  page
+    .locator("main > section, main > .stage > section")
+    .evaluateAll((sections: Element[]) =>
+      sections.map((section) => section.id || (section.classList.item(0) ?? "")),
+    );
+
+/** The horizontal offset in a computed transform ("none" or "matrix(a, b, c, d, x, y)"). */
+const translateX = (transform: string) =>
+  Number(/matrix\(([^)]+)\)/.exec(transform)?.[1]?.split(",")[4] ?? 0);
+
+const offsetOf = async (locator: Locator) =>
+  translateX(await locator.evaluate((element) => getComputedStyle(element).transform));
+
+/** Whether the pictures and cards are back in place: no offset left from their reveal. */
+const allInPlace = (page: Page) =>
+  page
+    .locator(".service__media, .properties .card")
+    .evaluateAll((elements: Element[]) =>
+      elements.every((element) =>
+        ["none", "matrix(1, 0, 0, 1, 0, 0)"].includes(getComputedStyle(element).transform),
+      ),
+    );
+
+/** Scrolls instantly, then runs the paused page clock (pauseClock, below) for that long. */
+const scrollOnClock = async (page: Page, y: number, ms: number) => {
+  await page.evaluate((top: number) => {
+    window.scrollTo({ top, behavior: "instant" });
+  }, Math.round(y));
+  await page.waitForTimeout(100);
+  await page.clock.runFor(ms);
+};
+
+const opacitiesOf = (locator: Locator) =>
+  locator.evaluateAll((elements) =>
+    elements.map((element) => Number(getComputedStyle(element).opacity)),
+  );
+
+/** Everything the home page reveals once, in its sections (dialogs aside). About has its own
+    story, which follows the scroll (its tests are below). */
+const REVEALED =
+  ".hero__lockup > *, .hero__identity > *, .service__media, .service__title, .service__body, .service__action, .service__links, .properties .card";
+
+/** Waits until every revealed element is fully shown and back in place, with no split text left. */
+const expectAllShown = async (page: Page) => {
+  await expect
+    .poll(async () => (await opacitiesOf(page.locator(REVEALED))).every((value) => value === 1), {
+      message: "everything shows",
+      timeout: 10_000,
+    })
+    .toBe(true);
+  await expect
+    .poll(() => allInPlace(page), { message: "pictures and cards back in place" })
+    .toBe(true);
+  await expect(page.locator(".service [aria-hidden] > div, .service__title > div")).toHaveCount(0);
+};
 
 for (const lang of languages) {
   test.describe(`home (${lang})`, () => {
@@ -42,10 +112,9 @@ for (const lang of languages) {
       expect(bold.length, "the tagline has bold words").toBeGreaterThan(0);
       await expect(page.locator(".hero__tagline strong")).toHaveText(bold as string[]);
       await expect(page.locator(".hero__role")).toHaveText(agent.title[lang]);
-      await expect(page.locator(".hero__agency")).toHaveCount(0);
     });
 
-    test("the quote's middle is smaller and Light, with the line break from the CMS on every screen", async ({
+    test("the quote's middle is smaller and Light, with the line break from the CMS", async ({
       page,
     }) => {
       const tagline = page.locator(".hero__tagline");
@@ -59,11 +128,6 @@ for (const lang of languages) {
       );
       expect(lightSize).toBeLessThan(present(quoteSize, "the quote's font size"));
       await expect(tagline.locator("br"), "one line break, as written in the CMS").toHaveCount(1);
-      const lines = await tagline.evaluate((element) => {
-        const style = getComputedStyle(element);
-        return Math.round(element.getBoundingClientRect().height / parseFloat(style.lineHeight));
-      });
-      expect(lines, "two lines, the same on phones and desktop").toBe(2);
     });
 
     test("hero has one action: the contact popup, from a Dark Red pill with an icon", async ({
@@ -101,18 +165,24 @@ for (const lang of languages) {
       }
     });
 
-    test("About links to the story page", async ({ page }) => {
+    test("About tells the story in two parts, in reading order, and links to the story page", async ({
+      page,
+    }) => {
+      const about = copyFor(lang).home.about;
+      await expect(page.locator(".about__line")).toHaveText([about.storyPart1, about.storyPart2]);
       await expect(page.locator(`.about a[href="${url(site.pages.about[lang])}"]`)).toHaveText(
-        copyFor(lang).home.about.storyLink,
+        about.storyLink,
       );
     });
 
-    test("About is followed directly by Services", async ({ page }) => {
-      await expect(page.locator(".trust")).toHaveCount(0);
-      const follows = await page
-        .locator(".stage")
-        .evaluate((stage) => stage.nextElementSibling?.id);
-      expect(follows).toBe("services");
+    test("sections in order: hero, About, services, properties; services has no visible title", async ({
+      page,
+    }) => {
+      const order = await sectionOrder(page);
+      expect(order).toEqual(["hero", "about", "services", "properties"]);
+      const heading = page.locator("#services-heading");
+      await expect(heading).toHaveText(copyFor(lang).home.services.heading);
+      await expect(heading).toHaveClass(/visually-hidden/);
     });
 
     test("two services: looking (buy or rent) and selling, each linking to its information pages", async ({
@@ -128,10 +198,9 @@ for (const lang of languages) {
         sell: [["sell", services.sell.sellLink]],
       } as const;
       for (const [id, links] of Object.entries(expected)) {
-        await expect(page.locator(`.service--${id} .service__title`)).toHaveText(
-          textAt(services, `${id}.title`),
-        );
-        const anchors = page.locator(`.service--${id} .service__links a`);
+        const block = page.locator(`[data-service="${id}"]`);
+        await expect(block.locator(".service__title")).toHaveText(textAt(services, `${id}.title`));
+        const anchors = block.locator(".service__links a");
         await expect(anchors).toHaveCount(links.length);
         for (const [index, [pageKey, label]] of links.entries()) {
           await expect(anchors.nth(index)).toHaveAttribute("href", url(site.pages[pageKey][lang]));
@@ -140,27 +209,21 @@ for (const lang of languages) {
       }
     });
 
-    test("service buttons point to the form pages and open the matching dialog, no intent", async ({
+    test("service buttons: black pills to the form pages, opening the matching dialog", async ({
       page,
     }) => {
       for (const [id, key] of [
         ["search", "propertyAlert"],
         ["sell", "estimation"],
       ] as const) {
-        const button = page.locator(`.service--${id} .service__action a`);
+        const button = page.locator(`[data-service="${id}"] .service__action a`);
         await expect(button).toHaveCount(1);
         await expect(button).toHaveAttribute("href", url(pageUrl(key, lang)));
         await expect(button).toHaveAttribute("data-dialog", `dialog-${key}`);
         await expect(button).not.toHaveAttribute("data-intent", /.*/);
         await expect(button).toHaveText(textAt(copyFor(lang).home.services, `${id}.button`));
+        await expect(button).toHaveCSS("background-color", "rgb(0, 0, 0)");
       }
-    });
-
-    test("About tells the story in two parts, in reading order", async ({ page }) => {
-      await expect(page.locator(".about__line")).toHaveText([
-        copyFor(lang).home.about.storyPart1,
-        copyFor(lang).home.about.storyPart2,
-      ]);
     });
   });
 }
@@ -170,7 +233,7 @@ for (const lang of languages) {
     page,
   }) => {
     await page.goto(`${lang}/`);
-    const shown = listings.slice(0, 6);
+    const shown = listings.slice(0, 3);
     await expect(page.locator("#properties .card")).toHaveCount(shown.length);
     for (const [index, item] of shown.entries()) {
       const card = page.locator("#properties .card").nth(index);
@@ -207,6 +270,7 @@ for (const lang of languages) {
         ),
       );
       await card.scrollIntoViewIfNeeded();
+      await expect(card).toHaveCSS("opacity", "1");
       const onButton = await more.evaluate((element) => {
         const rect = element.getBoundingClientRect();
         const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
@@ -223,178 +287,11 @@ for (const lang of languages) {
   });
 }
 
-test("the link to all properties shows only with more than the 6 cards on the home page", async ({
+test("the link to all properties shows only with more than the 3 cards on the home page", async ({
   page,
 }) => {
   await page.goto("fr/");
-  await expect(page.locator(".properties__all")).toHaveCount(listings.length > 6 ? 1 : 0);
-});
-
-test.describe("desktop hero", () => {
-  test.skip(({ isMobile }) => isMobile, "desktop only");
-
-  for (const [width, height] of [
-    [768, 1024],
-    [1024, 768],
-    [1440, 900],
-    [1920, 1080],
-  ] satisfies [number, number][]) {
-    test(`at ${width}px: full-screen image, text clear of the agent, agent under the stripes`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.setViewportSize({ width, height });
-      await page.goto("fr/");
-      const box = async (selector: string) =>
-        present(await page.locator(selector).boundingBox(), `the box of ${selector}`);
-
-      const hero = await box(".hero");
-      expect(hero.height).toBe(height);
-      const image = await box(".hero__side img");
-      expect(image).toMatchObject({ x: 0, y: 0, width: hero.width, height });
-
-      const text = await box(".hero__id");
-      const agent = await box(".hero__photo");
-      // The photo has a transparent margin of about 12% of its width on the left
-      expect(text.x + text.width, "text ends before the agent").toBeLessThanOrEqual(
-        agent.x + agent.width * 0.12 + 1,
-      );
-      expect(text.x, "text stays inside the content area").toBeGreaterThanOrEqual(0);
-      expect(agent.x + agent.width).toBeLessThanOrEqual(width);
-      const textCentre = text.x + text.width / 2;
-      if (width >= 1440) {
-        expect(Math.abs(textCentre - (width / 2 - 14)), "centred on the page").toBeLessThan(2);
-      }
-
-      const zIndexOf = (selector: string) =>
-        page.locator(selector).evaluate((element) => Number(getComputedStyle(element).zIndex));
-      const [side, figure, band, inner] = await Promise.all([
-        zIndexOf(".hero__side"),
-        zIndexOf(".hero__figure"),
-        zIndexOf(".hero__band"),
-        zIndexOf(".hero__inner"),
-      ]);
-      expect(side).toBeLessThan(figure);
-      expect(figure).toBeLessThan(band);
-      expect(band).toBeLessThan(inner);
-
-      const shot = (await page.screenshot({ scale: "css" })).toString("base64");
-      const fillStart = (rows: number[]) =>
-        page.evaluate(
-          async ([shot, rows]: readonly [string, number[]]) => {
-            const img = new Image();
-            img.src = `data:image/png;base64,${shot}`;
-            await img.decode();
-            const canvas = new OffscreenCanvas(img.width, img.height);
-            const context = canvas.getContext("2d");
-            if (!context) {
-              throw new Error("No 2D canvas context");
-            }
-            context.drawImage(img, 0, 0);
-            const { data } = context.getImageData(0, 0, img.width, img.height);
-            const isDarkRed = (x: number, y: number) => {
-              const index = (y * img.width + x) * 4;
-              return data[index] === 102 && data[index + 1] === 0 && data[index + 2] === 0;
-            };
-            return rows.map((y) => {
-              let x = img.width - 1;
-              while (x >= 0 && isDarkRed(x, y)) {
-                x--;
-              }
-              return x + 1;
-            });
-          },
-          [shot, rows] as const,
-        );
-      const starts = await fillStart([height - 10, height - 110]);
-      const low = present(starts[0], "where Dark Red starts near the bottom");
-      const high = present(starts[1], "where Dark Red starts 100px higher");
-      expect(low, "Dark Red is solid from the slash to the right edge").toBeLessThan(width - 50);
-      expect((high - low) / 100, "fixed slash angle").toBeCloseTo(
-        Math.tan((27.5 * Math.PI) / 180),
-        1,
-      );
-
-      const header = await box(".site-header");
-      const stripes = await box(".hero__band");
-      expect(stripes.y, "stripes start below the header").toBeGreaterThanOrEqual(header.height);
-    });
-  }
-
-  test("the hero scrolls up as it is, About covers it in white, the agent stays still on its right", async ({
-    page,
-  }) => {
-    await page.goto("fr/");
-    const heroHeight = await page
-      .locator(".hero")
-      .evaluate((element: HTMLElement) => element.offsetHeight);
-    const boxOf = async (selector: string) =>
-      present(await page.locator(selector).boundingBox(), `the box of ${selector}`);
-    /** The agent photo, his place in About and the About text, at a scroll position. */
-    const at = async (y: number) => {
-      await scrollToY(page, y);
-      return Promise.all([
-        boxOf(".stage__agent .agent-photos__layer--agent img"),
-        boxOf(".about__card"),
-        boxOf(".about__body"),
-      ]);
-    };
-    const same = (actual: Box, expected: Box, what: string) => {
-      for (const key of ["x", "y", "width", "height"] as const) {
-        expect(actual[key], `${what}: ${key}`).toBeCloseTo(expected[key], 0);
-      }
-    };
-    const heroLayers = [
-      { selector: ".hero__side", pseudo: null },
-      { selector: ".hero__band", pseudo: null },
-      { selector: ".hero", pseudo: "::before" },
-      { selector: ".hero__id", pseudo: null },
-    ];
-    const [start] = await at(0);
-    const heroAtStart = await boxOf(".hero");
-    for (const y of [heroHeight / 4, heroHeight / 2, heroHeight]) {
-      const [agent] = await at(y);
-      same(agent, start, `agent at ${y}px of scroll`);
-      const hero = await boxOf(".hero");
-      expect(hero.y, `hero at ${y}px of scroll: it scrolls with the page`).toBeCloseTo(
-        heroAtStart.y - y,
-        0,
-      );
-      for (const { selector, pseudo } of heroLayers) {
-        const opacity = await page
-          .locator(selector)
-          .evaluate(
-            (element, pseudoElement) => getComputedStyle(element, pseudoElement).opacity,
-            pseudo,
-          );
-        expect(opacity, `${selector}${pseudo ?? ""} at ${y}px of scroll: no fade`).toBe("1");
-      }
-    }
-    await expect(page.locator("#about")).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    const [agent, place, text] = await at(heroHeight);
-    same(place, agent, "his place in About");
-    expect(text.x + text.width, "About text ends before the agent").toBeLessThanOrEqual(agent.x);
-  });
-
-  test("cream logo over the hero, dark logo once About reaches the header", async ({ page }) => {
-    await page.goto("fr/");
-    const dark = page.locator(".brand__logo:not(.brand__logo--light)");
-    const light = page.locator(".brand__logo--light");
-    await expect(light).toBeVisible();
-    await expect(dark).toBeHidden();
-    await page.evaluate(() => {
-      window.scrollTo({ top: 200, behavior: "instant" });
-    });
-    await expect(light).toBeVisible();
-    await page.evaluate(() => {
-      window.scrollTo({
-        top: document.querySelector<HTMLElement>("#about")?.offsetTop,
-        behavior: "instant",
-      });
-    });
-    await expect(dark).toBeVisible();
-    await expect(light).toBeHidden();
-  });
+  await expect(page.locator(".properties__all")).toHaveCount(listings.length > 3 ? 1 : 0);
 });
 
 test("every section after the hero is on white, none on cream", async ({ page }) => {
@@ -424,6 +321,8 @@ test("the body is dark over the hero and white past it, for the iOS Safari bars"
 test("hero text passes AA against the photo and its scrim, measured on the pixels behind it", async ({
   page,
 }) => {
+  // Measured in the final layout, without the hero's own entrance on phones
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("fr/");
   await page.evaluate(() => document.fonts.ready);
   const parts = [".hero__name", ".hero__role", ".hero__tagline", ".hero__tagline .text-light"];
@@ -443,7 +342,9 @@ test("hero text passes AA against the photo and its scrim, measured on the pixel
       }),
     parts,
   );
-  await page.addStyleTag({ content: ".hero__id, .site-header { visibility: hidden !important; }" });
+  await page.addStyleTag({
+    content: ".hero__lockup, .site-header { visibility: hidden !important; }",
+  });
   const shot = (await page.screenshot({ scale: "css" })).toString("base64");
   const worst = await page.evaluate(
     async ([shot, boxes]) => {
@@ -493,21 +394,12 @@ test("a status badge on a card lets clicks through to the listing link", async (
   const badge = page.locator("#properties .card__status").first();
   test.skip((await badge.count()) === 0, "no listing with a status");
   await badge.scrollIntoViewIfNeeded();
+  await expect(page.locator("#properties .card").first()).toHaveCSS("opacity", "1");
   const hit = await badge.evaluate((element) => {
     const rect = element.getBoundingClientRect();
     return document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)?.tagName;
   });
   expect(hit).toBe("A");
-});
-
-test.describe("without JavaScript", () => {
-  test.use({ javaScriptEnabled: false });
-
-  test("the hero button goes to the Contact page", async ({ page }) => {
-    await page.goto("fr/");
-    await page.locator(".hero a").click();
-    await expect(page).toHaveURL(new RegExp(`${url(site.pages.contact.fr)}$`));
-  });
 });
 
 test("buttons show no focus ring, links keep theirs (exception in CLAUDE.md)", async ({ page }) => {
@@ -523,93 +415,273 @@ test("buttons show no focus ring, links keep theirs (exception in CLAUDE.md)", a
   await expect(action).toHaveCSS("outline-style", "none");
 
   const more = page.locator(".service__links a").first();
-  await page.keyboard.press("Tab");
   await more.focus();
   await expect(more).toHaveCSS("outline-style", "solid");
-});
-
-const opacitiesOf = (locator: Locator) =>
-  locator.evaluateAll((elements) =>
-    elements.map((element) => Number(getComputedStyle(element).opacity)),
-  );
-
-/** Scrolls instantly, then runs the paused page clock (pauseClock, below) for that long. */
-const scrollOnClock = async (page: Page, y: number, ms: number) => {
-  await page.evaluate((top: number) => {
-    window.scrollTo({ top, behavior: "instant" });
-  }, Math.round(y));
-  await page.waitForTimeout(100);
-  await page.clock.runFor(ms);
-};
-
-test("Services: each block's title, text, links and button fade in one after the other, and stay", async ({
-  page,
-}) => {
-  await pauseClock(page);
-  await page.goto("fr/");
-  const blocks = page.locator(".service__content");
-  await scrollOnClock(page, 0, 1000);
-  for (const opacity of await opacitiesOf(blocks.locator(":scope > *"))) {
-    expect(opacity, "nothing shows before its block arrives").toBe(0);
-  }
-  for (const index of [0, 1]) {
-    const block = blocks.nth(index);
-    const { top, vh } = await block.evaluate((element) => ({
-      top: element.getBoundingClientRect().top + scrollY,
-      vh: innerHeight,
-    }));
-    const parts = block.locator(":scope > *");
-    await scrollOnClock(page, top - vh * 0.3, 400);
-    const early = await opacitiesOf(parts);
-    expect(present(early[0], "the title"), "the title is coming in").toBeGreaterThan(0);
-    expect(present(early.at(-1), "the last part"), "the last part waits").toBeLessThan(
-      present(early[0], "the title"),
-    );
-    for (const [position, opacity] of early.entries()) {
-      if (position > 0) {
-        expect(
-          opacity,
-          `part ${position + 1} is never ahead of part ${position}`,
-        ).toBeLessThanOrEqual(present(early[position - 1], "the previous part"));
-      }
-    }
-    await page.clock.runFor(3000);
-    for (const opacity of await opacitiesOf(parts)) {
-      expect(opacity, "all in").toBe(1);
-    }
-  }
-  const pageEnd = await page.evaluate(() => document.documentElement.scrollHeight);
-  await scrollOnClock(page, pageEnd, 1000);
-  for (const opacity of await opacitiesOf(blocks.locator(":scope > *"))) {
-    expect(opacity, "blocks stay once shown").toBe(1);
-  }
-});
-
-test("a link to a section lands with its blocks shown, and the sections above it too", async ({
-  page,
-}) => {
-  await page.goto("fr/#properties");
-  await expect(page.locator("#properties-heading")).toHaveCSS("opacity", "1");
-  await expect(page.locator("#services .service__action").last()).toHaveCSS("opacity", "1");
-});
-
-test.describe("reduced motion", () => {
-  test.use({ reducedMotion: "reduce" });
-
-  test("the text shows without the reveal", async ({ page }) => {
-    await page.goto("fr/");
-    const blocks = page.locator(
-      ".service__content > *, #services-heading, #properties-heading, .properties .card",
-    );
-    for (const opacity of await opacitiesOf(blocks)) {
-      expect(opacity).toBe(1);
-    }
-  });
 });
 
 test("the hero image loads first", async ({ page }) => {
   await page.goto("fr/");
   await expect(page.locator(".hero__side img")).toHaveAttribute("fetchpriority", "high");
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the hero button goes to the Contact page, and everything shows", async ({ page }) => {
+    await page.goto("fr/");
+    for (const opacity of await opacitiesOf(page.locator(REVEALED))) {
+      expect(opacity).toBe(1);
+    }
+    await page.locator(".hero a").click();
+    await expect(page).toHaveURL(new RegExp(`${url(site.pages.contact.fr)}$`));
+  });
+});
+
+test.describe("reduced motion", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("everything shows in its final place, without the reveals", async ({ page }) => {
+    await page.goto("fr/");
+    for (const opacity of await opacitiesOf(page.locator(REVEALED))) {
+      expect(opacity).toBe(1);
+    }
+    await expect(page.locator(".pin-spacer")).toHaveCount(0);
+    await expectAllShown(page);
+  });
+});
+
+test.describe("animations", () => {
+  test("content waiting for its reveal stays readable to screen readers", async ({ page }) => {
+    await page.goto("fr/");
+    const waiting = page.locator(".service").first();
+    await expect(waiting.locator(".service__title")).toHaveCSS("opacity", "0");
+    await expect(waiting.locator(".service__title")).toHaveCSS("visibility", "visible");
+    await expect(
+      page.getByRole("heading", { name: copyFor("fr").home.services.search.title }),
+    ).toHaveCount(1);
+  });
+
+  test("every reveal plays once, as its section arrives, and never hides content again", async ({
+    page,
+  }) => {
+    await page.goto("fr/");
+    await expect(page.locator(".service__media").first(), "waits for its block").toHaveCSS(
+      "opacity",
+      "0",
+    );
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+    await scrollToY(page, 0);
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+  });
+
+  test("a link to a later section lands with it and the sections above it shown", async ({
+    page,
+  }) => {
+    await page.goto("fr/#properties");
+    await expect(page.locator(".properties .card").first()).toHaveCSS("opacity", "1");
+    await expect(page.locator(".service__action").last()).toHaveCSS("opacity", "1");
+  });
+
+  test("a link reached with the keyboard shows at once, before its block arrives", async ({
+    page,
+  }) => {
+    await page.goto("fr/");
+    const link = page.locator(".service__links a").first();
+    await expect(link.locator("..")).toHaveCSS("opacity", "0");
+    await link.focus();
+    await expect(link.locator("..")).toHaveCSS("opacity", "1");
+  });
+
+  test("reordered sections still play their own reveals", async ({ page }) => {
+    await page.route("**/ced/fr/", async (route) => {
+      const response = await route.fetch();
+      const html = await response.text();
+      const services = /<section id="services"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+      const properties = /<section id="properties"[\s\S]*?<\/section>/.exec(html)?.[0] ?? "";
+      expect(services && properties, "both sections found").toBeTruthy();
+      const swapped = html
+        .replace(services, "<!--services-->")
+        .replace(properties, services)
+        .replace("<!--services-->", properties);
+      await route.fulfill({ response, body: swapped });
+    });
+    await page.goto("fr/");
+    const order = await sectionOrder(page);
+    expect(order).toEqual(["hero", "about", "properties", "services"]);
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+  });
+
+  test("changing between the phone and desktop layouts never hides content again", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "a desktop window resized");
+    await page.goto("fr/");
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expectAllShown(page);
+    await expect(page.locator(".service__media").first()).toHaveCSS("opacity", "1");
+  });
+});
+
+test.describe("phone animations", () => {
+  test.skip(({ isMobile }) => !isMobile, "phones only");
+
+  test("a service picture rests at the screen edge, 32px of it showing, the text clear of it", async ({
+    page,
+  }) => {
+    await page.goto("fr/");
+    await scrollThroughPage(page);
+    await expectAllShown(page);
+    const viewport = await page.evaluate(() => innerWidth);
+    const boxOf = async (selector: string) =>
+      present(await page.locator(selector).boundingBox(), `the box of ${selector}`);
+
+    const buyPicture = await boxOf(".service--buy .service__media");
+    const buyTitle = await boxOf(".service--buy .service__title");
+    expect(buyPicture.x + buyPicture.width, "buy: 32px showing on the left").toBeCloseTo(32, 0);
+    expect(buyTitle.x, "buy: the text 64px from the left edge").toBeCloseTo(64, 0);
+
+    const sellPicture = await boxOf(".service--sell .service__media");
+    const sellTitle = await boxOf(".service--sell .service__title");
+    expect(viewport - sellPicture.x, "sell: 32px showing on the right").toBeCloseTo(32, 0);
+    expect(
+      viewport - (sellTitle.x + sellTitle.width),
+      "sell: the text 64px from the right edge",
+    ).toBeCloseTo(64, 0);
+  });
+
+  test("property cards sit in a rail to swipe", async ({ page }) => {
+    await page.goto("fr/");
+    await expect(page.locator(".properties__cards")).toHaveCSS("overflow-x", "auto");
+    await expect(page.locator(".properties__cards")).toHaveCSS("scroll-snap-type", "x mandatory");
+  });
+});
+
+test.describe("desktop: the stage and the animations", () => {
+  test.skip(({ isMobile }) => isMobile, "desktop only");
+
+  test("the slash moves out to the right as the hero scrolls away, with the scroll", async ({
+    page,
+  }) => {
+    await page.goto("fr/");
+    const band = page.locator(".hero__band");
+    const offset = () => offsetOf(band);
+    expect(await offset(), "still on load").toBe(0);
+    const heroHeight = await page
+      .locator(".hero")
+      .evaluate((element) => element.getBoundingClientRect().height);
+    await scrollToY(page, heroHeight / 2);
+    await expect.poll(offset).toBeGreaterThan(0);
+    const halfway = await offset();
+    await scrollToY(page, heroHeight);
+    await expect.poll(offset).toBeGreaterThan(halfway);
+    await scrollToY(page, 0);
+    await expect.poll(offset, "back with the scroll").toBe(0);
+  });
+
+  test("a service picture comes in from its outer side: buy from the left, sell from the right", async ({
+    page,
+  }) => {
+    await page.clock.install({ time: new Date("2026-01-01T09:00:00") });
+    await page.clock.pauseAt(new Date("2026-01-01T09:00:01"));
+    await page.goto("fr/");
+    for (const [side, sign] of [
+      ["buy", -1],
+      ["sell", 1],
+    ] as const) {
+      const block = page.locator(`.service--${side}`);
+      const media = block.locator(".service__media");
+      const top = await block.evaluate((element) => element.getBoundingClientRect().top + scrollY);
+      await scrollOnClock(page, top - 300, 150);
+      const x = await offsetOf(media);
+      expect(Math.sign(x), `${side}: on its outer side`).toBe(sign);
+      await page.clock.runFor(3000);
+      await expect(media).toHaveCSS("opacity", "1");
+    }
+  });
+
+  test("the hero scrolls up as it is, About covers it in white, the agent stays still on its right", async ({
+    page,
+  }) => {
+    await page.goto("fr/");
+    const heroHeight = await page
+      .locator(".hero")
+      .evaluate((element: HTMLElement) => element.offsetHeight);
+    const boxOf = async (selector: string) =>
+      present(await page.locator(selector).boundingBox(), `the box of ${selector}`);
+    /** The agent photo, his place in About and the About text, at a scroll position. */
+    const at = async (y: number) => {
+      await scrollToY(page, y);
+      return Promise.all([
+        boxOf(".stage__agent .agent-photos__layer--agent img"),
+        boxOf(".about__card"),
+        boxOf(".about__body"),
+      ]);
+    };
+    const same = (actual: Box, expected: Box, what: string) => {
+      for (const key of ["x", "y", "width", "height"] as const) {
+        expect(actual[key], `${what}: ${key}`).toBeCloseTo(expected[key], 0);
+      }
+    };
+    const heroLayers = [
+      { selector: ".hero__side", pseudo: null },
+      { selector: ".hero__band", pseudo: null },
+      { selector: ".hero", pseudo: "::before" },
+      { selector: ".hero__lockup", pseudo: null },
+    ];
+    const [start] = await at(0);
+    const heroAtStart = await boxOf(".hero");
+    for (const y of [heroHeight / 4, heroHeight / 2, heroHeight]) {
+      const [agent] = await at(y);
+      same(agent, start, `agent at ${y}px of scroll`);
+      const hero = await boxOf(".hero");
+      expect(hero.y, `hero at ${y}px of scroll: it scrolls with the page`).toBeCloseTo(
+        heroAtStart.y - y,
+        0,
+      );
+      for (const { selector, pseudo } of heroLayers) {
+        const opacity = await page
+          .locator(selector)
+          .evaluate(
+            (element, pseudoElement) => getComputedStyle(element, pseudoElement).opacity,
+            pseudo,
+          );
+        expect(opacity, `${selector}${pseudo ?? ""} at ${y}px of scroll: no fade`).toBe("1");
+      }
+    }
+    await expect(page.locator("#about")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    const [agent, place, text] = await at(heroHeight);
+    same(place, agent, "his place in About");
+    expect(text.x + text.width, "About text ends before the agent").toBeLessThanOrEqual(agent.x);
+  });
+
+  test("cream logo over the hero, dark logo once About reaches the header", async ({ page }) => {
+    await page.goto("fr/");
+    const dark = page.locator(".brand__logo:not(.brand__logo--light)");
+    const light = page.locator(".brand__logo--light");
+    await expect(light).toBeVisible();
+    await expect(dark).toBeHidden();
+    await page.evaluate(() => {
+      window.scrollTo({ top: 200, behavior: "instant" });
+    });
+    await expect(light).toBeVisible();
+    await page.evaluate(() => {
+      window.scrollTo({
+        top: document.querySelector<HTMLElement>("#about")?.offsetTop,
+        behavior: "instant",
+      });
+    });
+    await expect(dark).toBeVisible();
+    await expect(light).toBeHidden();
+  });
 });
 
 test("reduced motion: the agent photo shows in About without the travelling copy", async ({
@@ -681,8 +753,8 @@ test("short landscape screens: About is not held, its parts play one after the o
   page,
   isMobile,
 }) => {
-  test.skip(isMobile, "landscape phone size on the desktop layout");
-  await page.setViewportSize({ width: 844, height: 390 });
+  test.skip(isMobile, "a short window on the desktop layout");
+  await page.setViewportSize({ width: 1100, height: 390 });
   await page.goto("fr/#about");
   await expect(page.locator(".about__pin")).toHaveCSS("position", "relative");
   await expect(page.locator(".stage")).toHaveAttribute("data-story", "done", { timeout: 8000 });

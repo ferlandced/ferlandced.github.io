@@ -43,6 +43,32 @@ for (const path of paths) {
   });
 }
 
+for (const width of [1440, 1800]) {
+  test(`home at ${width}px: every section's content in the centred 1500px container`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("fr/");
+    const containers = page.locator(
+      "#about .container, #services .container, #properties .container",
+    );
+    await expect(containers).toHaveCount(3);
+    const expectedWidth = Math.min(width, 1500);
+    const expectedMargin = width >= 1440 ? 120 : 0;
+    for (const container of await containers.all()) {
+      const box = present(await container.boundingBox(), "a section's container");
+      expect(box.width).toBeCloseTo(expectedWidth, 0);
+      expect(box.x, "centred").toBeCloseTo((width - expectedWidth) / 2, 0);
+      await expect(container).toHaveCSS("padding-left", `${expectedMargin}px`);
+      await expect(container).toHaveCSS("padding-right", `${expectedMargin}px`);
+    }
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow, "no horizontal scroll").toBeLessThanOrEqual(0);
+  });
+}
+
 test.describe("screenshots", () => {
   test("home, top", async ({ page }) => {
     await page.goto("fr/");

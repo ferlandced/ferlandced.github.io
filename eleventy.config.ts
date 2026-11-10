@@ -42,10 +42,11 @@ export default function (eleventyConfig: UserConfig) {
   for (const source of ["admin/*.{html,css,yml}", "css", "images", "fonts"]) {
     eleventyConfig.addPassthroughCopy(source);
   }
-  // GSAP and ScrollTrigger for the home page's scroll effects, served from the site itself
+  // GSAP, ScrollTrigger and SplitText for the home page's animations, served from the site itself
   eleventyConfig.addPassthroughCopy({
     "node_modules/gsap/dist/gsap.min.js": "js/vendor/gsap.min.js",
     "node_modules/gsap/dist/ScrollTrigger.min.js": "js/vendor/ScrollTrigger.min.js",
+    "node_modules/gsap/dist/SplitText.min.js": "js/vendor/SplitText.min.js",
   });
   eleventyConfig.ignores.add("admin/**");
   eleventyConfig.ignores.add("README.md");

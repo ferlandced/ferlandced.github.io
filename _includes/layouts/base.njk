@@ -23,13 +23,12 @@
   <script>document.documentElement.classList.add("js");</script>
   {% if bodyClass == "home" %}<script src="/js/vendor/gsap.min.js" defer></script>
   <script src="/js/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="/js/vendor/SplitText.min.js" defer></script>
   {% endif %}<script src="/js/site.js" defer></script>
 </head>
 <body class="{{ bodyClass }}">
   {% include "partials/header.njk" %}
   {{ content | safe }}
   {% include "partials/footer.njk" %}
-  {# Phones: the menu circle as page content, so iOS Safari draws it under its toolbar (css/site.css) #}
-  <div class="page-circle" aria-hidden="true"><div class="page-circle__shape"></div></div>
 </body>
 </html>

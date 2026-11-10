@@ -50,7 +50,7 @@ test("desktop logo: 72px, its R on the content's left edge, not clipped", async 
   page,
 }, testInfo) => {
   test.skip(isPhone(testInfo), "desktop only");
-  for (const width of [992, 1440, 1920]) {
+  for (const width of [1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("fr/");
     const logo = present(
@@ -58,13 +58,16 @@ test("desktop logo: 72px, its R on the content's left edge, not clipped", async 
       "the logo's box",
     );
     expect(logo.height).toBeCloseTo(72, 0);
-    const content = present(
-      await page.locator("#services .container").boundingBox(),
-      "the content's box",
-    );
-    expect(Math.abs(logo.x + logo.height * 0.24 - content.x), `at ${width}px`).toBeLessThanOrEqual(
-      1,
-    );
+    const contentLeft = await page
+      .locator("#services .container")
+      .evaluate(
+        (element) =>
+          element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft),
+      );
+    expect(
+      Math.abs(logo.x + logo.height * 0.24 - contentLeft),
+      `at ${width}px`,
+    ).toBeLessThanOrEqual(1);
     expect(logo.x).toBeGreaterThanOrEqual(0);
     await expect(page.locator(".brand__office")).toHaveText(site.office.nameSuffix);
   }
@@ -122,21 +125,32 @@ test("phones: no contact icons above the burger; they are in the menu", async ({
   await expect(page.locator(".contact-icons--menu")).toBeVisible();
 });
 
-test("phones: the burger's circle keeps its size over the hero and past it", async ({
+test("phones: the burger sits on a 44px Dark Red circle", async ({ page }, testInfo) => {
+  test.skip(!isPhone(testInfo), "phones only");
+  await page.goto("fr/");
+  const toggle = page.locator(".nav-toggle");
+  const box = present(await toggle.boundingBox(), "the burger's box");
+  expect(box.width).toBe(44);
+  expect(box.height).toBe(44);
+  await expect(toggle).toHaveCSS("background-color", "rgb(102, 0, 0)");
+  await expect(toggle).toHaveCSS("border-radius", "50%");
+});
+
+test("phones: the open menu covers the screen in Dark Red and keeps focus inside", async ({
   page,
 }, testInfo) => {
   test.skip(!isPhone(testInfo), "phones only");
   await page.goto("fr/");
-  const header = page.locator(".site-header");
-  const radius = () =>
-    header.evaluate((element) =>
-      getComputedStyle(element).getPropertyValue("--menu-circle-radius").trim(),
-    );
-  const overHero = await radius();
-  expect(overHero).toBe("28px");
-  await page.evaluate(() => {
-    window.scrollTo({ top: innerHeight * 2, behavior: "instant" });
-  });
-  await expect(header).toHaveAttribute("data-past-hero", "");
-  expect(await radius()).toBe(overHero);
+  await page.locator(".nav-toggle").click();
+  const nav = page.locator(".site-nav");
+  await expect(nav).toHaveCSS("background-color", "rgb(102, 0, 0)");
+  const { width, height } = present(page.viewportSize(), "the viewport");
+  const box = present(await nav.boundingBox(), "the menu's box");
+  expect(box).toEqual({ x: 0, y: 0, width, height });
+  await expect(page.locator("main")).toHaveJSProperty("inert", true);
+  await expect(page.locator(".site-footer")).toHaveJSProperty("inert", true);
+  await expect(page.locator(".brand")).toHaveJSProperty("inert", true);
+  await expect(nav.locator("a").last()).toBeVisible();
+  await page.locator(".nav-toggle").click();
+  await expect(page.locator("main")).toHaveJSProperty("inert", false);
 });

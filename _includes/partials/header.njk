@@ -11,17 +11,16 @@
   </button>
   <nav class="site-nav" id="site-nav" aria-label="{{ t.menu.nav.label }}">
     {# Menu items are edited in the CMS (content/menu.json): a label and a URL per language; incomplete items are skipped #}
+    {# --item: its place in the phone menu, where the links come in one after the other #}
     {% for item in t.menu.items %}{% if item.url and item.label %}
-    <a href="{{ item.url }}">{{ item.label }}</a>{% endif %}{% endfor %}
-    {# Phone menu: the contact icons sit at the bottom of the burger panel #}
+    <a href="{{ item.url }}" style="--item: {{ loop.index0 }}">{{ item.label }}</a>{% endif %}{% endfor %}
+    {# Phone menu: the contact icons and the language switch close the full-screen menu #}
     {% set iconsClass = "contact-icons--menu" %}{% include "partials/contact-icons.njk" %}
     {# Phone menu: the language switch lives here instead of the header #}
     {%- for l in site.languages %}{% if l != lang %}
     <a class="site-nav__lang" href="{{ altUrls[l] or '/' ~ l ~ '/' }}" hreflang="{{ l }}" lang="{{ l }}">{{ t.menu.langSwitch[l] }}</a>
     {%- endif %}{% endfor %}
   </nav>
-  {# Phones: tapping the burger grows its circle into the menu, over the header #}
-  <div class="menu-circle" aria-hidden="true"></div>
   <div class="site-header__tools">
     {# Contact icons: fade in once the visitor scrolls past the hero (see js/site.js) #}
     {% set iconsClass = "contact-icons--header" %}{% include "partials/contact-icons.njk" %}

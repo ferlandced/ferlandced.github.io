@@ -46,6 +46,33 @@
   --color-white: #ffffff;
   --color-sky-blue: #a3d4f2;
 
+  /* Figma neutrals */
+  --color-neutral-50: #f7f7f7;
+  --color-neutral-200: #d9d9d9;
+  --color-neutral-700: #585756;
+
+  /* Figma spacing: 4px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Figma layout: sections are full-bleed, their content in a centred container */
+  --container-max: 1500px;
+  --layout-margin: 120px;
+
+  /* Figma corners */
+  --radius-card: 24px;
+  --radius-picture: 32px;
+  --radius-full: 1000px;
+
   /* Typography: Figtree for headings and buttons, Inter for text, Arial fallback.
      Exception to the manual's Montserrat (Matteo, 2026-11-07, see CLAUDE.md). */
   --font-heading: "Figtree", Arial, sans-serif;
@@ -56,6 +83,19 @@
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  /* Figma text styles (font shorthand: weight size/line-height family) */
+  --text-display: var(--font-medium) 4rem/4.5rem var(--font-heading);
+  --text-h1: var(--font-light) 3rem/3.5rem var(--font-heading);
+  --text-h2: var(--font-regular) 2.25rem/2.75rem var(--font-heading);
+  --text-h3: var(--font-medium) 1.5rem/2rem var(--font-heading);
+  --text-body-large: var(--font-light) 1.125rem/1.75rem var(--font-body);
+  --text-body: var(--font-light) 1rem/1.5rem var(--font-body);
+  --text-body-small: var(--font-regular) 0.875rem/1.25rem var(--font-body);
+  --text-label: var(--font-medium) 1rem/1.5rem var(--font-heading);
+  --text-label-button: var(--font-medium) 0.875rem/1.25rem var(--font-heading);
+  --text-label-button-tracking: 0.06em;
+  --text-link: var(--font-regular) 1rem/2rem var(--font-body);
 
   /* Semantic roles. WCAG 2.1 AA contrast checked for each text pairing. */
   --brand-background: var(--color-cream);
