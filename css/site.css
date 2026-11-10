@@ -583,6 +583,9 @@ body:not(.home) .contact-icons--header {
     padding: calc(var(--space-16) + var(--safe-top)) var(--page-margin)
       calc(var(--space-16) + var(--safe-bottom));
     overflow-y: auto;
+
+    /* A swipe on the menu never scrolls the page behind it (iOS Safari ignores overflow: hidden) */
+    overscroll-behavior: contain;
     background: var(--color-dark-red);
     box-shadow: none;
     opacity: 0;
@@ -605,14 +608,31 @@ body:not(.home) .contact-icons--header {
       translate 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
 
+  /* One after the other, 0.06s apart: the links, then the contact icons and the language */
   .js-nav [data-open] .site-nav > * {
     opacity: 1;
     translate: 0 0;
-    transition-delay: calc(0.1s + var(--item, 0) * 0.06s);
+    transition-delay: calc(0.1s + var(--item) * 0.06s);
   }
 
-  .js-nav [data-open] .site-nav > :is(.contact-icons, .site-nav__lang) {
-    transition-delay: 0.4s;
+  .site-nav > :nth-child(1) {
+    --item: 0;
+  }
+
+  .site-nav > :nth-child(2) {
+    --item: 1;
+  }
+
+  .site-nav > :nth-child(3) {
+    --item: 2;
+  }
+
+  .site-nav > :nth-child(4) {
+    --item: 3;
+  }
+
+  .site-nav > :nth-child(n + 5) {
+    --item: 5;
   }
 
   .js-nav .site-nav a:not(.btn) {
@@ -732,9 +752,12 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   );
 }
 
+/* Desktop: never shorter than the lockup needs (689px), so the hero, the agent in it and his
+   travelling copy always share one height */
 @media (width >= 1024px) {
   .stage {
-    --hero-height: max(560px, 100svh);
+    --hero-min-height: 720px;
+    --hero-height: max(var(--hero-min-height), 100svh);
     --about-top: var(--about-padding);
   }
 }
@@ -801,21 +824,25 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   left: calc(50% + var(--photo-x));
 }
 
+/* Figma hero__lockup (110:272, 126:250) */
 .hero__lockup {
+  --lockup-width: 588px;
+  --signature-width: 142px; /* Signature (75:34) */
+
   position: relative;
   z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
-  width: min(100% - 2 * var(--page-margin), 588px);
+  width: min(100% - 2 * var(--page-margin), var(--lockup-width));
   margin-inline: auto;
   padding-top: calc(var(--header-height) + var(--safe-top) + var(--space-12));
   text-align: center;
 }
 
 .hero__signature {
-  width: 142px;
+  width: var(--signature-width);
   height: auto;
 }
 
@@ -879,8 +906,11 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
     font: var(--text-h3);
   }
 
+  /* The quote matches no text style: Figtree Regular 25.92px on a normal line (110:277) */
   .hero__tagline {
-    font-size: 1.62rem;
+    --hero-quote-size: 1.62rem;
+
+    font-size: var(--hero-quote-size);
     line-height: 1.2;
   }
 
@@ -896,7 +926,7 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
      angle as it rises; an 11px Primary Red line, then Dark Red to the edge. js/site.ts moves the band
      out to the right as the hero scrolls away. */
   .hero__band {
-    --band-offset: 297px;
+    --band-offset: 297px; /* the red stripe's foot from the right edge (110:268) */
 
     position: absolute;
     inset: var(--space-20) 0 0 calc(100% - var(--band-offset));
@@ -978,8 +1008,8 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
 }
 
 /* Phones (Figma: iPhone 18 Pro 1-4): the agent fills the space under the title, down to where the
-   text must stop for the burger's circle. The text gathers at his feet and pushes up as it grows. A
-   white overlay with a background blur rises over him with the story (About story, below). */
+   text must stop for the burger's circle. The text gathers at his feet and pushes up as it grows,
+   on a blur that rises with it (About story, below). */
 @media (width <= 1023.98px) {
   .about {
     /* h2 line plus its gap below */
@@ -1030,34 +1060,43 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
     height: calc(100svh - var(--about-top) - var(--about-title-space) - var(--about-text-clear));
   }
 
-  /* The overlay, across the screen from his feet up: a white base (::before, 80%) under a
-     gradient from clear to white at 80% of its height that blurs what is behind it (::after).
-     Without the story: the end state, nearly white over him. It reaches 2px past his feet, so
-     no sliver of the photo's cut edge shows under it. */
-  .about__media::before,
-  .about__media::after {
-    content: "";
-    position: absolute;
-    inset: auto calc(-1 * var(--page-margin)) -2px;
-    z-index: 1;
-    height: 94%;
-  }
-
-  .about__media::before {
-    background: color-mix(in sRGB, var(--brand-surface) 80%, transparent);
-  }
-
-  /* The mask fades the blur in over the top quarter, so it has no hard top edge */
-  .about__media::after {
-    background: linear-gradient(to bottom, transparent, var(--brand-surface) 80%);
-    backdrop-filter: blur(10px);
-    mask-image: linear-gradient(to bottom, transparent, var(--color-black) 25%);
-  }
-
+  /* The overlay belongs to the text, across the screen: under it, a blur on a white base keeps it
+     readable (::before, fading in over its first --space-6); just above it, a gradient from clear to
+     the same white fades him into it (::after, --about-fade tall). As the text grows line by line
+     the overlay rises with it, so it covers only as much of him as the text needs. */
   .about__stack {
+    --about-fade: 120px;
+
     position: relative;
     z-index: 1;
     padding: 0 0 calc(var(--about-text-clear) + 8px);
+  }
+
+  .about__stack::before,
+  .about__stack::after {
+    content: "";
+    position: absolute;
+    inset-inline: calc(-1 * var(--page-margin));
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .about__stack::before {
+    top: calc(-1 * var(--space-6));
+    bottom: 0;
+    background: color-mix(in sRGB, var(--brand-surface) 80%, transparent);
+    backdrop-filter: blur(10px);
+    mask-image: linear-gradient(to bottom, transparent, var(--color-black) var(--space-6));
+  }
+
+  .about__stack::after {
+    bottom: 100%;
+    height: var(--about-fade);
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in sRGB, var(--brand-surface) 80%, transparent)
+    );
   }
 
   .about__stack .about__step > * {
@@ -1088,8 +1127,8 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
     margin-bottom: 24px;
   }
 
-  .about__media::before,
-  .about__media::after {
+  .about__stack::before,
+  .about__stack::after {
     display: none;
   }
 
@@ -1152,7 +1191,7 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
 }
 
 /* ==========================================================================
-   About story (js/site.ts, with GSAP: it animates the text, the photo change and the phone overlay,
+   About story (js/site.ts, with GSAP: it animates the text and the photo change,
    and sets data-story on .stage: start, paramedic, agent, done). Here only the layout it needs.
    Without JS or with reduced motion nothing is set: all text shows over the final picture, unpinned.
    ========================================================================== */
@@ -1194,9 +1233,8 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
 }
 
 /* Pinned phones (Figma: iPhone 18 Pro 2-4). Each block of text takes its height as it comes in,
-   pushing the ones above it up, so it is clipped while it grows. The overlay's three shares (from 0
-   to 1, set by js/site.ts): none at first; with part 1 over his lower 61%; with part 2 over all of
-   him; with the link and contact the white base comes in under it. */
+   pushing the ones above it up, so it is clipped while it grows; the overlay under the text
+   (About, phones) rises with it. */
 @media (width <= 1023.98px) and (height >= 600px) {
   .stage[data-story] .about__stack .about__step {
     overflow: clip;
@@ -1206,14 +1244,6 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   .stage[data-story] .about__stack .about__step:is([data-story-shown], :focus-within) {
     height: auto !important;
     overflow: visible;
-  }
-
-  .stage[data-story] .about__media::before {
-    opacity: var(--overlay-base, 1);
-  }
-
-  .stage[data-story] .about__media::after {
-    height: calc(61% * var(--overlay-first, 1) + (39% + 12px) * var(--overlay-second, 1));
   }
 }
 
@@ -1258,12 +1288,18 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
 }
 
 /* ==========================================================================
-   Services (Figma services): a tilted grey surface behind two blocks, buy then sell. Each block has
-   a tilted picture and its text. Desktop: picture and text side by side, the sell block mirrored.
-   Phones: the picture rests at the screen edge, 32px of it showing, the text clear of it.
+   Services (Figma services): a tilted grey surface behind two blocks, looking then selling. Each
+   block has a tilted picture and its text. Desktop: picture and text side by side, the sell block
+   mirrored. Phones: the picture rests at the screen edge, 32px of it showing, the text clear of it.
+   Measurements from Figma: phones 126:273, desktop 110:301.
    ========================================================================== */
 .services {
-  --services-tilt: 2.05deg;
+  --services-tilt: 2.05deg; /* the surface's rise: 14px over 390px (126:290) */
+  --service-picture-tilt: 4.47deg; /* 126:276; the sell picture leans the other way */
+  --service-picture-width: 210px; /* 126:276 */
+  --service-picture-height: 320px;
+  --service-picture-showing: var(--space-8); /* how much of the resting picture shows */
+  --service-text-inset: var(--space-16); /* text from the screen edge on the picture's side */
 
   position: relative;
   overflow-x: clip;
@@ -1286,24 +1322,30 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   transform: skewY(calc(-1 * var(--services-tilt)));
 }
 
+/* At least as tall as its picture, so a short text never lets it reach into the next block */
 .service {
   position: relative;
   display: flex;
   align-items: center;
+  min-height: var(--service-picture-height);
 }
 
 .service__media {
+  --resting: calc(
+    var(--service-picture-showing) - var(--page-margin) - var(--service-picture-width)
+  );
+
   position: absolute;
   inset-block: 0;
-  left: calc(var(--space-8) - var(--page-margin) - 210px);
-  width: 210px;
-  height: 320px;
+  left: var(--resting);
+  width: var(--service-picture-width);
+  height: var(--service-picture-height);
   margin-block: auto;
 }
 
 .service--sell .service__media {
   left: auto;
-  right: calc(var(--space-8) - var(--page-margin) - 210px);
+  right: var(--resting);
 }
 
 .service__image {
@@ -1312,11 +1354,11 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   object-fit: cover;
   border-radius: var(--radius-picture);
   box-shadow: 0 var(--space-6) var(--space-12) var(--brand-shadow-strong);
-  rotate: 4.47deg;
+  rotate: var(--service-picture-tilt);
 }
 
 .service--sell .service__image {
-  rotate: -4.47deg;
+  rotate: calc(-1 * var(--service-picture-tilt));
 }
 
 .service__text {
@@ -1325,12 +1367,12 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   align-items: flex-start;
   gap: var(--space-8);
   width: 100%;
-  padding-left: calc(var(--space-16) - var(--page-margin));
+  padding-left: calc(var(--service-text-inset) - var(--page-margin));
 }
 
 .service--sell .service__text {
   align-items: flex-end;
-  padding: 0 calc(var(--space-16) - var(--page-margin)) 0 0;
+  padding: 0 calc(var(--service-text-inset) - var(--page-margin)) 0 0;
   text-align: right;
 }
 
@@ -1355,13 +1397,16 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   margin: 0;
 }
 
+/* Figma Link/Underline: 16px on a 32px line (110:315, 126:281) */
 .service__links a {
   font: var(--text-link);
 }
 
 @media (width >= 1024px) {
   .services {
-    --services-tilt: 3.3deg;
+    --services-tilt: 3.3deg; /* the surface's rise: 86px over 1500px (122:361) */
+    --service-media-share: 38.6%; /* the picture's column: 486px of 1260px (110:306) */
+    --service-picture-share: 88%; /* the picture in its column: 428px of 486px (110:307) */
 
     overflow-x: visible;
     padding-block: var(--space-32);
@@ -1387,6 +1432,7 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
 
   .service {
     gap: var(--space-6);
+    min-height: 0;
   }
 
   .service--sell {
@@ -1396,7 +1442,7 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   .service__media {
     position: relative;
     inset: auto;
-    flex: 0 0 38.6%;
+    flex: 0 0 var(--service-media-share);
     height: auto;
     padding-block: var(--space-12);
   }
@@ -1406,7 +1452,7 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   }
 
   .service__image {
-    width: 88%;
+    width: var(--service-picture-share);
     height: auto;
     aspect-ratio: 428 / 668;
     margin-inline: auto;
@@ -1453,12 +1499,13 @@ body.home .site-header:not([data-past-hero]) .brand__logo--light {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: var(--page-margin);
-  scrollbar-width: none;
 }
 
 /* Each card */
 .properties__cards > * {
-  flex: 0 0 min(384px, 100%);
+  --card-width: 384px; /* Property card in the rail (126:295) */
+
+  flex: 0 0 min(var(--card-width), 100%);
   scroll-snap-align: start;
 }
 

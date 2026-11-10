@@ -198,7 +198,7 @@ for (const lang of languages) {
         sell: [["sell", services.sell.sellLink]],
       } as const;
       for (const [id, links] of Object.entries(expected)) {
-        const block = page.locator(`[data-service="${id}"]`);
+        const block = page.locator(`.service--${id}`);
         await expect(block.locator(".service__title")).toHaveText(textAt(services, `${id}.title`));
         const anchors = block.locator(".service__links a");
         await expect(anchors).toHaveCount(links.length);
@@ -216,7 +216,7 @@ for (const lang of languages) {
         ["search", "propertyAlert"],
         ["sell", "estimation"],
       ] as const) {
-        const button = page.locator(`[data-service="${id}"] .service__action a`);
+        const button = page.locator(`.service--${id} .service__action a`);
         await expect(button).toHaveCount(1);
         await expect(button).toHaveAttribute("href", url(pageUrl(key, lang)));
         await expect(button).toHaveAttribute("data-dialog", `dialog-${key}`);
@@ -544,8 +544,8 @@ test.describe("phone animations", () => {
     const boxOf = async (selector: string) =>
       present(await page.locator(selector).boundingBox(), `the box of ${selector}`);
 
-    const buyPicture = await boxOf(".service--buy .service__media");
-    const buyTitle = await boxOf(".service--buy .service__title");
+    const buyPicture = await boxOf(".service--search .service__media");
+    const buyTitle = await boxOf(".service--search .service__title");
     expect(buyPicture.x + buyPicture.width, "buy: 32px showing on the left").toBeCloseTo(32, 0);
     expect(buyTitle.x, "buy: the text 64px from the left edge").toBeCloseTo(64, 0);
 
@@ -558,6 +558,35 @@ test.describe("phone animations", () => {
     ).toBeCloseTo(64, 0);
   });
 
+  test("with a short text, a service picture still stays inside its block", async ({ page }) => {
+    await page.route("**/ced/fr/", async (route) => {
+      const response = await route.fetch();
+      const html = (await response.text()).replaceAll(
+        /<p class="service__body">[^<]*<\/p>/g,
+        '<p class="service__body">Court.</p>',
+      );
+      await route.fulfill({ response, body: html });
+    });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("fr/");
+    const overhangs = await page.locator(".service").evaluateAll((blocks: Element[]) =>
+      blocks.map((block) => {
+        const media = block.querySelector(".service__media");
+        if (!(block instanceof HTMLElement) || !(media instanceof HTMLElement)) {
+          throw new Error("Expected a block with its picture");
+        }
+        return {
+          above: -media.offsetTop,
+          below: media.offsetTop + media.offsetHeight - block.offsetHeight,
+        };
+      }),
+    );
+    for (const { above, below } of overhangs) {
+      expect(above, "not above its block").toBeLessThanOrEqual(0);
+      expect(below, "not below its block").toBeLessThanOrEqual(0);
+    }
+  });
+
   test("property cards sit in a rail to swipe", async ({ page }) => {
     await page.goto("fr/");
     await expect(page.locator(".properties__cards")).toHaveCSS("overflow-x", "auto");
@@ -567,6 +596,34 @@ test.describe("phone animations", () => {
 
 test.describe("desktop: the stage and the animations", () => {
   test.skip(({ isMobile }) => isMobile, "desktop only");
+
+  for (const [width, height] of [
+    [1024, 600],
+    [1280, 560],
+  ] as const) {
+    test(`at ${width}×${height}: the hero, the agent and his travelling copy share one height`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("fr/");
+      const bottoms = await page.evaluate(() =>
+        [".hero", ".stage__pin", ".hero__photo", ".stage__agent", ".hero__cta"].map((selector) => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            throw new Error(`Missing ${selector}`);
+          }
+          return Math.round(element.getBoundingClientRect().bottom);
+        }),
+      );
+      const [hero, pin, photo, copy, button] = bottoms;
+      expect(pin, "the stage").toBe(hero);
+      expect(photo, "the agent stands on the hero's bottom edge").toBe(hero);
+      expect(copy, "his travelling copy too").toBe(hero);
+      expect(present(button, "the button"), "the button inside the hero").toBeLessThan(
+        present(hero, "the hero"),
+      );
+    });
+  }
 
   test("the slash moves out to the right as the hero scrolls away, with the scroll", async ({
     page,
@@ -594,7 +651,7 @@ test.describe("desktop: the stage and the animations", () => {
     await page.clock.pauseAt(new Date("2026-01-01T09:00:01"));
     await page.goto("fr/");
     for (const [side, sign] of [
-      ["buy", -1],
+      ["search", -1],
       ["sell", 1],
     ] as const) {
       const block = page.locator(`.service--${side}`);
@@ -957,44 +1014,55 @@ test.describe("About story: the text follows the scroll, the photo changes on it
     await expect.poll(() => layerOffsets(page, picture)).toEqual(agentBack);
   });
 
-  test("the overlay rises with each part's text, its white base comes in with the link and contact", async ({
+  test("the blur sits under the text and rises with it, the gradient just above it", async ({
     page,
   }) => {
     test.skip(!(await page.locator(".about__media").isVisible()), "phones: text over the photo");
-    /** The blur's height in heights of the picture, and the white base's opacity. */
+    /** Where the blur and the gradient start, from the top of the picture, and where the text starts. */
     const overlay = () =>
-      page.locator(".about__media").evaluate((media) => {
-        const blur = parseFloat(getComputedStyle(media, "::after").height);
-        const share = Math.round((blur / media.getBoundingClientRect().height) * 100) / 100;
-        return { share, base: Number(getComputedStyle(media, "::before").opacity) };
+      page.locator(".about__stack").evaluate((stack) => {
+        const media = stack.parentElement?.querySelector(".about__media");
+        if (!media) {
+          throw new Error("Expected the picture");
+        }
+        const shown = [...stack.querySelectorAll(".about__step")].filter(
+          (step) => step.getBoundingClientRect().height > 0,
+        );
+        const text = shown[0]?.getBoundingClientRect().top ?? stack.getBoundingClientRect().bottom;
+        const blur = stack.getBoundingClientRect().top;
+        const fade = parseFloat(getComputedStyle(stack, "::after").height);
+        return {
+          textTop: Math.round(text),
+          blurTop: Math.round(blur),
+          gradientTop: Math.round(blur - fade),
+          blurs: getComputedStyle(stack, "::before").backdropFilter.includes("blur"),
+          pictureTop: Math.round(media.getBoundingClientRect().top),
+        };
       });
 
     await scrollToStep(page, -1);
-    expect(await overlay(), "none before the story").toEqual({ share: 0, base: 0 });
-
-    await scrollToStep(page, 0.4);
-    expect((await overlay()).share, "half way up his lower part").toBeCloseTo(0.3, 1);
-    await page.clock.runFor(5000);
-    expect((await overlay()).share, "time alone does not move it").toBeCloseTo(0.3, 1);
+    const before = await overlay();
+    expect(before.blurs, "the blur keeps the text readable").toBe(true);
 
     await scrollToStep(page, 0.9);
-    expect((await overlay()).share, "over his lower part").toBeCloseTo(0.61, 2);
+    const firstPart = await overlay();
+    expect(firstPart.blurTop, "the blur starts where the text starts").toBe(firstPart.textTop);
+    expect(firstPart.gradientTop, "it rose with the first part").toBeLessThan(before.gradientTop);
+    expect(firstPart.gradientTop, "his upper part stays clear").toBeGreaterThan(
+      firstPart.pictureTop,
+    );
 
     await scrollToStep(page, 1.9);
-    expect((await overlay()).share, "over all of him").toBeGreaterThanOrEqual(1);
-    expect((await overlay()).base).toBe(0);
-
-    await scrollToStep(page, 2.3);
-    expect((await overlay()).base, "not yet while part 2 is read").toBe(0);
-
-    await scrollToStep(page, 2.7);
-    expect((await overlay()).base, "the white base, half way in").toBeCloseTo(0.5, 1);
-
-    await scrollToStep(page, 3.1);
-    expect((await overlay()).base).toBe(1);
+    const secondPart = await overlay();
+    expect(secondPart.blurTop).toBe(secondPart.textTop);
+    expect(secondPart.gradientTop, "it rose with the second part").toBeLessThan(
+      firstPart.gradientTop,
+    );
 
     await scrollToStep(page, 0.9);
-    expect(await overlay(), "scrolled back, it goes down again").toEqual({ share: 0.61, base: 0 });
+    expect((await overlay()).gradientTop, "scrolled back, it goes down again").toBe(
+      firstPart.gradientTop,
+    );
   });
 
   test("each photo change starts as its part's first line is in, then plays on its own clock, one at a time", async ({

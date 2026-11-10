@@ -68,6 +68,16 @@ export default defineConfig<SafeAreaOptions>({
       },
     },
     {
+      // A tablet in portrait: under the 1024px breakpoint, so it gets the phone layout
+      name: "mobile-ipad-portrait",
+      testMatch: "mobile/**/*.spec.ts",
+      use: {
+        ...devices["iPad (gen 7)"],
+        browserName: "chromium",
+        safeAreaInsets: { top: 24, right: 0, bottom: 20, left: 0 },
+      },
+    },
+    {
       name: "mobile-pixel-7",
       testMatch: "mobile/**/*.spec.ts",
       use: { ...devices["Pixel 7"], safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 } },

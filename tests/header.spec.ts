@@ -143,6 +143,7 @@ test("phones: the open menu covers the screen in Dark Red and keeps focus inside
   await page.goto("fr/");
   await page.locator(".nav-toggle").click();
   const nav = page.locator(".site-nav");
+  await expect(nav.locator("a").first(), "focus moves into the menu").toBeFocused();
   await expect(nav).toHaveCSS("background-color", "rgb(102, 0, 0)");
   const { width, height } = present(page.viewportSize(), "the viewport");
   const box = present(await nav.boundingBox(), "the menu's box");

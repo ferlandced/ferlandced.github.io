@@ -86,14 +86,14 @@ translated: true
     <h2 class="visually-hidden" id="services-heading">{{ home.services.heading }}</h2>
     <div class="container services__content">
       {% set services = [
-        { id: "search", side: "buy", form: "propertyAlert",
+        { id: "search", form: "propertyAlert",
           links: [{ label: home.services.search.buyLink, page: "buy" }, { label: home.services.search.rentLink, page: "rent" }] },
-        { id: "sell", side: "sell", form: "estimation",
+        { id: "sell", form: "estimation",
           links: [{ label: home.services.sell.sellLink, page: "sell" }] }
       ] %}
       {% for service in services %}{% set copy = home.services[service.id] %}
-      <div class="service service--{{ service.side }}" data-service="{{ service.id }}">
-        <div class="service__media">{% if copy.image %}<img class="service__image" src="{{ copy.image }}" alt="{{ copy.imageAlt }}" width="428" height="668" loading="lazy" decoding="async">{% endif %}</div>
+      <div class="service service--{{ service.id }}">
+        <div class="service__media">{% if copy.image %}<img class="service__image" src="{{ copy.image }}" alt="{{ copy.imageAlt }}" width="900" height="1400" loading="lazy" decoding="async">{% endif %}</div>
         <div class="service__text">
           <h3 class="service__title">{{ copy.title }}</h3>
           <p class="service__body">{{ copy.text }}</p>

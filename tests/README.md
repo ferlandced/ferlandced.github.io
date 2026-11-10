@@ -20,7 +20,9 @@ These two folders run on their own projects, never on the four above.
 
 - `desktop/`: `desktop-chromium`, `desktop-webkit` (1440×900). No touch, no phone emulation.
 - `mobile/`: `mobile-iphone-14-pro` (insets 59 top, 34 bottom), `mobile-iphone-14-pro-landscape`
-  (59 left and right, 21 bottom), `mobile-pixel-7` (no insets). `mobile/support/safe-area.ts` hands
+  (59 left and right, 21 bottom), `mobile-ipad-portrait` (810×1080, insets 24 top, 20 bottom: a
+  tablet in portrait, which gets the phone layout under the 1024px breakpoint), `mobile-pixel-7` (no
+  insets). `mobile/support/safe-area.ts` hands
   each project's `safeAreaInsets` to Chromium (`Emulation.setSafeAreaInsetsOverride`), so
   `env(safe-area-inset-*)` resolves as on the device. The iPhones therefore run in Chromium:
   WebKit has no such override, and Safari's own status bar and toolbar never appear in a test.

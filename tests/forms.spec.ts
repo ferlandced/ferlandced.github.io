@@ -632,7 +632,7 @@ test.describe("dialog", () => {
       const rentTexts = form.locator('[data-when-intent="location"]');
       const buyTexts = form.locator('[data-when-intent="achat"]');
 
-      await page.locator('[data-service="search"] a[data-dialog="dialog-propertyAlert"]').click();
+      await page.locator('.service--search a[data-dialog="dialog-propertyAlert"]').click();
       await expect(dialog).toHaveJSProperty("open", true);
       await expect(form.locator('input[name="intent"]:checked'), "nothing chosen yet").toHaveCount(
         0,
@@ -650,7 +650,7 @@ test.describe("dialog", () => {
       expect(sent.subject).toBe(rental);
 
       await dialog.locator(".form-panel__close").click();
-      await page.locator('[data-service="search"] a[data-dialog="dialog-propertyAlert"]').click();
+      await page.locator('.service--search a[data-dialog="dialog-propertyAlert"]').click();
       await expect(
         form.locator('input[name="intent"]:checked'),
         "a sent form starts over",
@@ -669,7 +669,7 @@ test.describe("dialog", () => {
   test("the sell button opens the estimation without an intent", async ({ page, submissions }) => {
     await page.goto("en/");
     const form = page.locator("#dialog-estimation form[data-wizard]");
-    await page.locator('[data-service="sell"] a[data-dialog="dialog-estimation"]').click();
+    await page.locator('.service--sell a[data-dialog="dialog-estimation"]').click();
     await fillStep1(form, "estimation");
     await next(form);
     await skip(form);

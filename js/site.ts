@@ -1,6 +1,6 @@
 // Burger menu below the desktop breakpoint: a full-screen menu over the page (css/site.css, Phone
-// menu). While it is open, the rest of the page is inert, so focus stays in the menu. Without JS the
-// nav stays visible (see .js-nav in site.css).
+// menu). Opening it moves focus to its first link; while it is open the rest of the page is inert,
+// so focus stays in the menu. Without JS the nav stays visible (see .js-nav in site.css).
 (() => {
   const root = document.querySelector<HTMLElement>("[data-nav-root]");
   const toggle = root?.querySelector<HTMLButtonElement>(".nav-toggle");
@@ -28,7 +28,11 @@
   };
 
   toggle.addEventListener("click", () => {
-    setOpen(!root.hasAttribute("data-open"));
+    const open = !root.hasAttribute("data-open");
+    setOpen(open);
+    if (open) {
+      nav.querySelector("a")?.focus();
+    }
   });
   nav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
@@ -47,30 +51,16 @@
 })();
 
 // Home page animations: GSAP, ScrollTrigger and SplitText, which only the home page loads (before
-// this script). Each section animates on its own, from its own position on the page, so sections can
-// be added, removed or reordered. The hero and About share the stage and the About story (below).
-// Reveals play once and then stay. Without the libraries, without JS
-// or with reduced motion, everything shows in its final place.
+// this script): the About story, then the reveals of the other sections. Without the libraries,
+// without JS or with reduced motion, everything shows in its final place.
 const hasScrollEffects =
   typeof gsap !== "undefined" &&
   typeof ScrollTrigger !== "undefined" &&
   typeof SplitText !== "undefined";
-const LAYOUTS = {
-  desktop: "(width >= 1024px)",
-  phone: "(width <= 1023.98px)",
-  motion: "(prefers-reduced-motion: no-preference)",
-};
-// Sections whose reveal has played: never hidden again, even when the layout changes
-const revealed = new WeakSet<Element>();
 
 if (hasScrollEffects) {
   gsap.registerPlugin(ScrollTrigger, SplitText);
   gsap.defaults({ ease: "power3.out" });
-
-  // ScrollTrigger measures again on resize and once images load; web fonts can move text too
-  void document.fonts.ready.then(() => {
-    ScrollTrigger.refresh();
-  });
 
   // ScrollTrigger measures the page as it loads, which can cancel the browser's jump to a
   // #section: once measured, the page goes there.
@@ -84,121 +74,9 @@ if (hasScrollEffects) {
   }
 }
 
-interface LineReveal {
-  x: number;
-  duration: number;
-  stagger: number;
-}
-
-// Text comes in line by line: each line slides in from x and fades in, inside its own mask. The
-// lines are measured as they play, and put back to plain text once in.
-const revealLines = (
-  timeline: gsap.core.Timeline,
-  elements: Element[],
-  { x, duration, stagger }: LineReveal,
-  position?: gsap.Position,
-) => {
-  const split = SplitText.create(elements, { type: "lines", mask: "lines" });
-  timeline
-    .set(elements, { opacity: 1 }, position)
-    .from(split.lines, { x, opacity: 0, duration, stagger }, "<")
-    .call(() => {
-      split.revert();
-    });
-};
-
-// A section's reveal: `hidden` waits faded out (still read by screen readers) until `trigger`
-// reaches `start`, then `build` plays it, once. A section already above the screen (opened at a
-// later section) shows at once, as does one where the keyboard brings focus.
-const revealOnce = (
-  context: gsap.Context,
-  section: HTMLElement,
-  {
-    trigger,
-    start,
-    hidden,
-    build,
-  }: {
-    trigger: Element;
-    start: string;
-    hidden: Element[];
-    build: (timeline: gsap.core.Timeline) => void;
-  },
-) => {
-  if (revealed.has(section)) {
-    return;
-  }
-  gsap.set(hidden, { opacity: 0 });
-  let timeline: gsap.core.Timeline | undefined;
-  const play = () => {
-    if (timeline) {
-      return;
-    }
-    revealed.add(section);
-    const played = context.add(() => {
-      const steps = gsap.timeline();
-      build(steps);
-      return steps;
-    });
-    timeline = played;
-    if (section.getBoundingClientRect().bottom < 0) {
-      played.progress(1);
-    }
-  };
-  ScrollTrigger.create({ trigger, start, once: true, onEnter: play });
-  const showAtOnce = () => {
-    play();
-    timeline?.progress(1);
-  };
-  section.addEventListener("focusin", showAtOnce);
-  return () => {
-    section.removeEventListener("focusin", showAtOnce);
-  };
-};
-
-// Hero. Desktop: still on load; as the hero scrolls away the slash moves out to the right, with the
-// scroll. Phones: on load, the lockup rises in, one part after the other.
-(() => {
-  const hero = document.querySelector<HTMLElement>(".hero");
-  if (!hasScrollEffects || !hero) {
-    return;
-  }
-  const CONFIG = {
-    band: { start: "top top", end: "bottom top" },
-    lockup: { y: 24, duration: 0.8, stagger: 0.1, delay: 0.2 },
-  };
-  gsap.matchMedia().add(
-    LAYOUTS,
-    (context) => {
-      const { desktop, phone, motion } = context.conditions ?? {};
-      if (!motion) {
-        return;
-      }
-      if (desktop) {
-        gsap.to(".hero__band", {
-          xPercent: 100,
-          ease: "none",
-          scrollTrigger: { trigger: hero, ...CONFIG.band, scrub: true },
-        });
-      }
-      if (phone && !revealed.has(hero)) {
-        revealed.add(hero);
-        gsap.from(".hero__signature, .hero__name, .hero__role, .hero__tagline, .hero__cta", {
-          y: CONFIG.lockup.y,
-          opacity: 0,
-          duration: CONFIG.lockup.duration,
-          stagger: CONFIG.lockup.stagger,
-          delay: CONFIG.lockup.delay,
-        });
-      }
-    },
-    hero,
-  );
-})();
-
 // About story. About holds on screen (sticky, css/site.css, About story) while the visitor scrolls
 // four short steps. Screens 600px tall or more: the text follows the scroll, forwards and back; on
-// phones each block also grows line by line and the overlay rises with it. Shorter screens: About
+// phones each block also grows line by line, its blur rising with it. Shorter screens: About
 // is not held and its parts play one after the other once it arrives.
 // The photo changes on its own clock either way, one change at a time: part 1 brings the paramedic,
 // who then stays at least PARAMEDIC_HELD_S; part 2 brings the agent back, who then stays.
@@ -326,21 +204,6 @@ const revealOnce = (
     }
     comeIn(link, 2.4, 2.7);
     comeIn(contact, 2.7, 3);
-    if (growsLineByLine) {
-      const overlay = [
-        { property: "--overlay-first", from: 0, to: 0.8 },
-        { property: "--overlay-second", from: 1, to: 1.8 },
-        { property: "--overlay-base", from: 2.4, to: 3 },
-      ];
-      for (const { property, from, to } of overlay) {
-        story.fromTo(
-          stage,
-          { [property]: 0 },
-          { [property]: 1, duration: to - from },
-          from - FIRST,
-        );
-      }
-    }
     story.set({}, {}, LAST - FIRST);
 
     // On phones a part's first line is in once that share of its full height shows
@@ -437,34 +300,223 @@ const revealOnce = (
   );
 })();
 
-// Services: each block on its own, once it is 30% into the screen. Desktop: the picture comes in from
-// its outer side (buy from the left, sell from the right), then the text, line by line. Phones (Figma
-// enter states 126:413, 126:415): the picture fades in at the centre, holds, then moves aside to rest
-// at the screen edge (css/site.css), then the text comes in line by line.
+// Reveals of the other sections. Each one is triggered and scoped by its own section, with its
+// timings in one CONFIG, so sections can be added, removed or reordered. A reveal plays once, when
+// its trigger's top reaches 70% of the screen height, and never hides content again.
 (() => {
-  const blocks = [...document.querySelectorAll<HTMLElement>(".service")];
-  if (!hasScrollEffects || !blocks.length) {
+  if (!hasScrollEffects) {
     return;
   }
-  const CONFIG = {
-    start: "top 70%",
-    desktop: { mediaX: 80, mediaDuration: 0.9 },
-    phone: { scale: 0.92, enterDuration: 0.6, hold: 0.3, moveDuration: 0.9 },
-    line: { x: 24, duration: 0.8, stagger: 0.08 },
-    item: { duration: 0.6, stagger: 0.08 },
+  const LAYOUTS = {
+    desktop: "(width >= 1024px)",
+    phone: "(width <= 1023.98px)",
+    motion: "(prefers-reduced-motion: no-preference)",
+  };
+  // Sections whose reveal has played: never hidden again, even when the layout changes
+  const revealed = new WeakSet<Element>();
+
+  interface LineReveal {
+    x: number;
+    duration: number;
+    stagger: number;
+  }
+
+  // Text comes in line by line: each line slides in from x and fades in, inside its own mask. The
+  // lines are measured as they play, and put back to plain text once in.
+  const revealLines = (
+    timeline: gsap.core.Timeline,
+    elements: Element[],
+    { x, duration, stagger }: LineReveal,
+    position?: gsap.Position,
+  ) => {
+    const split = SplitText.create(elements, { type: "lines", mask: "lines" });
+    timeline
+      .set(elements, { opacity: 1 }, position)
+      .from(split.lines, { x, opacity: 0, duration, stagger }, "<")
+      .call(() => {
+        split.revert();
+      });
   };
 
-  for (const block of blocks) {
-    const media = block.querySelector<HTMLElement>(".service__media");
-    const lines = [...block.querySelectorAll<HTMLElement>(".service__title, .service__body")];
-    const items = [...block.querySelectorAll<HTMLElement>(".service__action, .service__links")];
-    if (!media) {
-      continue;
+  // A section's reveal: `hidden` waits faded out (still read by screen readers) until `trigger`
+  // reaches `start`, then `build` plays it, once. A section already above the screen (opened at a
+  // later section) shows at once, as does one where the keyboard brings focus.
+  const revealOnce = (
+    context: gsap.Context,
+    section: HTMLElement,
+    {
+      trigger,
+      start,
+      hidden,
+      build,
+    }: {
+      trigger: Element;
+      start: string;
+      hidden: Element[];
+      build: (timeline: gsap.core.Timeline) => void;
+    },
+  ) => {
+    if (revealed.has(section)) {
+      return;
     }
-    // The picture's side: -1 left (buy), 1 right (sell); the text comes in from that side
-    const side = block.classList.contains("service--sell") ? 1 : -1;
-    const fromCentre = () => block.clientWidth / 2 - (media.offsetLeft + media.offsetWidth / 2);
+    gsap.set(hidden, { opacity: 0 });
+    let timeline: gsap.core.Timeline | undefined;
+    const play = () => {
+      if (timeline) {
+        return;
+      }
+      revealed.add(section);
+      const played = context.add(() => {
+        const steps = gsap.timeline();
+        build(steps);
+        return steps;
+      });
+      timeline = played;
+      if (section.getBoundingClientRect().bottom < 0) {
+        played.progress(1);
+      }
+    };
+    ScrollTrigger.create({ trigger, start, once: true, onEnter: play });
+    const showAtOnce = () => {
+      play();
+      timeline?.progress(1);
+    };
+    section.addEventListener("focusin", showAtOnce);
+    return () => {
+      section.removeEventListener("focusin", showAtOnce);
+    };
+  };
 
+  // Hero. Desktop: still on load; as the hero scrolls away the slash moves out to the right, with the
+  // scroll. Phones: on load, the lockup rises in, one part after the other.
+  const revealHero = () => {
+    const hero = document.querySelector<HTMLElement>(".hero");
+    if (!hero) {
+      return;
+    }
+    const CONFIG = {
+      band: { start: "top top", end: "bottom top" },
+      lockup: { y: 24, duration: 0.8, stagger: 0.1, delay: 0.2 },
+    };
+    gsap.matchMedia().add(
+      LAYOUTS,
+      (context) => {
+        const { desktop, phone, motion } = context.conditions ?? {};
+        if (!motion) {
+          return;
+        }
+        if (desktop) {
+          gsap.to(".hero__band", {
+            xPercent: 100,
+            ease: "none",
+            scrollTrigger: { trigger: hero, ...CONFIG.band, scrub: true },
+          });
+        }
+        if (phone && !revealed.has(hero)) {
+          revealed.add(hero);
+          gsap.from(".hero__signature, .hero__name, .hero__role, .hero__tagline, .hero__cta", {
+            y: CONFIG.lockup.y,
+            opacity: 0,
+            duration: CONFIG.lockup.duration,
+            stagger: CONFIG.lockup.stagger,
+            delay: CONFIG.lockup.delay,
+          });
+        }
+      },
+      hero,
+    );
+  };
+
+  // Services: each block on its own, once its top reaches 70% of the screen. Desktop: the picture
+  // comes in from its outer side (looking from the left, selling from the right), then the text, line
+  // by line. Phones (Figma enter states 126:413, 126:415): the picture fades in at the centre, holds,
+  // then moves aside to rest at the screen edge (css/site.css), then the text comes in line by line.
+  const revealServices = () => {
+    const blocks = [...document.querySelectorAll<HTMLElement>(".service")];
+    if (!blocks.length) {
+      return;
+    }
+    const CONFIG = {
+      start: "top 70%",
+      desktop: { mediaX: 80, mediaDuration: 0.9 },
+      phone: { scale: 0.92, enterDuration: 0.6, hold: 0.3, moveDuration: 0.9 },
+      line: { x: 24, duration: 0.8, stagger: 0.08 },
+      item: { duration: 0.6, stagger: 0.08 },
+    };
+
+    for (const block of blocks) {
+      const media = block.querySelector<HTMLElement>(".service__media");
+      const lines = [...block.querySelectorAll<HTMLElement>(".service__title, .service__body")];
+      const items = [...block.querySelectorAll<HTMLElement>(".service__action, .service__links")];
+      if (!media) {
+        continue;
+      }
+      // The picture's side: -1 left (looking for a property), 1 right (sell); the text comes in from that side
+      const side = block.classList.contains("service--sell") ? 1 : -1;
+      const fromCentre = () => block.clientWidth / 2 - (media.offsetLeft + media.offsetWidth / 2);
+
+      gsap.matchMedia().add(
+        LAYOUTS,
+        (context) => {
+          const { desktop, motion } = context.conditions ?? {};
+          if (!motion) {
+            return;
+          }
+          return revealOnce(context, block, {
+            trigger: block,
+            start: CONFIG.start,
+            hidden: [media, ...lines, ...items],
+            build: (timeline) => {
+              if (desktop) {
+                timeline.fromTo(
+                  media,
+                  { x: side * CONFIG.desktop.mediaX, opacity: 0 },
+                  { x: 0, opacity: 1, duration: CONFIG.desktop.mediaDuration },
+                );
+              } else {
+                timeline
+                  .fromTo(
+                    media,
+                    { x: fromCentre(), scale: CONFIG.phone.scale, opacity: 0 },
+                    { scale: 1, opacity: 1, duration: CONFIG.phone.enterDuration },
+                  )
+                  .to(media, {
+                    x: 0,
+                    duration: CONFIG.phone.moveDuration,
+                    ease: "power3.inOut",
+                    delay: CONFIG.phone.hold,
+                  });
+              }
+              revealLines(timeline, lines, { ...CONFIG.line, x: side * CONFIG.line.x });
+              timeline.fromTo(
+                items,
+                { x: side * CONFIG.line.x, opacity: 0 },
+                { x: 0, opacity: 1, ...CONFIG.item },
+                "-=0.4",
+              );
+            },
+          });
+        },
+        block,
+      );
+    }
+  };
+
+  // My properties: once the title reaches 70% of the screen, the cards come into place one after the
+  // other. Desktop: they rise; phones: they slide in from the right, into the rail.
+  const revealProperties = () => {
+    const section = document.querySelector<HTMLElement>(".properties");
+    const title = section?.querySelector(".properties__title");
+    const cards = [...(section?.querySelectorAll<HTMLElement>(".card") ?? [])];
+    if (!section || !title || !cards.length) {
+      return;
+    }
+    const CONFIG = {
+      start: "top 70%",
+      desktop: { y: 48, stagger: 0.2 },
+      phone: { x: 64, stagger: 0.15 },
+      duration: 0.9,
+    };
     gsap.matchMedia().add(
       LAYOUTS,
       (context) => {
@@ -472,85 +524,28 @@ const revealOnce = (
         if (!motion) {
           return;
         }
-        return revealOnce(context, block, {
-          trigger: block,
+        const from = desktop ? { y: CONFIG.desktop.y } : { x: CONFIG.phone.x };
+        const stagger = desktop ? CONFIG.desktop.stagger : CONFIG.phone.stagger;
+        return revealOnce(context, section, {
+          trigger: title,
           start: CONFIG.start,
-          hidden: [media, ...lines, ...items],
+          hidden: cards,
           build: (timeline) => {
-            if (desktop) {
-              timeline.fromTo(
-                media,
-                { x: side * CONFIG.desktop.mediaX, opacity: 0 },
-                { x: 0, opacity: 1, duration: CONFIG.desktop.mediaDuration },
-              );
-            } else {
-              timeline
-                .fromTo(
-                  media,
-                  { x: fromCentre(), scale: CONFIG.phone.scale, opacity: 0 },
-                  { scale: 1, opacity: 1, duration: CONFIG.phone.enterDuration },
-                )
-                .to(media, {
-                  x: 0,
-                  duration: CONFIG.phone.moveDuration,
-                  ease: "power3.inOut",
-                  delay: CONFIG.phone.hold,
-                });
-            }
-            revealLines(timeline, lines, { ...CONFIG.line, x: side * CONFIG.line.x });
             timeline.fromTo(
-              items,
-              { x: side * CONFIG.line.x, opacity: 0 },
-              { x: 0, opacity: 1, ...CONFIG.item },
-              "-=0.4",
+              cards,
+              { ...from, opacity: 0 },
+              { x: 0, y: 0, opacity: 1, duration: CONFIG.duration, stagger },
             );
           },
         });
       },
-      block,
+      section,
     );
-  }
-})();
-
-// My properties: once the title is 30% into the screen, the cards come into place one after the
-// other. Desktop: they rise; phones: they slide in from the right, into the rail.
-(() => {
-  const section = document.querySelector<HTMLElement>(".properties");
-  const title = section?.querySelector(".properties__title");
-  const cards = [...(section?.querySelectorAll<HTMLElement>(".card") ?? [])];
-  if (!hasScrollEffects || !section || !title || !cards.length) {
-    return;
-  }
-  const CONFIG = {
-    start: "top 70%",
-    desktop: { y: 48, stagger: 0.2 },
-    phone: { x: 64, stagger: 0.15 },
-    duration: 0.9,
   };
-  gsap.matchMedia().add(
-    LAYOUTS,
-    (context) => {
-      const { desktop, motion } = context.conditions ?? {};
-      if (!motion) {
-        return;
-      }
-      const from = desktop ? { y: CONFIG.desktop.y } : { x: CONFIG.phone.x };
-      const stagger = desktop ? CONFIG.desktop.stagger : CONFIG.phone.stagger;
-      return revealOnce(context, section, {
-        trigger: title,
-        start: CONFIG.start,
-        hidden: cards,
-        build: (timeline) => {
-          timeline.fromTo(
-            cards,
-            { ...from, opacity: 0 },
-            { x: 0, y: 0, opacity: 1, duration: CONFIG.duration, stagger },
-          );
-        },
-      });
-    },
-    section,
-  );
+
+  revealHero();
+  revealServices();
+  revealProperties();
 })();
 
 // The header is past the hero once About reaches it: from there it is white, with the dark logo and
