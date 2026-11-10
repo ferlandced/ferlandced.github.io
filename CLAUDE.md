@@ -92,6 +92,7 @@ During development, run the smallest relevant test suite first to get fast feedb
 - Performance: WebP images with `width` and `height`, lazy loading below the fold, no layout shift. Do not encode AVIF with macOS `sips` (broken in Firefox).
 - New behaviour comes with a test, or an updated one. Tests read copy from the content files, never hardcoded strings.
 - Changing a content file's structure means updating `admin/config.yml`, `lib/content.ts`, the templates and the tests together. The CMS editor is not technical: French labels, hints that say where the text appears on the site, one file per page or part.
+- ALWAYS evaluate the usage of existing solid libraries before developing in house. Before choosing one, bring Matteo the candidates with their reliability, ease of use, adoption (weekly downloads, stars), maintenance and licence, and a recommendation; he picks.
 - No new dependency (runtime or dev), external service or third-party request without Matteo's approval. Pin exact versions.
 - Secrets live in GitHub Actions secrets, never in the repo or in logs.
 - Keep the docs true: when a rule or decision changes, update CLAUDE.md, DESIGN.md or tests/README.md in the same PR.
