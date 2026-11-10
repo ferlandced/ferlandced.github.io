@@ -82,6 +82,13 @@ export default defineConfig([
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
     rules: {
       ...playwright.configs["flat/recommended"].rules,
+      // Skipping a test on the wrong device is fine; an unconditional skip still warns
+      "playwright/no-skipped-test": ["warn", { allowConditional: true }],
+      // These helpers hold the assertions of the tests that call them
+      "playwright/expect-expect": [
+        "warn",
+        { assertFunctionNames: ["check", "expectOptions", "expectAllShown"] },
+      ],
       "max-nested-callbacks": ["error", 4],
       // page.evaluate((y) => …, y) runs in the browser and must take its values as arguments
       "@typescript-eslint/no-shadow": "off",

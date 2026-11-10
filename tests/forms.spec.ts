@@ -237,8 +237,8 @@ for (const [key, formConfig] of FORM_ENTRIES) {
         const button = visibleStep(form).locator(".form-skip");
         await button.click();
         await expect(button).toBeDisabled();
-        // A second click on the disabled button must not send again; the click itself may fail
-        await button.click({ force: true }).catch(() => undefined);
+        // A second click on the disabled button must not send again
+        await button.dispatchEvent("click");
         await expect(form.locator("[data-success]")).toBeVisible();
         expect(submissions).toHaveLength(1);
       });

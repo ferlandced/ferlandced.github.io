@@ -8,33 +8,44 @@ const contentPages = pages.filter(
 );
 
 for (const sitePage of contentPages) {
-  test(`${sitePage.name}: title, text and review banner`, async ({ page }) => {
-    const pageContent = present(content[sitePage.contentKey], `content for ${sitePage.contentKey}`);
+  const pageContent = present(content[sitePage.contentKey], `content for ${sitePage.contentKey}`);
+  const firstHeading = /^## (.+)$/m.exec(pageContent.body[sitePage.lang])?.[1];
+
+  test(`${sitePage.name}: title and description`, async ({ page }) => {
     await page.goto(sitePage.path);
     await expect(page.locator("h1")).toHaveText(pageContent.title[sitePage.lang]);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
       pageContent.description[sitePage.lang],
     );
-    // First heading of the Markdown body is rendered
-    const firstHeading = /^## (.+)$/m.exec(pageContent.body[sitePage.lang])?.[1];
-    if (firstHeading) {
-      await expect(page.locator("main h2").first()).toHaveText(firstHeading);
-    }
+  });
 
-    // Drafts pending legal review: one banner before the title, one after the text
-    const banners = page.locator("main > .legal-banner");
-    if (pageContent.reviewPending) {
+  if (firstHeading) {
+    test(`${sitePage.name}: the Markdown body, from its first heading`, async ({ page }) => {
+      await page.goto(sitePage.path);
+      await expect(page.locator("main h2").first()).toHaveText(firstHeading);
+    });
+  }
+
+  // Drafts pending legal review: one banner before the title, one after the text
+  if (pageContent.reviewPending) {
+    const bannerTitle = present(pageContent.draftBanner, `draft banner for ${sitePage.contentKey}`)
+      .title[sitePage.lang];
+
+    test(`${sitePage.name}: a review banner before the title and after the text`, async ({
+      page,
+    }) => {
+      await page.goto(sitePage.path);
+      const banners = page.locator("main > .legal-banner");
       await expect(banners).toHaveCount(2);
-      await expect(banners.first()).toContainText(
-        present(pageContent.draftBanner, `draft banner for ${sitePage.contentKey}`).title[
-          sitePage.lang
-        ],
-      );
+      await expect(banners.first()).toContainText(bannerTitle);
       await expect(page.locator("main > :first-child")).toHaveClass(/legal-banner/);
       await expect(page.locator("main > :last-child")).toHaveClass(/legal-banner/);
-    } else {
-      await expect(banners).toHaveCount(0);
-    }
-  });
+    });
+  } else {
+    test(`${sitePage.name}: no review banner`, async ({ page }) => {
+      await page.goto(sitePage.path);
+      await expect(page.locator("main > .legal-banner")).toHaveCount(0);
+    });
+  }
 }

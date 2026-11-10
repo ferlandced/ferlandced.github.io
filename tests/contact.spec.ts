@@ -53,6 +53,14 @@ for (const lang of languages) {
   });
 
   for (const option of site.contactOptions) {
+    // The intent the form starts with: a hidden field (estimation) holds it, empty without one;
+    // radios (property alert) have it picked, or none; the other forms have no intent
+    const startingIntents =
+      {
+        estimation: [option.intent ?? ""],
+        propertyAlert: option.intent ? [option.intent] : [],
+      }[option.form] ?? [];
+
     test(`popup (${lang}): ${option.id} closes the popup and opens its form`, async ({ page }) => {
       const popup = await openContactPopup(page, lang);
       await popup
@@ -63,19 +71,14 @@ for (const lang of languages) {
       await expect(popup).toHaveJSProperty("open", false);
       const dialog = page.locator(`#dialog-${option.form}`);
       await expect(dialog).toHaveJSProperty("open", true);
-      // A hidden intent field (estimation) holds the intent; radios (property alert) have it picked
-      const hidden = dialog.locator('input[type="hidden"][name="intent"]');
-      const radios = dialog.locator('input[type="radio"][name="intent"]');
-      if (await hidden.count()) {
-        await expect(hidden).toHaveValue(option.intent || "");
-      } else if (await radios.count()) {
-        const picked = dialog.locator('input[name="intent"]:checked');
-        if (option.intent) {
-          await expect(picked).toHaveValue(option.intent);
-        } else {
-          await expect(picked).toHaveCount(0);
-        }
-      }
+      const intents = await dialog
+        .locator('input[name="intent"]')
+        .evaluateAll((inputs: HTMLInputElement[]) =>
+          inputs
+            .filter((input) => input.type === "hidden" || input.checked)
+            .map((input) => input.value),
+        );
+      expect(intents, "the intent it starts with").toEqual(startingIntents);
     });
 
     test(`Contact page (${lang}): ${option.id} goes to the form page`, async ({ page }) => {
@@ -103,12 +106,16 @@ test("popup: Escape and the X close it", async ({ page }) => {
   await expect(popup).toHaveJSProperty("open", false);
 });
 
-test("copy button: desktop only, copies the number and confirms", async ({ page, isMobile }) => {
+test("copy button: hidden on touch screens, which can call", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "touch screens");
+  const popup = await openContactPopup(page, "fr");
+  await expect(popup.locator("[data-copy]")).toBeHidden();
+});
+
+test("copy button: copies the number and confirms", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop: touch screens hide it");
   const popup = await openContactPopup(page, "fr");
   const copy = popup.locator("[data-copy]");
-  if (isMobile) {
-    return expect(copy).toBeHidden();
-  }
   await page.evaluate(() => {
     window.copied = [];
     navigator.clipboard.writeText = (text) => {

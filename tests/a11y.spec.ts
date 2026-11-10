@@ -72,11 +72,10 @@ for (const [key, formConfig] of FORM_ENTRIES) {
       await check(page, `#dialog-${key}`);
     }
     await fillStep1(form, key);
-    for (let index = formConfig.contactStep; index < formConfig.steps; index++) {
+    await check(page, `#dialog-${key}`);
+    for (let index = formConfig.contactStep + 1; index < formConfig.steps; index++) {
+      await next(form);
       await check(page, `#dialog-${key}`);
-      if (index < formConfig.steps - 1) {
-        await next(form);
-      }
     }
   });
 }

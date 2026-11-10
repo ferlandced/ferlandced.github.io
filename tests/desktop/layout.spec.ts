@@ -43,7 +43,10 @@ for (const path of paths) {
   });
 }
 
-for (const width of [1440, 1800]) {
+for (const [width, expectedMargin] of [
+  [1440, 120],
+  [1800, 120],
+] as const) {
   test(`home at ${width}px: every section's content in the centred 1500px container`, async ({
     page,
   }) => {
@@ -54,7 +57,6 @@ for (const width of [1440, 1800]) {
     );
     await expect(containers).toHaveCount(3);
     const expectedWidth = Math.min(width, 1500);
-    const expectedMargin = width >= 1440 ? 120 : 0;
     for (const container of await containers.all()) {
       const box = present(await container.boundingBox(), "a section's container");
       expect(box.width).toBeCloseTo(expectedWidth, 0);
